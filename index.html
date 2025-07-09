@@ -182,7 +182,7 @@
       <button type="submit">Cadastrar Cliente</button>
     </form>
 
-    <ul id="lista-clientes"></ul>
+   
   </main>
 
   <script>
@@ -244,7 +244,7 @@
       formCliente.reset();
     });
 
-    function adicionarClienteNaLista(cliente) {
+     {
       const item = document.createElement('li');
       item.textContent = `${cliente.nome} - ${cliente.telefone}`;
       listaClientes.appendChild(item);
