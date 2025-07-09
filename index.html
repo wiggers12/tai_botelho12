@@ -54,16 +54,7 @@
       pointer-events: none; /* Impede cliques e interações quando invisível */
     }
 
-    /* Estilo para o texto "Bem-vinda ao" */
-    .splash-welcome-text {
-      color: #DDD; /* Cinza claro suave */
-      font-size: 1.8em;
-      font-weight: 300;
-      margin-bottom: 5px; /* Espaço entre os textos */
-      text-shadow: 0 0 5px rgba(255, 215, 0, 0.1); /* Sombra dourada sutil */
-    }
-
-    /* Estilo para "TB" (Iniciais - Dourado e Maior) */
+    /* Estilo para o texto "TB" (Iniciais - Dourado e Maior) */
     .splash-initials {
       font-family: 'Poppins', sans-serif;
       font-size: 8em; /* Tamanho bem grande para destaque */
@@ -91,7 +82,7 @@
     #splash-enter-button {
         background: linear-gradient(45deg, #FFD700, #DAA520); /* Gradiente dourado para o botão */
         color: #000; /* Texto preto para contraste no botão dourado */
-        padding: 15px 30px;
+        padding: 10px 30px; /* **Ajustado: Diminuído o padding vertical de 15px para 10px** */
         border: none;
         border-radius: 50px; /* Borda bem arredondada (pill shape) */
         cursor: pointer;
@@ -392,9 +383,6 @@
       }
 
       /* Splash screen em telas menores */
-      .splash-welcome-text {
-        font-size: 1.2em;
-      }
       .splash-initials {
         font-size: 5em;
       }
@@ -403,7 +391,7 @@
       }
       #splash-enter-button {
           font-size: 1em;
-          padding: 12px 25px;
+          padding: 8px 20px; /* **Ajustado para telas menores também** */
           margin-top: 30px;
       }
     }
@@ -411,10 +399,10 @@
 </head>
 <body>
   <div id="splash-screen">
-    <p class="splash-welcome-text">Bem-vinda ao</p>
     <h1 class="splash-initials">TB</h1>
     <p class="splash-full-name">Espaço Tai Botelho</p>
-    <button id="splash-enter-button">Bem-vinda</button> </div>
+    <button id="splash-enter-button">Bem-vinda</button>
+  </div>
   <header>
     <h1>Espaço Tai Botelho</h1>
   </header>
@@ -815,7 +803,7 @@
     // --- LÓGICA DA SPLASH SCREEN ---
     window.addEventListener('load', () => {
       const splashScreen = document.getElementById('splash-screen');
-      const enterButton = document.getElementById('splash-enter-button'); // Pega o novo botão
+      const enterButton = document.getElementById('splash-enter-button'); 
       const mainContent = document.querySelector('.grid-container'); 
       const headerElement = document.querySelector('header');
 
@@ -823,23 +811,19 @@
       if (mainContent) mainContent.style.visibility = 'hidden';
       if (headerElement) headerElement.style.visibility = 'hidden';
 
-      // Remove a lógica de setTimeout que escondia automaticamente
-      // A splash screen agora só será escondida ao clicar no botão
       enterButton.addEventListener('click', () => {
           splashScreen.classList.add('hidden'); // Inicia o fade out
 
-          // Após a transição de fade-out, esconde a splash screen e mostra o conteúdo principal
           splashScreen.addEventListener('transitionend', () => {
               splashScreen.style.display = 'none'; // Remove do fluxo após a transição
               if (mainContent) mainContent.style.visibility = 'visible'; // Mostra o conteúdo principal
               if (headerElement) headerElement.style.visibility = 'visible'; // Mostra o header
 
-              // Certifica-se de que a seção de cadastro de clientes seja a primeira a ser exibida
               showSection('section-cadastro-clientes', document.getElementById('menu-cadastro-clientes'));
-          }, { once: true }); // Garante que o evento só seja executado uma vez
+          }, { once: true }); 
       });
 
-      atualizarListasDeClientes(); // Assegura que os selects de cliente estejam preenchidos
+      atualizarListasDeClientes(); 
     });
   </script>
 
