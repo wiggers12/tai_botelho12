@@ -41,7 +41,7 @@
       height: 100vh; /* 100% da altura da viewport */
       background-color: #000; /* Fundo preto para contrastar com o dourado */
       display: flex; /* Para centralizar o conteúdo */
-      flex-direction: column; /* Para empilhar os textos */
+      flex-direction: column; /* Para empilhar os textos e o botão */
       justify-content: center; /* Centraliza horizontalmente */
       align-items: center; /* Centraliza verticalmente */
       z-index: 9999; /* Garante que fique acima de todos os outros elementos */
@@ -65,7 +65,7 @@
 
     /* Estilo para "TB" (Iniciais - Dourado e Maior) */
     .splash-initials {
-      font-family: 'Poppins', sans-serif; /* Mantenha a fonte principal ou explore outra */
+      font-family: 'Poppins', sans-serif;
       font-size: 8em; /* Tamanho bem grande para destaque */
       font-weight: 700;
       margin: 0; /* Remove margens padrão */
@@ -85,6 +85,27 @@
       margin-top: 10px; /* Espaço acima */
       text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); /* Sombra dourada para profundidade */
       letter-spacing: 1px;
+    }
+
+    /* Estilo para o botão de entrada na Splash Screen */
+    #splash-enter-button {
+        background: linear-gradient(45deg, #FFD700, #DAA520); /* Gradiente dourado para o botão */
+        color: #000; /* Texto preto para contraste no botão dourado */
+        padding: 15px 30px;
+        border: none;
+        border-radius: 50px; /* Borda bem arredondada (pill shape) */
+        cursor: pointer;
+        font-size: 1.2em;
+        font-weight: 700;
+        margin-top: 40px; /* Espaço para separar do texto */
+        box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4); /* Sombra para dar profundidade */
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        letter-spacing: 0.5px;
+    }
+
+    #splash-enter-button:hover {
+        transform: translateY(-3px); /* Efeito de "levantar" ao passar o mouse */
+        box-shadow: 0 8px 20px rgba(255, 215, 0, 0.6); /* Sombra mais intensa */
     }
 
 
@@ -380,6 +401,11 @@
       .splash-full-name {
         font-size: 1.8em;
       }
+      #splash-enter-button {
+          font-size: 1em;
+          padding: 12px 25px;
+          margin-top: 30px;
+      }
     }
   </style>
 </head>
@@ -388,7 +414,7 @@
     <p class="splash-welcome-text">Bem-vinda ao</p>
     <h1 class="splash-initials">TB</h1>
     <p class="splash-full-name">Espaço Tai Botelho</p>
-  </div>
+    <button id="splash-enter-button">Bem-vinda</button> </div>
   <header>
     <h1>Espaço Tai Botelho</h1>
   </header>
@@ -786,10 +812,10 @@
         exibirHistoricoDoCliente(clienteId); 
     }
 
-    // --- CARREGAR DADOS AO INICIAR ---
+    // --- LÓGICA DA SPLASH SCREEN ---
     window.addEventListener('load', () => {
-      // Esconder todo o conteúdo principal até a splash screen sumir
       const splashScreen = document.getElementById('splash-screen');
+      const enterButton = document.getElementById('splash-enter-button'); // Pega o novo botão
       const mainContent = document.querySelector('.grid-container'); 
       const headerElement = document.querySelector('header');
 
@@ -797,24 +823,21 @@
       if (mainContent) mainContent.style.visibility = 'hidden';
       if (headerElement) headerElement.style.visibility = 'hidden';
 
-      // Define o tempo que a splash screen ficará visível (ex: 3 segundos)
-      const splashDuration = 3000; // 3 segundos
-      const fadeOutDuration = 1000; // Duração da transição CSS (1 segundo)
-
-      setTimeout(() => {
+      // Remove a lógica de setTimeout que escondia automaticamente
+      // A splash screen agora só será escondida ao clicar no botão
+      enterButton.addEventListener('click', () => {
           splashScreen.classList.add('hidden'); // Inicia o fade out
 
-          setTimeout(() => {
+          // Após a transição de fade-out, esconde a splash screen e mostra o conteúdo principal
+          splashScreen.addEventListener('transitionend', () => {
               splashScreen.style.display = 'none'; // Remove do fluxo após a transição
               if (mainContent) mainContent.style.visibility = 'visible'; // Mostra o conteúdo principal
               if (headerElement) headerElement.style.visibility = 'visible'; // Mostra o header
 
               // Certifica-se de que a seção de cadastro de clientes seja a primeira a ser exibida
-              // após a splash screen sumir
               showSection('section-cadastro-clientes', document.getElementById('menu-cadastro-clientes'));
-
-          }, fadeOutDuration); // Espera a transição terminar antes de remover o display
-      }, splashDuration);
+          }, { once: true }); // Garante que o evento só seja executado uma vez
+      });
 
       atualizarListasDeClientes(); // Assegura que os selects de cliente estejam preenchidos
     });
