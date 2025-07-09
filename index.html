@@ -5,118 +5,113 @@
   <title>Espaço Tai Botelho</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
   <style>
-    /* Variáveis de Cores */
+    /* Variáveis de Cores (NOVA PALETA: Azul e Verde Moderno) */
     :root {
-      --primary-color: #e91e63; /* Rosa Principal */
-      --secondary-color: #9c27b0; /* Roxo Secundário */
-      --accent-color: #fce4ec; /* Rosa Claro para fundos de seções */
-      --text-color-dark: #4a4a4a; /* Cinza escuro para texto principal */
+      --primary-color: #007bff; /* Azul vibrante */
+      --secondary-color: #28a745; /* Verde moderno */
+      --accent-color: #e6f7ff; /* Azul muito claro para fundos de seções */
+      --text-color-dark: #343a40; /* Cinza escuro para texto principal */
       --text-color-light: #ffffff; /* Branco para texto em fundos escuros */
-      --bg-light: #fefefe; /* Branco muito suave para o corpo */
-      --border-color: #e0e0e0; /* Cinza claro para bordas */
-      --shadow-light: rgba(0, 0, 0, 0.05);
-      --shadow-medium: rgba(0, 0, 0, 0.1);
-      --menu-bg: #f8f8f8; /* Fundo do menu suave */
-      --menu-link-hover: #f0f0f0; /* Cor ao passar o mouse no link do menu */
+      --bg-light: #f8f9fa; /* Branco suave para o corpo */
+      --border-color: #dee2e6; /* Cinza claro para bordas */
+      --shadow-light: rgba(0, 0, 0, 0.08);
+      --shadow-medium: rgba(0, 0, 0, 0.15);
+      --menu-bg: #ffffff; /* Fundo do menu branco */
+      --menu-link-hover: #e9ecef; /* Cor ao passar o mouse no link do menu */
     }
 
     body {
       font-family: 'Poppins', sans-serif;
-      background-color: #2C3E50; /* Azul escuro conforme sua escolha */
+      background-color: var(--bg-light); /* Fundo suave */
       margin: 0;
       padding: 0;
       color: var(--text-color-dark); /* Texto principal cinza escuro */
       line-height: 1.6;
-      min-height: 100vh; /* Garante que o body ocupa a altura total da viewport */
-      display: flex; /* Para flexbox no body, se necessário, ou para que o grid-container preencha */
+      min-height: 100vh;
+      display: flex;
       flex-direction: column;
     }
 
     /* Estilos para a Splash Screen */
     #splash-screen {
-      position: fixed; /* Fica fixo na tela */
+      position: fixed;
       top: 0;
       left: 0;
-      width: 100vw; /* 100% da largura da viewport */
-      height: 100vh; /* 100% da altura da viewport */
-      background-color: #000; /* Fundo preto para contrastar com o dourado */
-      display: flex; /* Para centralizar o conteúdo */
-      flex-direction: column; /* Para empilhar os textos e o botão */
-      justify-content: center; /* Centraliza horizontalmente */
-      align-items: center; /* Centraliza verticalmente */
-      z-index: 9999; /* Garante que fique acima de todos os outros elementos */
-      opacity: 1; /* Inicialmente visível */
-      transition: opacity 1s ease-out; /* Transição de 1 segundo para o fade-out */
+      width: 100vw;
+      height: 100vh;
+      background-color: #000;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      opacity: 1;
+      transition: opacity 1s ease-out;
     }
 
     #splash-screen.hidden {
-      opacity: 0; /* Torna invisível */
-      pointer-events: none; /* Impede cliques e interações quando invisível */
+      opacity: 0;
+      pointer-events: none;
     }
 
-    /* Estilo para o texto "TB" (Iniciais - Dourado e Maior) */
     .splash-initials {
       font-family: 'Poppins', sans-serif;
-      font-size: 8em; /* Tamanho bem grande para destaque */
+      font-size: 8em;
       font-weight: 700;
-      margin: 0; /* Remove margens padrão */
-      background: linear-gradient(135deg, #FFD700, #DAA520, #B8860B); /* Gradiente dourado */
-      -webkit-background-clip: text; /* Aplica o gradiente apenas ao texto */
-      -webkit-text-fill-color: transparent; /* Torna o texto transparente para mostrar o gradiente */
-      text-shadow: 0 0 15px rgba(255, 215, 0, 0.8), /* Brilho dourado mais intenso */
+      margin: 0;
+      background: linear-gradient(135deg, #FFD700, #DAA520, #B8860B);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 15px rgba(255, 215, 0, 0.8),
                    0 0 30px rgba(255, 215, 0, 0.5);
-      letter-spacing: 5px; /* Espaçamento entre as letras */
+      letter-spacing: 5px;
     }
 
-    /* Estilo para "Espaço Tai Botelho" (Nome Completo - Dourado e Moderno) */
     .splash-full-name {
-      color: #FFD700; /* Dourado sólido para o nome completo */
-      font-size: 2.5em; /* Um bom tamanho para o nome */
+      color: #FFD700;
+      font-size: 2.5em;
       font-weight: 600;
-      margin-top: 10px; /* Espaço acima */
-      text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); /* Sombra dourada para profundidade */
+      margin-top: 10px;
+      text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
       letter-spacing: 1px;
     }
 
-    /* Estilo para o botão de entrada na Splash Screen */
     #splash-enter-button {
-        background: linear-gradient(45deg, #FFD700, #DAA520); /* Gradiente dourado para o botão */
-        color: #000; /* Texto preto para contraste no botão dourado */
-        padding: 10px 30px; /* Ajustado: Diminuído o padding vertical de 15px para 10px */
+        background: linear-gradient(45deg, #FFD700, #DAA520);
+        color: #000;
+        padding: 10px 30px;
         border: none;
-        border-radius: 50px; /* Borda bem arredondada (pill shape) */
+        border-radius: 50px;
         cursor: pointer;
         font-size: 1.2em;
         font-weight: 700;
-        margin-top: 40px; /* Espaço para separar do texto */
-        box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4); /* Sombra para dar profundidade */
+        margin-top: 40px;
+        box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
         transition: transform 0.2s ease, box-shadow 0.2s ease;
         letter-spacing: 0.5px;
     }
 
     #splash-enter-button:hover {
-        transform: translateY(-3px); /* Efeito de "levantar" ao passar o mouse */
-        box-shadow: 0 8px 20px rgba(255, 215, 0, 0.6); /* Sombra mais intensa */
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(255, 215, 0, 0.6);
     }
 
-
-    /* Oculta o conteúdo principal e o header no carregamento inicial */
     .grid-container, header {
         visibility: hidden;
     }
 
     header {
-      background: linear-gradient(135deg, var(--primary-color), #d81b60); /* Gradiente suave */
+      background: linear-gradient(135deg, var(--primary-color), #0056b3); /* Gradiente azul */
       color: var(--text-color-light);
-      padding: 25px 20px; /* Mais padding */
+      padding: 25px 20px;
       text-align: center;
-      box-shadow: 0 4px 10px var(--shadow-medium); /* Sombra mais pronunciada */
+      box-shadow: 0 4px 10px var(--shadow-medium);
       position: relative;
       overflow: hidden;
-      z-index: 100; /* Garante que o header fique acima do conteúdo */
+      z-index: 100;
     }
 
-    header::before { /* Efeito de fundo sutil no header */
+    header::before {
       content: '';
       position: absolute;
       top: 0;
@@ -130,40 +125,39 @@
 
     header h1 {
       margin: 0;
-      font-weight: 700; /* Mais encorpado */
-      font-size: 3em; /* Um pouco maior */
-      letter-spacing: 1px; /* Espaçamento entre letras */
+      font-weight: 700;
+      font-size: 3em;
+      letter-spacing: 1px;
       position: relative;
       z-index: 1;
     }
 
-    /* --- Container Principal com CSS Grid --- */
     .grid-container {
         display: grid;
-        grid-template-columns: 220px 1fr; /* Coluna esquerda (sidebar) fixa de 220px, coluna direita (conteúdo) flexível */
-        gap: 0; /* Espaço entre as colunas, podemos ajustar */
-        flex-grow: 1; /* Permite que o container cresça e ocupe o espaço restante */
+        grid-template-columns: 220px 1fr;
+        gap: 0;
+        flex-grow: 1;
     }
 
     /* --- Menu de Navegação (Sidebar) --- */
     nav {
         background-color: var(--menu-bg);
-        box-shadow: 2px 0 5px var(--shadow-light); /* Sombra à direita da sidebar */
+        box-shadow: 2px 0 5px var(--shadow-light);
         padding: 20px 0;
-        display: flex; /* Para centralizar os itens verticalmente, se quiser */
-        flex-direction: column; /* Itens um embaixo do outro */
-        align-items: flex-start; /* Alinha os itens à esquerda dentro da nav */
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
     }
 
     nav ul {
         list-style: none;
         padding: 0;
         margin: 0;
-        width: 100%; /* Ocupa a largura total da nav */
+        width: 100%;
     }
 
     nav li {
-        margin-bottom: 5px; /* Espaçamento entre os itens do menu */
+        margin-bottom: 5px;
         width: 100%;
     }
 
@@ -171,66 +165,97 @@
         text-decoration: none;
         color: var(--primary-color);
         font-weight: 600;
-        padding: 12px 20px; /* Mais padding para botões de menu maiores */
+        padding: 12px 20px;
         display: block;
         transition: background-color 0.3s ease, color 0.3s ease;
         border-radius: 5px;
-        text-align: left; /* Alinha o texto do link à esquerda */
+        text-align: left;
     }
 
     nav a:hover,
-    nav a.active { /* Estilo para o link ativo */
+    nav a.active {
         background-color: var(--primary-color);
         color: var(--text-color-light);
     }
 
+    /* Estilo para o submenu de Clientes */
+    .submenu {
+        display: none; /* Inicia oculto */
+        list-style: none;
+        padding: 0;
+        margin: 5px 0 5px 20px; /* Recuo para o submenu */
+        width: calc(100% - 20px); /* Ajusta a largura com o recuo */
+        background-color: #f1f3f5; /* Fundo mais claro para o submenu */
+        border-radius: 5px;
+    }
+
+    .submenu.active {
+        display: block; /* Exibe quando ativo */
+    }
+
+    .submenu li {
+        margin-bottom: 0; /* Remove margem extra entre itens do submenu */
+    }
+
+    .submenu a {
+        padding: 8px 15px; /* Padding menor para itens do submenu */
+        font-weight: 400; /* Fonte mais leve */
+        color: var(--text-color-dark); /* Cor de texto mais suave */
+    }
+
+    .submenu a:hover,
+    .submenu a.active {
+        background-color: var(--secondary-color); /* Cor de destaque para o submenu */
+        color: var(--text-color-light);
+    }
+
+
     h2 {
-      color: var(--primary-color); /* Rosa principal */
-      border-bottom: 2px solid var(--accent-color); /* Linha sutil rosa claro */
+      color: var(--primary-color);
+      border-bottom: 2px solid var(--accent-color);
       padding-bottom: 12px;
-      margin-top: 40px; /* Mais espaço acima */
-      margin-bottom: 25px; /* Mais espaço abaixo */
+      margin-top: 40px;
+      margin-bottom: 25px;
       font-weight: 600;
       font-size: 1.8em;
       text-align: center;
     }
 
     main {
-      max-width: 100%; /* Ocupa a largura total da coluna de conteúdo */
-      margin: 0; /* Remove margens extras */
-      padding: 30px; /* Mais padding */
-      background-color: var(--text-color-light); /* Fundo branco puro */
-      border-radius: 12px; /* Cantos mais arredondados */
-      box-shadow: 0 8px 20px var(--shadow-medium); /* Sombra mais suave e espalhada */
+      max-width: 100%;
+      margin: 0;
+      padding: 30px;
+      background-color: var(--text-color-light);
+      border-radius: 12px;
+      box-shadow: 0 8px 20px var(--shadow-medium);
     }
 
-    /* --- Seções de Conteúdo --- */
-    .content-section { /* Nova classe para as seções que serão exibidas/ocultadas */
-        display: none; /* Todas as seções começam escondidas */
-        padding: 20px 0; /* Padding interno das seções */
+    .content-section {
+        display: none;
+        padding: 20px 0;
     }
 
-    .content-section.active { /* A seção ativa será exibida */
+    .content-section.active {
         display: block;
     }
 
     form {
-      background-color: var(--accent-color); /* Fundo rosa claro */
-      padding: 30px; /* Mais padding */
-      border-radius: 10px; /* Cantos arredondados */
+      background-color: var(--accent-color);
+      padding: 30px;
+      border-radius: 10px;
       max-width: 450px;
-      margin: 30px auto; /* Centraliza o formulário */
-      box-shadow: 0 5px 15px var(--shadow-light); /* Sombra suave */
-      border: 1px solid var(--border-color); /* Borda fina e clara */
-      position: relative; /* Para posicionar a mensagem de feedback */
+      margin: 30px auto;
+      box-shadow: 0 5px 15px var(--shadow-light);
+      border: 1px solid var(--border-color);
+      position: relative;
     }
 
     input, select, textarea { 
-      border: 1px solid var(--border-color); /* Borda cinza clara */
-      border-radius: 6px; /* Cantos levemente mais arredondados */
-      padding: 12px; /* Mais padding interno */
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 12px;
       margin-top: 8px;
-      margin-bottom: 18px; /* Mais espaço abaixo */
+      margin-bottom: 18px;
       box-sizing: border-box;
       width: 100%;
       font-size: 1em;
@@ -239,40 +264,39 @@
     }
 
     input:focus, select:focus, textarea:focus {
-      border-color: var(--primary-color); /* Borda rosa ao focar */
-      box-shadow: 0 0 0 3px rgba(233, 30, 99, 0.2); /* Sombra de foco sutil */
-      outline: none; /* Remove o outline padrão */
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2); /* Sombra de foco azul */
+      outline: none;
     }
 
     button {
-      background: linear-gradient(45deg, var(--primary-color), var(--secondary-color)); /* Gradiente nos botões */
+      background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
       color: var(--text-color-light);
-      padding: 15px 25px; /* Mais padding para botões maiores */
+      padding: 15px 25px;
       border: none;
-      border-radius: 8px; /* Cantos mais arredondados */
+      border-radius: 8px;
       cursor: pointer;
-      font-size: 1.1em; /* Fonte um pouco maior */
+      font-size: 1.1em;
       font-weight: 600;
-      transition: transform 0.2s ease, box-shadow 0.2s ease; /* Transição de escala e sombra */
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
       width: 100%;
       letter-spacing: 0.5px;
     }
 
     button:hover {
-      transform: translateY(-2px); /* Leve levantamento */
-      box-shadow: 0 6px 15px var(--shadow-medium); /* Sombra ao passar o mouse */
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px var(--shadow-medium);
     }
 
     label {
       font-weight: 500;
       display: block;
-      margin-bottom: 8px; /* Mais espaço abaixo do label */
+      margin-bottom: 8px;
       color: var(--text-color-dark);
     }
 
-    /* Estilo para as seções de consulta e histórico */
-    .section-box { /* Classe para formulários/seções dentro das abas */
-      background-color: var(--accent-color); /* Fundo rosa claro */
+    .section-box {
+      background-color: var(--accent-color);
       padding: 30px;
       border-radius: 10px;
       max-width: 450px;
@@ -281,96 +305,103 @@
       border: 1px solid var(--border-color);
     }
 
-    /* Itens da lista de consulta de agendamentos e histórico */
-    .lista-itens li { /* Unificado para listas de agendamentos e histórico */
-      background-color: var(--text-color-light); /* Fundo branco para os itens da lista */
+    .lista-itens li {
+      background-color: var(--text-color-light);
       margin: 10px 0;
-      padding: 18px; /* Mais padding */
+      padding: 18px;
       border-radius: 8px;
-      box-shadow: 0 2px 8px var(--shadow-light); /* Sombra mais suave */
-      border-left: 5px solid var(--primary-color); /* Linha colorida na esquerda */
+      box-shadow: 0 2px 8px var(--shadow-light);
+      border-left: 5px solid var(--primary-color);
       color: var(--text-color-dark);
       font-size: 0.95em;
       display: flex;
-      flex-direction: column; /* Para empilhar as informações */
+      flex-direction: column;
       align-items: flex-start;
       line-height: 1.5;
     }
 
     .lista-itens li span {
-      display: block; /* Cada parte da informação em uma nova linha */
+      display: block;
       margin-bottom: 5px;
     }
 
     .lista-itens li span:first-child,
-    .lista-itens li strong { /* Para o título do item no histórico */
+    .lista-itens li strong {
         font-weight: 600;
         color: var(--primary-color);
     }
 
-    /* Estilo para as mensagens de feedback */
     #feedback-message {
-      position: absolute; /* Posição absoluta dentro do formulário */
-      top: 10px; /* Ajuste a distância do topo */
+      position: absolute;
+      top: 10px;
       left: 50%;
       transform: translateX(-50%);
       padding: 10px 20px;
       border-radius: 8px;
       font-weight: bold;
       text-align: center;
-      opacity: 0; /* Inicialmente invisível */
+      opacity: 0;
       transition: opacity 0.5s ease-in-out;
       width: fit-content;
-      white-space: nowrap; /* Impede que o texto quebre linha */
-      z-index: 10; /* Garante que fique acima de outros elementos */
+      white-space: nowrap;
+      z-index: 10;
     }
 
     #feedback-message.show {
-      opacity: 1; /* Torna visível */
+      opacity: 1;
     }
 
     #feedback-message.success {
-      background-color: #d4edda; /* Verde claro */
-      color: #155724; /* Verde escuro */
+      background-color: #d4edda;
+      color: #155724;
       border: 1px solid #c3e6cb;
     }
 
     #feedback-message.error {
-      background-color: #f8d7da; /* Vermelho claro */
-      color: #721c24; /* Vermelho escuro */
+      background-color: #f8d7da;
+      color: #721c24;
       border: 1px solid #f5c6cb;
     }
 
-
-    /* Estilo para o select de clientes na seção de histórico */
     #select-cliente-historico {
-        margin-bottom: 25px; /* Mais espaço após o select */
+        margin-bottom: 25px;
     }
 
     /* Media Queries para responsividade */
     @media (max-width: 768px) {
-      /* Em telas pequenas, a sidebar pode virar um menu "hamburger" ou empilhar */
       .grid-container {
-        grid-template-columns: 1fr; /* Uma única coluna */
+        grid-template-columns: 1fr;
       }
 
       nav {
-        box-shadow: 0 2px 5px var(--shadow-light); /* Sombra embaixo do menu */
+        box-shadow: 0 2px 5px var(--shadow-light);
         padding: 10px 0;
       }
 
       nav ul {
-        flex-direction: column; /* Empilha os itens do menu */
-        align-items: center; /* Centraliza os links do menu */
+        flex-direction: column;
+        align-items: center;
       }
 
       nav li {
         margin: 5px 0;
-        width: 90%; /* Ocupa mais largura */
+        width: 90%;
       }
       
       nav a {
-        text-align: center; /* Centraliza o texto do link */
+        text-align: center;
+        padding: 10px 15px;
+      }
+
+      .submenu {
+        width: 100%; /* Submenu ocupa largura total em mobile */
+        margin-left: 0; /* Remove recuo em mobile */
+        border-radius: 0;
+        padding-top: 5px;
+        padding-bottom: 5px;
+      }
+
+      .submenu a {
         padding: 10px 15px;
       }
 
@@ -383,7 +414,7 @@
       }
 
       main {
-        margin: 20px 15px; /* Margem lateral em telas pequenas */
+        margin: 20px 15px;
         padding: 20px;
       }
 
@@ -403,7 +434,6 @@
         font-size: 0.9em;
       }
 
-      /* Splash screen em telas menores */
       .splash-initials {
         font-size: 5em;
       }
@@ -431,11 +461,16 @@
   <div class="grid-container">
     <nav>
       <ul>
-        <li><a href="#" id="menu-cadastro-clientes">Cadastro de Clientes</a></li>
-        <li><a href="#" id="menu-agendamento-cliente">Agendamento de Cliente</a></li>
-        <li><a href="#" id="menu-consultar-agendamentos">Consultar Agendamentos</a></li>
-        <li><a href="#" id="menu-historico-procedimentos">Histórico de Procedimentos por Cliente</a></li>
-        <li><a href="#" id="menu-financeiro">Financeiro</a></li>
+        <li>
+            <a href="#" id="menu-clientes">👥 Clientes</a>
+            <ul class="submenu" id="submenu-clientes">
+                <li><a href="#" id="menu-cadastro-clientes">Cadastro de Clientes</a></li>
+                <li><a href="#" id="menu-agendamento-cliente">Agendamento de Cliente</a></li>
+                <li><a href="#" id="menu-consultar-agendamentos">Consultar Agendamentos</a></li>
+                <li><a href="#" id="menu-historico-procedimentos">Histórico de Procedimentos por Cliente</a></li>
+            </ul>
+        </li>
+        <li><a href="#" id="menu-financeiro">💰 Financeiro</a></li>
       </ul>
     </nav>
 
@@ -554,7 +589,6 @@
       localStorage.setItem('agendamentos', JSON.stringify(agendamentos));
     }
 
-    // NOVA FUNÇÃO: Obter e Salvar Despesas (Exemplo)
     function getDespesas() {
         return JSON.parse(localStorage.getItem('despesas')) || [];
     }
@@ -567,28 +601,28 @@
     function showFeedback(elementId, message, type) {
         const feedbackDiv = document.getElementById(elementId);
         feedbackDiv.textContent = message;
-        feedbackDiv.className = 'feedback-message show ' + type; // Adiciona classes para estilo e visibilidade
+        feedbackDiv.className = 'feedback-message show ' + type;
 
-        // Remove a mensagem após 5 segundos
         setTimeout(() => {
             feedbackDiv.classList.remove('show');
-            // Limpa o texto e as classes de tipo após a transição para redefinir
             setTimeout(() => {
                 feedbackDiv.textContent = '';
                 feedbackDiv.className = 'feedback-message'; 
-            }, 500); // Meio segundo para a transição de opacidade
+            }, 500);
         }, 5000);
     }
 
     // --- CONTROLE DO MENU E SEÇÕES ---
     const menuLinks = document.querySelectorAll('nav ul li a');
     const contentSections = document.querySelectorAll('.content-section');
+    const submenuClientes = document.getElementById('submenu-clientes');
+    const menuClientes = document.getElementById('menu-clientes');
 
     function hideAllSections() {
       contentSections.forEach(section => {
         section.classList.remove('active');
       });
-      menuLinks.forEach(link => {
+      document.querySelectorAll('nav ul li a').forEach(link => { // Seleciona todos os links, incluindo submenus
         link.classList.remove('active');
       });
     }
@@ -604,41 +638,56 @@
       }
     }
 
-    menuLinks.forEach(link => {
-      link.addEventListener('click', (e) => {
+    // Lógica para o menu principal "Clientes" e seu submenu
+    menuClientes.addEventListener('click', (e) => {
         e.preventDefault();
-        const id = link.id;
-        
-        switch (id) {
-          case 'menu-cadastro-clientes':
-            showSection('section-cadastro-clientes', link);
-            break;
-          case 'menu-agendamento-cliente':
-            showSection('section-agendamento-cliente', link);
-            atualizarListasDeClientes(); // Garante que o select esteja preenchido
-            break;
-          case 'menu-consultar-agendamentos':
-            showSection('section-consultar-agendamentos', link);
-            exibirAgendamentosParaConsulta(); // Carrega os agendamentos ao mostrar a seção
-            break;
-          case 'menu-historico-procedimentos':
-            showSection('section-historico-procedimentos', link);
-            atualizarListasDeClientes(); // Garante que o select esteja preenchido
-            // Limpa e reinicia a exibição do histórico para evitar dados antigos
-            document.getElementById('historico-detalhes-cliente').innerHTML = '<p>Selecione um cliente acima para ver ou adicionar procedimentos.</p>';
-            document.getElementById('select-cliente-historico').value = '';
-            break;
-          case 'menu-financeiro': // NOVO CASE PARA O ÍCONE FINANCEIRO
-            showSection('section-financeiro', link);
-            carregarFinancas(); // Chama a função para carregar dados financeiros
-            break;
-        }
-      });
+        submenuClientes.classList.toggle('active'); // Alterna a visibilidade do submenu
+        // Oculta outras seções se o menu principal for clicado
+        hideAllSections(); 
+        menuClientes.classList.toggle('active'); // Marca o item "Clientes" como ativo/inativo
+    });
+
+    // Adiciona event listeners para os links do submenu
+    const subMenuLinks = submenuClientes.querySelectorAll('a');
+    subMenuLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            // Mantém o item "Clientes" ativo quando um submenu é clicado
+            menuClientes.classList.add('active'); 
+            const id = link.id;
+            
+            switch (id) {
+                case 'menu-cadastro-clientes':
+                    showSection('section-cadastro-clientes', link);
+                    break;
+                case 'menu-agendamento-cliente':
+                    showSection('section-agendamento-cliente', link);
+                    atualizarListasDeClientes();
+                    break;
+                case 'menu-consultar-agendamentos':
+                    showSection('section-consultar-agendamentos', link);
+                    exibirAgendamentosParaConsulta();
+                    break;
+                case 'menu-historico-procedimentos':
+                    showSection('section-historico-procedimentos', link);
+                    atualizarListasDeClientes();
+                    document.getElementById('historico-detalhes-cliente').innerHTML = '<p>Selecione um cliente acima para ver ou adicionar procedimentos.</p>';
+                    document.getElementById('select-cliente-historico').value = '';
+                    break;
+            }
+        });
+    });
+
+    // Event listener para o menu Financeiro (fora do submenu de clientes)
+    document.getElementById('menu-financeiro').addEventListener('click', (e) => {
+        e.preventDefault();
+        submenuClientes.classList.remove('active'); // Garante que o submenu de clientes esteja fechado
+        showSection('section-financeiro', e.target); // e.target é o link clicado
+        carregarFinancas();
     });
 
     // --- AGENDAMENTO ---
     const formAgendamento = document.getElementById('form-agendamento');
-    // A antiga mensagemConfirmacao não será mais usada diretamente.
 
     formAgendamento.addEventListener('submit', function (e) {
       e.preventDefault();
@@ -648,7 +697,6 @@
       const datahora = document.getElementById('datahora').value;
       const profissional = document.getElementById('profissional').value;
 
-      // Validação dos campos
       if (!clienteId || !servico || !datahora || !profissional) {
         showFeedback('feedback-agendamento', 'Por favor, preencha todos os campos obrigatórios para o agendamento.', 'error');
         return;
@@ -680,36 +728,32 @@
     formCliente.addEventListener('submit', function (e) {
       e.preventDefault();
 
-      const nome = document.getElementById('nome-cliente').value.trim(); // .trim() para remover espaços em branco
+      const nome = document.getElementById('nome-cliente').value.trim();
       const telefone = document.getElementById('telefone-cliente').value.trim();
       const idade = document.getElementById('idade-cliente').value;
       const genero = document.getElementById('genero-cliente').value;
       const clienteDesde = document.getElementById('cliente-desde').value;
 
-      // Validação dos campos
       if (!nome || !telefone) {
         showFeedback('feedback-cliente', 'Nome e Telefone são campos obrigatórios.', 'error');
         return;
       }
 
-      // Validação de telefone (apenas números e tamanho razoável)
-      const telefoneLimpo = telefone.replace(/\D/g, ''); // Remove tudo que não é dígito
-      if (!/^\d{8,15}$/.test(telefoneLimpo)) { // Verifica se tem entre 8 e 15 dígitos
+      const telefoneLimpo = telefone.replace(/\D/g, '');
+      if (!/^\d{8,15}$/.test(telefoneLimpo)) {
         showFeedback('feedback-cliente', 'Por favor, insira um número de telefone válido (apenas dígitos, 8 a 15 caracteres).', 'error');
         return;
       }
 
-      // Validação de idade (se preenchida)
       if (idade && (isNaN(idade) || parseInt(idade) < 0 || parseInt(idade) > 120)) {
           showFeedback('feedback-cliente', 'Por favor, insira uma idade válida (entre 0 e 120).', 'error');
           return;
       }
 
-
       const novoCliente = {
         id: Date.now().toString(), 
         nome: nome,
-        telefone: telefoneLimpo, // Salva o telefone limpo
+        telefone: telefoneLimpo,
         idade: idade || null,
         genero: genero || null,
         clienteDesde: clienteDesde || null,
@@ -721,7 +765,7 @@
       salvarClientes(clientes);
       formCliente.reset();
       atualizarListasDeClientes(); 
-      showFeedback('feedback-cliente', `✅ Cliente "${nome}" cadastrado com sucesso!`, 'success'); // Feedback para o usuário
+      showFeedback('feedback-cliente', `✅ Cliente "${nome}" cadastrado com sucesso!`, 'success');
     });
 
     // --- ATUALIZAÇÃO DAS LISTAS DE CLIENTES (SELECTs) ---
@@ -877,19 +921,17 @@
         const profissional = form.elements['procProfissional'].value.trim();
         const observacoes = form.elements['procObs'].value.trim();
 
-        // Validação de campos obrigatórios do procedimento
         if (!data || !nomeServico || isNaN(valor) || valor < 0) {
             showFeedback('feedback-procedimento', 'Por favor, preencha a Data, o Serviço e o Valor válido para o procedimento.', 'error');
             return;
         }
 
-
         const novoProc = {
             data: data,
             nomeServico: nomeServico,
             valor: valor,
-            profissional: profissional || null, // Salva null se vazio
-            observacoes: observacoes || null   // Salva null se vazio
+            profissional: profissional || null,
+            observacoes: observacoes || null
         };
 
         clientes[clienteIndex].historicoProcedimentos.push(novoProc);
@@ -932,7 +974,7 @@
         salvarDespesas(despesas);
         formDespesa.reset();
         showFeedback('feedback-despesa', `✅ Despesa "${descricao}" de R$ ${valor.toFixed(2)} adicionada!`, 'success');
-        carregarFinancas(); // Atualiza o total de despesas
+        carregarFinancas();
     });
 
     // --- LÓGICA DA SPLASH SCREEN ---
@@ -947,14 +989,17 @@
       if (headerElement) headerElement.style.visibility = 'hidden';
 
       enterButton.addEventListener('click', () => {
-          splashScreen.classList.add('hidden'); // Inicia o fade out
+          splashScreen.classList.add('hidden');
 
           splashScreen.addEventListener('transitionend', () => {
-              splashScreen.style.display = 'none'; // Remove do fluxo após a transição
-              if (mainContent) mainContent.style.visibility = 'visible'; // Mostra o conteúdo principal
-              if (headerElement) headerElement.style.visibility = 'visible'; // Mostra o header
+              splashScreen.style.display = 'none';
+              if (mainContent) mainContent.style.visibility = 'visible';
+              if (headerElement) headerElement.style.visibility = 'visible';
 
+              // Abre a seção de Cadastro de Clientes por padrão e ativa o submenu "Clientes"
               showSection('section-cadastro-clientes', document.getElementById('menu-cadastro-clientes'));
+              submenuClientes.classList.add('active'); // Abre o submenu de clientes
+              menuClientes.classList.add('active'); // Mantém o item principal "Clientes" ativo
           }, { once: true }); 
       });
 
