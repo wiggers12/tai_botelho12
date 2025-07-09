@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <title>Espaço Tai</title>
+  <title>Espaço Tai Botelho</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <style>
     body {
@@ -74,6 +74,7 @@
       font-weight: 600;
       transition: background-color 0.3s ease;
       width: 100%;
+      margin-top: 10px; /* Adicionado um pouco de margem acima dos botões */
     }
 
     button:hover {
@@ -87,13 +88,13 @@
       color: #555;
     }
 
-    ul { /* Esta regra CSS para UL ainda é necessária se você decidir usar outras listas no futuro */
+    ul {
       list-style: none;
       padding: 0;
       margin-top: 20px;
     }
 
-    li { /* Esta regra CSS para LI ainda é necessária se você decidir usar outros itens de lista */
+    li {
       background-color: #f8bbd0;
       margin: 10px 0;
       padding: 15px;
@@ -118,6 +119,17 @@
       color: green;
     }
 
+    /* Estilo para a seção de consulta de agendamentos */
+    #consulta-agendamentos-section {
+      background-color: #fce4ec; /* Mesma cor dos formulários */
+      padding: 25px;
+      border-radius: 8px;
+      max-width: 450px;
+      margin: 20px auto;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      display: none; /* Começa escondida */
+    }
+
     /* Media Queries para responsividade */
     @media (max-width: 768px) {
       header h1 {
@@ -129,7 +141,7 @@
         padding: 15px;
       }
 
-      form {
+      form, #consulta-agendamentos-section { /* Aplica a largura total também para a nova seção */
         max-width: 100%;
         margin: 15px auto;
         padding: 20px;
@@ -145,7 +157,7 @@
 <body>
 
   <header>
-    <h1>Espaço Tai</h1>
+    <h1>Espaço Tai Botelho</h1>
   </header>
 
   <main>
@@ -169,6 +181,7 @@
     </form>
 
     <p id="mensagem-confirmacao"></p>
+    
     <h2>👩‍🦰 Cadastro de Clientes</h2>
     <form id="form-cliente">
       <label>Nome:</label><br>
@@ -180,13 +193,19 @@
       <button type="submit">Cadastrar Cliente</button>
     </form>
 
-    </main>
+    <h2>🔍 Consultar Agendamentos</h2>
+    <button id="mostrar-agendamentos">Mostrar Agendamentos</button>
+    <div id="consulta-agendamentos-section">
+      <ul id="lista-agendamentos-consulta"></ul>
+      <button id="ocultar-agendamentos">Ocultar Agendamentos</button>
+    </div>
+    
+  </main>
 
   <script>
     // AGENDAMENTO
     const form = document.getElementById('form-agendamento');
-    // REMOVIDA: A constante 'lista' que referenciava 'lista-agendamentos' não é mais necessária para exibir.
-    // const lista = document.getElementById('lista-agendamentos'); 
+    // A constante 'lista' que referenciava 'lista-agendamentos' não é mais necessária para exibir.
 
     form.addEventListener('submit', function (e) {
       e.preventDefault();
@@ -197,8 +216,8 @@
       const profissional = document.getElementById('profissional').value;
 
       const agendamento = { cliente, servico, datahora, profissional };
-      // ALTERADA: A chamada para adicionarNaLista agora não faz nada visual.
-      adicionarNaLista(agendamento);
+      // A função adicionarNaLista agora não faz nada visual.
+      adicionarNaLista(agendamento); // Mantida para consistência, mas não faz nada visual
       salvarAgendamento(agendamento);
       form.reset();
 
@@ -214,10 +233,10 @@
       }
     });
 
-    // ALTERADA: Esta função agora não faz nada, pois a lista de agendamentos não será exibida.
+    // Esta função agora não faz nada, pois a lista de agendamentos não será exibida automaticamente.
     function adicionarNaLista(agendamento) {
       // O agendamento é salvo em 'salvarAgendamento'.
-      // Não precisamos mais exibir o agendamento nesta lista visual.
+      // A exibição será feita pela nova função 'exibirAgendamentosParaConsulta'.
     }
 
     function salvarAgendamento(agendamento) {
@@ -237,7 +256,7 @@
 
       const cliente = { nome, telefone };
       // A função adicionarClienteNaLista foi esvaziada para não exibir o cliente.
-      adicionarClienteNaLista(cliente);
+      adicionarClienteNaLista(cliente); // Mantida para consistência, mas não faz nada visual
       salvarCliente(cliente);
       formCliente.reset();
     });
@@ -276,13 +295,44 @@
       return cliente ? cliente.telefone : '';
     }
 
+    // NOVA FUNCIONALIDADE: CONSULTAR AGENDAMENTOS
+    const btnMostrarAgendamentos = document.getElementById('mostrar-agendamentos');
+    const btnOcultarAgendamentos = document.getElementById('ocultar-agendamentos');
+    const consultaAgendamentosSection = document.getElementById('consulta-agendamentos-section');
+    const listaAgendamentosConsulta = document.getElementById('lista-agendamentos-consulta');
+
+    btnMostrarAgendamentos.addEventListener('click', () => {
+      exibirAgendamentosParaConsulta();
+      consultaAgendamentosSection.style.display = 'block'; // Mostra a seção
+      btnMostrarAgendamentos.style.display = 'none'; // Esconde o botão "Mostrar"
+    });
+
+    btnOcultarAgendamentos.addEventListener('click', () => {
+      consultaAgendamentosSection.style.display = 'none'; // Esconde a seção
+      btnMostrarAgendamentos.style.display = 'block'; // Mostra o botão "Mostrar"
+      listaAgendamentosConsulta.innerHTML = ''; // Limpa a lista ao ocultar
+    });
+
+    function exibirAgendamentosParaConsulta() {
+      listaAgendamentosConsulta.innerHTML = ''; // Limpa a lista antes de preencher
+      const agendamentos = JSON.parse(localStorage.getItem('agendamentos')) || [];
+      if (agendamentos.length === 0) {
+        const item = document.createElement('li');
+        item.textContent = 'Nenhum agendamento encontrado.';
+        listaAgendamentosConsulta.appendChild(item);
+      } else {
+        agendamentos.forEach(agendamento => {
+          const item = document.createElement('li');
+          item.textContent = `${agendamento.datahora} - ${agendamento.cliente} | ${agendamento.servico} com ${agendamento.profissional}`;
+          listaAgendamentosConsulta.appendChild(item);
+        });
+      }
+    }
+
     // CARREGAR DADOS AO INICIAR
     window.addEventListener('load', () => {
-      const agendamentos = JSON.parse(localStorage.getItem('agendamentos')) || [];
-      // REMOVIDA: agendamentos.forEach(adicionarNaLista); // Não precisa mais para exibir a lista de agendamentos
-      
-      const clientes = JSON.parse(localStorage.getItem('clientes')) || [];
-      // REMOVIDA: clientes.forEach(adicionarClienteNaLista); // Não precisa mais para exibir a lista de clientes
+      // As chamadas para adicionarNaLista e adicionarClienteNaLista foram removidas daqui,
+      // pois as listas não são mais exibidas automaticamente ao carregar.
       
       atualizarListaDeClientes(); // Garante que o select de clientes é populado ao carregar
     });
