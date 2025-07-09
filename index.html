@@ -448,6 +448,25 @@
         font-weight: 600;
     }
 
+    .filter-controls {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 25px;
+        flex-wrap: wrap;
+        align-items: flex-end;
+    }
+
+    .filter-controls label {
+        margin-bottom: 5px;
+        font-weight: 500;
+    }
+
+    .filter-controls select, .filter-controls input[type="date"] {
+        width: auto;
+        min-width: 150px;
+        margin-bottom: 0; /* Remove default form margin */
+    }
+
     /* Media Queries para responsividade */
     @media (max-width: 768px) {
       .grid-container {
@@ -529,6 +548,14 @@
 
       .finance-summary {
           flex-direction: column;
+      }
+
+      .filter-controls {
+          flex-direction: column;
+          align-items: stretch;
+      }
+      .filter-controls select, .filter-controls input[type="date"] {
+          width: 100%;
       }
     }
   </style>
@@ -712,6 +739,23 @@
               </div>
 
               <h4>Extrato Detalhado</h4>
+              <div class="filter-controls">
+                  <div>
+                      <label for="filter-period">Filtrar por:</label>
+                      <select id="filter-period">
+                          <option value="all">Todo o Período</option>
+                          <option value="day">Dia</option>
+                          <option value="week">Semana</option>
+                          <option value="month">Mês</option>
+                          <option value="year">Ano</option>
+                      </select>
+                  </div>
+                  <div id="filter-date-container" style="display:none;">
+                      <label for="filter-date">Data Específica:</label>
+                      <input type="date" id="filter-date">
+                  </div>
+              </div>
+
               <table class="finance-table">
                   <thead>
                       <tr>
@@ -889,7 +933,10 @@
                     break;
                 case 'menu-extrato-financeiro':
                     showFinanceSubSection('sub-section-extrato-financeiro');
-                    carregarExtratoFinanceiro(); // Carrega o extrato
+                    // Carrega o extrato com filtros padrão (todo o período)
+                    document.getElementById('filter-period').value = 'all';
+                    document.getElementById('filter-date-container').style.display = 'none';
+                    carregarExtratoFinanceiro(); 
                     break;
             }
         });
@@ -1217,16 +1264,107 @@
     const totalDespesasElement = document.getElementById('total-despesas');
     const saldoAtualElement = document.getElementById('saldo-atual');
     const tabelaExtratoBody = document.getElementById('tabela-extrato-body');
+    const filterPeriod = document.getElementById('filter-period');
+    const filterDate = document.getElementById('filter-date');
+    const filterDateContainer = document.getElementById('filter-date-container');
+
+    filterPeriod.addEventListener('change', () => {
+        if (filterPeriod.value === 'day') {
+            filterDateContainer.style.display = 'block';
+            filterDate.valueAsDate = new Date(); // Define a data atual como padrão
+        } else {
+            filterDateContainer.style.display = 'none';
+            filterDate.value = ''; // Limpa a data quando o filtro não é 'day'
+        }
+        carregarExtratoFinanceiro();
+    });
+
+    filterDate.addEventListener('change', () => {
+        carregarExtratoFinanceiro();
+    });
 
     function carregarExtratoFinanceiro() {
-        const receitas = getReceitas();
-        const despesas = getDespesas();
+        const todasReceitas = getReceitas();
+        const todasDespesas = getDespesas();
+        
+        const periodoSelecionado = filterPeriod.value;
+        const dataFiltro = filterDate.value ? new Date(filterDate.value + 'T00:00:00') : null;
+
+        let receitasFiltradas = [];
+        let despesasFiltradas = [];
+
+        const hoje = new Date();
+        hoje.setHours(0, 0, 0, 0); // Zera hora para comparação de data
+
+        if (periodoSelecionado === 'all') {
+            receitasFiltradas = todasReceitas;
+            despesasFiltradas = todasDespesas;
+        } else {
+            const getStartOfWeek = (date) => {
+                const d = new Date(date);
+                const day = d.getDay(); // 0 = Sunday, 1 = Monday, etc.
+                const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Ajusta para segunda-feira
+                d.setDate(diff);
+                d.setHours(0, 0, 0, 0);
+                return d;
+            };
+
+            const getEndOfWeek = (date) => {
+                const d = getStartOfWeek(date);
+                d.setDate(d.getDate() + 6);
+                d.setHours(23, 59, 59, 999);
+                return d;
+            };
+
+            receitasFiltradas = todasReceitas.filter(r => {
+                const dataLancamento = new Date(r.data + 'T00:00:00');
+                dataLancamento.setHours(0, 0, 0, 0);
+
+                if (periodoSelecionado === 'day') {
+                    return dataFiltro && dataLancamento.toDateString() === dataFiltro.toDateString();
+                } else if (periodoSelecionado === 'week') {
+                    const startOfWeekFilter = getStartOfWeek(dataFiltro || hoje);
+                    const endOfWeekFilter = getEndOfWeek(dataFiltro || hoje);
+                    return dataLancamento >= startOfWeekFilter && dataLancamento <= endOfWeekFilter;
+                } else if (periodoSelecionado === 'month') {
+                    const monthFilter = (dataFiltro || hoje).getMonth();
+                    const yearFilter = (dataFiltro || hoje).getFullYear();
+                    return dataLancamento.getMonth() === monthFilter && dataLancamento.getFullYear() === yearFilter;
+                } else if (periodoSelecionado === 'year') {
+                    const yearFilter = (dataFiltro || hoje).getFullYear();
+                    return dataLancamento.getFullYear() === yearFilter;
+                }
+                return false;
+            });
+
+            despesasFiltradas = todasDespesas.filter(d => {
+                const dataLancamento = new Date(d.data + 'T00:00:00');
+                dataLancamento.setHours(0, 0, 0, 0);
+
+                if (periodoSelecionado === 'day') {
+                    return dataFiltro && dataLancamento.toDateString() === dataFiltro.toDateString();
+                } else if (periodoSelecionado === 'week') {
+                    const startOfWeekFilter = getStartOfWeek(dataFiltro || hoje);
+                    const endOfWeekFilter = getEndOfWeek(dataFiltro || hoje);
+                    return dataLancamento >= startOfWeekFilter && dataLancamento <= endOfWeekFilter;
+                } else if (periodoSelecionado === 'month') {
+                    const monthFilter = (dataFiltro || hoje).getMonth();
+                    const yearFilter = (dataFiltro || hoje).getFullYear();
+                    return dataLancamento.getMonth() === monthFilter && dataLancamento.getFullYear() === yearFilter;
+                } else if (periodoSelecionado === 'year') {
+                    const yearFilter = (dataFiltro || hoje).getFullYear();
+                    return dataLancamento.getFullYear() === yearFilter;
+                }
+                return false;
+            });
+        }
+
 
         let totalReceitas = 0;
-        receitas.forEach(r => totalReceitas += r.valor);
+        receitasFiltradas.forEach(r => totalReceitas += r.valor);
 
         let totalDespesas = 0;
-        despesas.forEach(d => totalDespesas += d.valor);
+        despesasFiltradas.forEach(d => totalDespesas += d.valor);
 
         const saldoAtual = totalReceitas - totalDespesas;
 
@@ -1238,7 +1376,7 @@
 
         // Preencher tabela do extrato
         tabelaExtratoBody.innerHTML = '';
-        const todosLancamentos = [...receitas, ...despesas];
+        const todosLancamentos = [...receitasFiltradas, ...despesasFiltradas];
         
         // Ordenar por data (mais recente primeiro)
         todosLancamentos.sort((a, b) => new Date(b.data) - new Date(a.data));
@@ -1247,7 +1385,7 @@
             const row = tabelaExtratoBody.insertRow();
             const cell = row.insertCell(0);
             cell.colSpan = 4;
-            cell.textContent = 'Nenhum lançamento financeiro registrado.';
+            cell.textContent = 'Nenhum lançamento financeiro registrado para o período selecionado.';
             cell.style.textAlign = 'center';
             cell.style.padding = '20px';
         } else {
@@ -1290,7 +1428,7 @@
               // Abre a seção de Cadastro de Clientes por padrão e ativa o submenu "Clientes"
               showSection('section-cadastro-clientes', document.getElementById('menu-cadastro-clientes'));
               submenuClientes.classList.add('active'); // Abre o submenu de clientes
-              menuClientes.classList.add('active'); // Mantém o item principal "Clientes" ativo
+              document.getElementById('menu-clientes').classList.add('active'); // Mantém o item principal "Clientes" ativo
           }, { once: true }); 
       });
 
