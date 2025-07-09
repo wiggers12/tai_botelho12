@@ -6,47 +6,139 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <style>
     body {
-  font-family: 'Poppins', sans-serif; /* Aplica a nova fonte a todo o corpo do site */
-  background-color: #fff0f5; /* Sua cor de fundo atual */
-  margin: 0;
-  padding: 0;
-  color: #333; /* Uma cor de texto geral mais suave, para não ser preto puro */
-}
+      font-family: 'Poppins', sans-serif; /* Aplica a nova fonte a todo o corpo do site */
+      background-color: #fff0f5; /* Sua cor de fundo atual */
+      margin: 0;
+      padding: 0;
+      color: #333; /* Uma cor de texto geral mais suave, para não ser preto puro */
+    }
+
     header {
-  background-color: #e91e63;
-  color: white; /* Alterado para branco para um contraste melhor com o fundo rosa do header */
-  padding: 20px;
-  text-align: center;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* Adiciona uma sombra sutil para dar profundidade ao cabeçalho */
-}
-    main {
+      background-color: #e91e63;
+      color: white; /* Alterado para branco para um contraste melhor com o fundo rosa do header */
       padding: 20px;
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* Adiciona uma sombra sutil para dar profundidade ao cabeçalho */
+    }
+
+    header h1 {
+      margin: 0; /* Remove a margem padrão do h1 para centralizá-lo melhor no header */
+      font-weight: 600; /* Deixa o título principal mais encorpado */
+      font-size: 2.5em; /* Aumenta o tamanho do título para destacá-lo */
+    }
+
+    h2 {
+      color: #e91e63; /* Mantém a cor principal do seu tema para os subtítulos */
+      border-bottom: 2px solid #f8bbd0; /* Adiciona uma linha sutil abaixo dos títulos para separação */
+      padding-bottom: 10px; /* Espaçamento entre o título e a linha */
+      margin-top: 30px; /* Mais espaço acima dos subtítulos */
+      margin-bottom: 20px; /* Mais espaço abaixo dos subtítulos */
+    }
+
+    main {
+      max-width: 800px; /* Limita a largura do conteúdo principal */
+      margin: 20px auto; /* Centraliza o main e adiciona margem em cima/embaixo */
+      padding: 20px;
+      background-color: white; /* Fundo branco para o conteúdo principal */
+      border-radius: 8px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.08); /* Sombra suave para o contêiner principal */
     }
 
     form {
       background-color: #fce4ec;
-      padding: 15px;
+      padding: 25px; /* Aumenta o padding interno */
       border-radius: 8px;
-      max-width: 400px;
-      margin-bottom: 20px;
+      max-width: 450px; /* Aumenta um pouco a largura máxima do formulário */
+      margin: 20px auto; /* Centraliza o formulário */
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Sombra mais visível para os formulários */
     }
 
-    input, select, button {
-      width: 100%;
-      padding: 8px;
-      margin-top: 5px;
+    input, select {
+      border: 1px solid #f8bbd0; /* Borda mais discreta */
+      border-radius: 5px; /* Cantos levemente arredondados */
+      padding: 10px; /* Mais padding interno */
+      margin-top: 8px; /* Mais espaço acima */
+      margin-bottom: 15px; /* Mais espaço abaixo */
+      box-sizing: border-box; /* Garante que padding e border não aumentem a largura total */
+      width: 100%; /* Garante que os campos ocupem 100% da largura do pai */
+    }
+
+    button {
+      background-color: #e91e63;
+      color: white;
+      padding: 12px 20px; /* Mais padding para o botão */
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1em;
+      font-weight: 600;
+      transition: background-color 0.3s ease; /* Transição suave no hover */
+      width: 100%; /* Garante que o botão ocupe 100% da largura */
+    }
+
+    button:hover {
+      background-color: #d81b60; /* Escurece um pouco no hover */
+    }
+
+    label {
+      font-weight: 500; /* Deixa o label um pouco mais escuro */
+      display: block; /* Garante que o label ocupe sua própria linha */
+      margin-bottom: 5px; /* Espaçamento entre label e input */
+      color: #555;
     }
 
     ul {
       list-style: none;
       padding: 0;
+      margin-top: 20px;
     }
 
     li {
       background-color: #f8bbd0;
-      margin: 5px 0;
+      margin: 10px 0; /* Mais espaçamento entre os itens da lista */
+      padding: 15px; /* Mais padding interno */
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.08); /* Sombra suave para os itens da lista */
+      display: flex; /* Para flexbox, se for adicionar botões depois */
+      justify-content: space-between; /* Para espaçar conteúdo e possíveis botões */
+      align-items: center;
+      color: #444; /* Cor de texto para os itens da lista */
+      font-size: 0.95em;
+    }
+
+    #mensagem-confirmacao {
+      text-align: center;
       padding: 10px;
+      background-color: #e0ffe0; /* Fundo verde claro para a mensagem de sucesso */
+      border: 1px solid #aaddaa;
       border-radius: 5px;
+      margin-top: 15px;
+      font-size: 1.1em;
+      font-weight: bold; /* Adicionado para manter a formatação original da mensagem */
+      color: green; /* Adicionado para manter a cor original da mensagem */
+    }
+
+    /* Media Queries para responsividade */
+    @media (max-width: 768px) {
+      header h1 {
+        font-size: 2em; /* Diminui o título do cabeçalho em telas menores */
+      }
+
+      main {
+        margin: 10px; /* Menos margem nas laterais em telas pequenas */
+        padding: 15px;
+      }
+
+      form {
+        max-width: 100%; /* Formulário ocupa a largura total disponível */
+        margin: 15px auto;
+        padding: 20px;
+      }
+
+      li {
+        padding: 12px;
+        font-size: 0.9em;
+      }
     }
   </style>
 </head>
@@ -76,7 +168,7 @@
       <button type="submit">Agendar</button>
     </form>
 
-    <p id="mensagem-confirmacao" style="color: green; font-weight: bold;"></p>
+    <p id="mensagem-confirmacao"></p>
     <ul id="lista-agendamentos"></ul>
 
     <h2>👩‍🦰 Cadastro de Clientes</h2>
@@ -112,6 +204,7 @@
       form.reset();
 
       const mensagem = document.getElementById('mensagem-confirmacao');
+      // A cor e o peso da fonte da mensagem de confirmação foram movidos para o CSS
       mensagem.textContent = `✅ Agendamento confirmado para ${cliente} em ${datahora} com ${profissional}.`;
       setTimeout(() => mensagem.textContent = '', 5000);
 
