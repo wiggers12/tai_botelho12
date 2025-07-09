@@ -6,84 +6,84 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: 'Poppins', sans-serif; /* Aplica a nova fonte a todo o corpo do site */
-      background-color: #fff0f5; /* Sua cor de fundo atual */
+      font-family: 'Poppins', sans-serif;
+      background-color: #fff0f5;
       margin: 0;
       padding: 0;
-      color: #333; /* Uma cor de texto geral mais suave, para não ser preto puro */
+      color: #333;
     }
 
     header {
       background-color: #e91e63;
-      color: white; /* Alterado para branco para um contraste melhor com o fundo rosa do header */
+      color: white;
       padding: 20px;
       text-align: center;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* Adiciona uma sombra sutil para dar profundidade ao cabeçalho */
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
 
     header h1 {
-      margin: 0; /* Remove a margem padrão do h1 para centralizá-lo melhor no header */
-      font-weight: 600; /* Deixa o título principal mais encorpado */
-      font-size: 2.5em; /* Aumenta o tamanho do título para destacá-lo */
+      margin: 0;
+      font-weight: 600;
+      font-size: 2.5em;
     }
 
     h2 {
-      color: #e91e63; /* Mantém a cor principal do seu tema para os subtítulos */
-      border-bottom: 2px solid #f8bbd0; /* Adiciona uma linha sutil abaixo dos títulos para separação */
-      padding-bottom: 10px; /* Espaçamento entre o título e a linha */
-      margin-top: 30px; /* Mais espaço acima dos subtítulos */
-      margin-bottom: 20px; /* Mais espaço abaixo dos subtítulos */
+      color: #e91e63;
+      border-bottom: 2px solid #f8bbd0;
+      padding-bottom: 10px;
+      margin-top: 30px;
+      margin-bottom: 20px;
     }
 
     main {
-      max-width: 800px; /* Limita a largura do conteúdo principal */
-      margin: 20px auto; /* Centraliza o main e adiciona margem em cima/embaixo */
+      max-width: 800px;
+      margin: 20px auto;
       padding: 20px;
-      background-color: white; /* Fundo branco para o conteúdo principal */
+      background-color: white;
       border-radius: 8px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.08); /* Sombra suave para o contêiner principal */
+      box-shadow: 0 0 15px rgba(0,0,0,0.08);
     }
 
     form {
       background-color: #fce4ec;
-      padding: 25px; /* Aumenta o padding interno */
+      padding: 25px;
       border-radius: 8px;
-      max-width: 450px; /* Aumenta um pouco a largura máxima do formulário */
-      margin: 20px auto; /* Centraliza o formulário */
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Sombra mais visível para os formulários */
+      max-width: 450px;
+      margin: 20px auto;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
 
     input, select {
-      border: 1px solid #f8bbd0; /* Borda mais discreta */
-      border-radius: 5px; /* Cantos levemente arredondados */
-      padding: 10px; /* Mais padding interno */
-      margin-top: 8px; /* Mais espaço acima */
-      margin-bottom: 15px; /* Mais espaço abaixo */
-      box-sizing: border-box; /* Garante que padding e border não aumentem a largura total */
-      width: 100%; /* Garante que os campos ocupem 100% da largura do pai */
+      border: 1px solid #f8bbd0;
+      border-radius: 5px;
+      padding: 10px;
+      margin-top: 8px;
+      margin-bottom: 15px;
+      box-sizing: border-box;
+      width: 100%;
     }
 
     button {
       background-color: #e91e63;
       color: white;
-      padding: 12px 20px; /* Mais padding para o botão */
+      padding: 12px 20px;
       border: none;
       border-radius: 5px;
       cursor: pointer;
       font-size: 1em;
       font-weight: 600;
-      transition: background-color 0.3s ease; /* Transição suave no hover */
-      width: 100%; /* Garante que o botão ocupe 100% da largura */
+      transition: background-color 0.3s ease;
+      width: 100%;
     }
 
     button:hover {
-      background-color: #d81b60; /* Escurece um pouco no hover */
+      background-color: #d81b60;
     }
 
     label {
-      font-weight: 500; /* Deixa o label um pouco mais escuro */
-      display: block; /* Garante que o label ocupe sua própria linha */
-      margin-bottom: 5px; /* Espaçamento entre label e input */
+      font-weight: 500;
+      display: block;
+      margin-bottom: 5px;
       color: #555;
     }
 
@@ -95,42 +95,42 @@
 
     li {
       background-color: #f8bbd0;
-      margin: 10px 0; /* Mais espaçamento entre os itens da lista */
-      padding: 15px; /* Mais padding interno */
+      margin: 10px 0;
+      padding: 15px;
       border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.08); /* Sombra suave para os itens da lista */
-      display: flex; /* Para flexbox, se for adicionar botões depois */
-      justify-content: space-between; /* Para espaçar conteúdo e possíveis botões */
+      box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+      display: flex;
+      justify-content: space-between;
       align-items: center;
-      color: #444; /* Cor de texto para os itens da lista */
+      color: #444;
       font-size: 0.95em;
     }
 
     #mensagem-confirmacao {
       text-align: center;
       padding: 10px;
-      background-color: #e0ffe0; /* Fundo verde claro para a mensagem de sucesso */
+      background-color: #e0ffe0;
       border: 1px solid #aaddaa;
       border-radius: 5px;
       margin-top: 15px;
       font-size: 1.1em;
-      font-weight: bold; /* Adicionado para manter a formatação original da mensagem */
-      color: green; /* Adicionado para manter a cor original da mensagem */
+      font-weight: bold;
+      color: green;
     }
 
     /* Media Queries para responsividade */
     @media (max-width: 768px) {
       header h1 {
-        font-size: 2em; /* Diminui o título do cabeçalho em telas menores */
+        font-size: 2em;
       }
 
       main {
-        margin: 10px; /* Menos margem nas laterais em telas pequenas */
+        margin: 10px;
         padding: 15px;
       }
 
       form {
-        max-width: 100%; /* Formulário ocupa a largura total disponível */
+        max-width: 100%;
         margin: 15px auto;
         padding: 20px;
       }
@@ -182,8 +182,7 @@
       <button type="submit">Cadastrar Cliente</button>
     </form>
 
-   
-  </main>
+    </main>
 
   <script>
     // AGENDAMENTO
@@ -204,7 +203,6 @@
       form.reset();
 
       const mensagem = document.getElementById('mensagem-confirmacao');
-      // A cor e o peso da fonte da mensagem de confirmação foram movidos para o CSS
       mensagem.textContent = `✅ Agendamento confirmado para ${cliente} em ${datahora} com ${profissional}.`;
       setTimeout(() => mensagem.textContent = '', 5000);
 
@@ -230,7 +228,7 @@
 
     // CLIENTES
     const formCliente = document.getElementById('form-cliente');
-    const listaClientes = document.getElementById('lista-clientes');
+    // A constante listaClientes foi removida pois não há mais uma <ul> visível para ela.
 
     formCliente.addEventListener('submit', function (e) {
       e.preventDefault();
@@ -239,22 +237,23 @@
       const telefone = document.getElementById('telefone-cliente').value;
 
       const cliente = { nome, telefone };
-      adicionarClienteNaLista(cliente);
-      salvarCliente(cliente);
+      // A função adicionarClienteNaLista foi esvaziada para não exibir o cliente.
+      // adicionarClienteNaLista(cliente);
+      salvarCliente(cliente); // Isso continua salvando e atualizando o select
       formCliente.reset();
     });
 
-     {
-      const item = document.createElement('li');
-      item.textContent = `${cliente.nome} - ${cliente.telefone}`;
-      listaClientes.appendChild(item);
+    // Esta função agora não faz nada, pois a lista de clientes não será exibida.
+    function adicionarClienteNaLista(cliente) {
+      // O cliente é salvo e o select de agendamento é atualizado em 'salvarCliente'.
+      // Não precisamos mais exibir o cliente nesta lista visual.
     }
 
     function salvarCliente(cliente) {
       const clientes = JSON.parse(localStorage.getItem('clientes')) || [];
       clientes.push(cliente);
       localStorage.setItem('clientes', JSON.stringify(clientes));
-      atualizarListaDeClientes();
+      atualizarListaDeClientes(); // ESSA LINHA GARANTE QUE O SELECT É ATUALIZADO
     }
 
     function atualizarListaDeClientes() {
@@ -284,9 +283,10 @@
       agendamentos.forEach(adicionarNaLista);
 
       const clientes = JSON.parse(localStorage.getItem('clientes')) || [];
-      clientes.forEach(adicionarClienteNaLista);
-
-      atualizarListaDeClientes();
+      // A linha clientes.forEach(adicionarClienteNaLista); foi removida,
+      // pois não precisamos mais exibir os clientes em uma lista visível.
+      
+      atualizarListaDeClientes(); // Garante que o select é populado ao carregar
     });
   </script>
 
