@@ -264,6 +264,21 @@
       <label>Telefone:</label>
       <input type="tel" id="telefone-cliente" required>
 
+      <label>Idade:</label>
+      <input type="number" id="idade-cliente" min="0" max="120">
+
+      <label>Gênero:</label>
+      <select id="genero-cliente">
+        <option value="">Selecione</option>
+        <option value="feminino">Feminino</option>
+        <option value="masculino">Masculino</option>
+        <option value="nao_informar">Prefiro não informar</option>
+        <option value="outro">Outro</option>
+      </select>
+
+      <label>Cliente desde:</label>
+      <input type="date" id="cliente-desde">
+
       <button type="submit">Cadastrar Cliente</button>
     </form>
 
@@ -361,12 +376,18 @@
 
       const nome = document.getElementById('nome-cliente').value;
       const telefone = document.getElementById('telefone-cliente').value;
+      const idade = document.getElementById('idade-cliente').value; // Novo campo
+      const genero = document.getElementById('genero-cliente').value; // Novo campo
+      const clienteDesde = document.getElementById('cliente-desde').value; // Novo campo
 
       // Cada cliente agora terá um ID único e um array para o histórico de procedimentos
       const novoCliente = {
         id: Date.now().toString(), // ID único baseado no timestamp
         nome: nome,
         telefone: telefone,
+        idade: idade || null, // Salva a idade ou null se vazio
+        genero: genero || null, // Salva o gênero ou null se vazio
+        clienteDesde: clienteDesde || null, // Salva a data ou null se vazio
         historicoProcedimentos: [] // Novo array para o histórico
       };
       
@@ -494,6 +515,10 @@
 
         historicoDetalhesCliente.innerHTML = `
             <h3>Histórico de ${cliente.nome}</h3>
+            <p>Telefone: ${cliente.telefone || 'Não informado'}</p>
+            <p>Idade: ${cliente.idade || 'Não informada'}</p>
+            <p>Gênero: ${cliente.genero ? (cliente.genero === 'nao_informar' ? 'Prefiro não informar' : cliente.genero.charAt(0).toUpperCase() + cliente.genero.slice(1)) : 'Não informado'}</p>
+            <p>Cliente desde: ${cliente.clienteDesde ? new Date(cliente.clienteDesde + 'T00:00:00').toLocaleDateString('pt-BR') : 'Não informado'}</p>
             <ul id="lista-procedimentos-cliente" class="lista-itens"></ul>
 
             <h4>Registrar Novo Procedimento</h4>
