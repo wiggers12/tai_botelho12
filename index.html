@@ -82,7 +82,7 @@
     #splash-enter-button {
         background: linear-gradient(45deg, #FFD700, #DAA520); /* Gradiente dourado para o botão */
         color: #000; /* Texto preto para contraste no botão dourado */
-        padding: 10px 30px; /* **Ajustado: Diminuído o padding vertical de 15px para 10px** */
+        padding: 10px 30px; /* Ajustado: Diminuído o padding vertical de 15px para 10px */
         border: none;
         border-radius: 50px; /* Borda bem arredondada (pill shape) */
         cursor: pointer;
@@ -150,7 +150,6 @@
         background-color: var(--menu-bg);
         box-shadow: 2px 0 5px var(--shadow-light); /* Sombra à direita da sidebar */
         padding: 20px 0;
-        /* Remover text-align: center; */
         display: flex; /* Para centralizar os itens verticalmente, se quiser */
         flex-direction: column; /* Itens um embaixo do outro */
         align-items: flex-start; /* Alinha os itens à esquerda dentro da nav */
@@ -223,6 +222,7 @@
       margin: 30px auto; /* Centraliza o formulário */
       box-shadow: 0 5px 15px var(--shadow-light); /* Sombra suave */
       border: 1px solid var(--border-color); /* Borda fina e clara */
+      position: relative; /* Para posicionar a mensagem de feedback */
     }
 
     input, select, textarea { 
@@ -308,18 +308,39 @@
         color: var(--primary-color);
     }
 
-    #mensagem-confirmacao {
-      text-align: center;
-      padding: 15px;
-      background-color: #e0ffe0; /* Verde claro */
-      border: 1px solid #aaddaa;
+    /* Estilo para as mensagens de feedback */
+    #feedback-message {
+      position: absolute; /* Posição absoluta dentro do formulário */
+      top: 10px; /* Ajuste a distância do topo */
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 10px 20px;
       border-radius: 8px;
-      margin-top: 20px;
-      font-size: 1.1em;
       font-weight: bold;
-      color: #28a745; /* Verde mais escuro */
-      box-shadow: 0 2px 5px rgba(40, 167, 69, 0.1);
+      text-align: center;
+      opacity: 0; /* Inicialmente invisível */
+      transition: opacity 0.5s ease-in-out;
+      width: fit-content;
+      white-space: nowrap; /* Impede que o texto quebre linha */
+      z-index: 10; /* Garante que fique acima de outros elementos */
     }
+
+    #feedback-message.show {
+      opacity: 1; /* Torna visível */
+    }
+
+    #feedback-message.success {
+      background-color: #d4edda; /* Verde claro */
+      color: #155724; /* Verde escuro */
+      border: 1px solid #c3e6cb;
+    }
+
+    #feedback-message.error {
+      background-color: #f8d7da; /* Vermelho claro */
+      color: #721c24; /* Vermelho escuro */
+      border: 1px solid #f5c6cb;
+    }
+
 
     /* Estilo para o select de clientes na seção de histórico */
     #select-cliente-historico {
@@ -391,7 +412,7 @@
       }
       #splash-enter-button {
           font-size: 1em;
-          padding: 8px 20px; /* **Ajustado para telas menores também** */
+          padding: 8px 20px; 
           margin-top: 30px;
       }
     }
@@ -421,7 +442,7 @@
       <section id="section-cadastro-clientes" class="content-section">
           <h2>👩‍🦰 Cadastro de Clientes</h2>
           <form id="form-cliente">
-              <label>Nome:</label>
+              <div id="feedback-cliente" class="feedback-message"></div> <label>Nome:</label>
               <input type="text" id="nome-cliente" required>
 
               <label>Telefone:</label>
@@ -434,8 +455,7 @@
               <select id="genero-cliente">
                 <option value="">Selecione</option>
                 <option value="feminino">Feminino</option>
-                <option value="masculino">Masculino</option>
-                <option value="nao_informar">Prefiro não informar</option>
+                <option value="masculino">Masculino</option>                <option value="nao_informar">Prefiro não informar</option>
                 <option value="outro">Outro</option>
               </select>
 
@@ -449,7 +469,7 @@
       <section id="section-agendamento-cliente" class="content-section">
           <h2>📅 Agendar Atendimento</h2>
           <form id="form-agendamento">
-              <label>Nome do Cliente:</label>
+              <div id="feedback-agendamento" class="feedback-message"></div> <label>Nome do Cliente:</label>
               <select id="cliente" required>
                   <option value="">Selecione um cliente</option>
               </select>
@@ -465,8 +485,7 @@
 
               <button type="submit">Agendar</button>
           </form>
-          <p id="mensagem-confirmacao"></p>
-      </section>
+          </section>
 
       <section id="section-consultar-agendamentos" class="content-section">
           <h2>🔍 Consultar Agendamentos</h2>
@@ -507,6 +526,23 @@
 
     function salvarAgendamentos(agendamentos) {
       localStorage.setItem('agendamentos', JSON.stringify(agendamentos));
+    }
+
+    // --- FUNÇÃO PARA EXIBIR FEEDBACK ---
+    function showFeedback(elementId, message, type) {
+        const feedbackDiv = document.getElementById(elementId);
+        feedbackDiv.textContent = message;
+        feedbackDiv.className = 'feedback-message show ' + type; // Adiciona classes para estilo e visibilidade
+
+        // Remove a mensagem após 5 segundos
+        setTimeout(() => {
+            feedbackDiv.classList.remove('show');
+            // Limpa o texto e as classes de tipo após a transição para redefinir
+            setTimeout(() => {
+                feedbackDiv.textContent = '';
+                feedbackDiv.className = 'feedback-message'; 
+            }, 500); // Meio segundo para a transição de opacidade
+        }, 5000);
     }
 
     // --- CONTROLE DO MENU E SEÇÕES ---
@@ -563,7 +599,7 @@
 
     // --- AGENDAMENTO ---
     const formAgendamento = document.getElementById('form-agendamento');
-    const mensagemConfirmacao = document.getElementById('mensagem-confirmacao');
+    // A antiga mensagemConfirmacao não será mais usada diretamente.
 
     formAgendamento.addEventListener('submit', function (e) {
       e.preventDefault();
@@ -573,15 +609,15 @@
       const datahora = document.getElementById('datahora').value;
       const profissional = document.getElementById('profissional').value;
 
-      if (!clienteId) {
-        alert('Por favor, selecione um cliente.');
+      // Validação dos campos
+      if (!clienteId || !servico || !datahora || !profissional) {
+        showFeedback('feedback-agendamento', 'Por favor, preencha todos os campos obrigatórios para o agendamento.', 'error');
         return;
       }
 
       const clientes = getClientes();
       const clienteSelecionado = clientes.find(c => c.id === clienteId);
       const clienteNome = clienteSelecionado ? clienteSelecionado.nome : 'Cliente Desconhecido';
-
 
       const agendamento = { cliente: clienteNome, servico, datahora, profissional };
       
@@ -590,9 +626,7 @@
       salvarAgendamentos(agendamentos);
       formAgendamento.reset();
 
-      mensagemConfirmacao.textContent = `✅ Agendamento confirmado para ${clienteNome} em ${new Date(datahora).toLocaleString('pt-BR')}.`;
-      setTimeout(() => mensagemConfirmacao.textContent = '', 5000);
-
+      showFeedback('feedback-agendamento', `✅ Agendamento confirmado para ${clienteNome} em ${new Date(datahora).toLocaleString('pt-BR')}.`, 'success');
       
       if (clienteSelecionado && clienteSelecionado.telefone) {
         const mensagemTexto = `Olá ${clienteNome}, seu agendamento para ${servico} com ${profissional} foi confirmado para ${new Date(datahora).toLocaleString('pt-BR')}.`;
@@ -607,16 +641,36 @@
     formCliente.addEventListener('submit', function (e) {
       e.preventDefault();
 
-      const nome = document.getElementById('nome-cliente').value;
-      const telefone = document.getElementById('telefone-cliente').value;
+      const nome = document.getElementById('nome-cliente').value.trim(); // .trim() para remover espaços em branco
+      const telefone = document.getElementById('telefone-cliente').value.trim();
       const idade = document.getElementById('idade-cliente').value;
       const genero = document.getElementById('genero-cliente').value;
       const clienteDesde = document.getElementById('cliente-desde').value;
 
+      // Validação dos campos
+      if (!nome || !telefone) {
+        showFeedback('feedback-cliente', 'Nome e Telefone são campos obrigatórios.', 'error');
+        return;
+      }
+
+      // Validação de telefone (apenas números e tamanho razoável)
+      const telefoneLimpo = telefone.replace(/\D/g, ''); // Remove tudo que não é dígito
+      if (!/^\d{8,15}$/.test(telefoneLimpo)) { // Verifica se tem entre 8 e 15 dígitos
+        showFeedback('feedback-cliente', 'Por favor, insira um número de telefone válido (apenas dígitos, 8 a 15 caracteres).', 'error');
+        return;
+      }
+
+      // Validação de idade (se preenchida)
+      if (idade && (isNaN(idade) || parseInt(idade) < 0 || parseInt(idade) > 120)) {
+          showFeedback('feedback-cliente', 'Por favor, insira uma idade válida (entre 0 e 120).', 'error');
+          return;
+      }
+
+
       const novoCliente = {
         id: Date.now().toString(), 
         nome: nome,
-        telefone: telefone,
+        telefone: telefoneLimpo, // Salva o telefone limpo
         idade: idade || null,
         genero: genero || null,
         clienteDesde: clienteDesde || null,
@@ -628,7 +682,7 @@
       salvarClientes(clientes);
       formCliente.reset();
       atualizarListasDeClientes(); 
-      alert('Cliente cadastrado com sucesso!'); // Feedback para o usuário
+      showFeedback('feedback-cliente', `✅ Cliente "${nome}" cadastrado com sucesso!`, 'success'); // Feedback para o usuário
     });
 
     // --- ATUALIZAÇÃO DAS LISTAS DE CLIENTES (SELECTs) ---
@@ -719,20 +773,20 @@
 
             <h4>Registrar Novo Procedimento</h4>
             <form id="form-adicionar-procedimento">
-                <label for="procData">Data:</label>
-                <input type="date" id="procData" required><br><br>
+                <div id="feedback-procedimento" class="feedback-message"></div> <label for="procData">Data:</label>
+                <input type="date" id="procData" required>
 
                 <label for="procServico">Serviço:</label>
-                <input type="text" id="procServico" required><br><br>
+                <input type="text" id="procServico" required>
 
                 <label for="procValor">Valor (R$):</label>
-                <input type="number" id="procValor" step="0.01" required><br><br>
+                <input type="number" id="procValor" step="0.01" required>
 
                 <label for="procProfissional">Profissional (Opcional):</label>
-                <input type="text" id="procProfissional"><br><br>
+                <input type="text" id="procProfissional">
 
                 <label for="procObs">Observações (Opcional):</label>
-                <textarea id="procObs" rows="3"></textarea><br><br>
+                <textarea id="procObs" rows="3"></textarea>
 
                 <button type="submit">Adicionar Procedimento</button>
             </form>
@@ -758,7 +812,6 @@
         }
 
         const formAdicionarProcedimento = document.getElementById('form-adicionar-procedimento');
-        // Remover o listener anterior se ele já existia para evitar múltiplos listeners
         if (formAdicionarProcedimento._submitListener) {
             formAdicionarProcedimento.removeEventListener('submit', formAdicionarProcedimento._submitListener);
         }
@@ -767,7 +820,7 @@
             adicionarProcedimentoAoCliente(clienteId, formAdicionarProcedimento);
         };
         formAdicionarProcedimento.addEventListener('submit', newSubmitListener);
-        formAdicionarProcedimento._submitListener = newSubmitListener; // Guarda a referência
+        formAdicionarProcedimento._submitListener = newSubmitListener;
     }
 
     function adicionarProcedimentoAoCliente(clienteId, form) {
@@ -775,28 +828,35 @@
         const clienteIndex = clientes.findIndex(c => c.id === clienteId);
 
         if (clienteIndex === -1) {
-            alert('Erro: Cliente não encontrado para adicionar procedimento.');
+            showFeedback('feedback-procedimento', 'Erro: Cliente não encontrado para adicionar procedimento.', 'error');
             return;
         }
 
         const data = form.elements['procData'].value;
-        const nomeServico = form.elements['procServico'].value;
+        const nomeServico = form.elements['procServico'].value.trim();
         const valor = parseFloat(form.elements['procValor'].value);
-        const profissional = form.elements['procProfissional'].value;
-        const observacoes = form.elements['procObs'].value;
+        const profissional = form.elements['procProfissional'].value.trim();
+        const observacoes = form.elements['procObs'].value.trim();
+
+        // Validação de campos obrigatórios do procedimento
+        if (!data || !nomeServico || isNaN(valor) || valor < 0) {
+            showFeedback('feedback-procedimento', 'Por favor, preencha a Data, o Serviço e o Valor válido para o procedimento.', 'error');
+            return;
+        }
+
 
         const novoProc = {
             data: data,
             nomeServico: nomeServico,
             valor: valor,
-            profissional: profissional,
-            observacoes: observacoes
+            profissional: profissional || null, // Salva null se vazio
+            observacoes: observacoes || null   // Salva null se vazio
         };
 
         clientes[clienteIndex].historicoProcedimentos.push(novoProc);
         salvarClientes(clientes);
         form.reset(); 
-        alert('Procedimento adicionado com sucesso!');
+        showFeedback('feedback-procedimento', `✅ Procedimento "${nomeServico}" adicionado com sucesso para ${clientes[clienteIndex].nome}!`, 'success');
         exibirHistoricoDoCliente(clienteId); 
     }
 
