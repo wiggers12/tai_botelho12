@@ -130,6 +130,14 @@
     formCliente.addEventListener('submit', function (e) {
       e.preventDefault();
 
+    const telefoneCliente = buscarTelefoneDoCliente(cliente);
+if (telefoneCliente) {
+  const mensagemTexto = `Olá ${cliente}, seu agendamento para ${servico} com ${profissional} foi confirmado para ${datahora}.`;
+  const linkWhatsApp = `https://wa.me/55${telefoneCliente.replace(/\D/g, '')}?text=${encodeURIComponent(mensagemTexto)}`;
+  window.open(linkWhatsApp, '_blank');
+}
+
+
       const nome = document.getElementById('nome-cliente').value;
       const telefone = document.getElementById('telefone-cliente').value;
 
@@ -182,3 +190,8 @@
 </body>
 </html>
 
+function buscarTelefoneDoCliente(nome) {
+  const clientes = JSON.parse(localStorage.getItem('clientes')) || [];
+  const cliente = clientes.find(c => c.nome === nome);
+  return cliente ? cliente.telefone : '';
+}
