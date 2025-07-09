@@ -88,7 +88,7 @@
       border: 1px solid var(--border-color); /* Borda fina e clara */
     }
 
-    input, select {
+    input, select, textarea { /* Adicionado textarea aqui */
       border: 1px solid var(--border-color); /* Borda cinza clara */
       border-radius: 6px; /* Cantos levemente mais arredondados */
       padding: 12px; /* Mais padding interno */
@@ -101,7 +101,7 @@
       transition: border-color 0.3s ease, box-shadow 0.3s ease;
     }
 
-    input:focus, select:focus {
+    input:focus, select:focus, textarea:focus { /* Adicionado textarea aqui */
       border-color: var(--primary-color); /* Borda rosa ao focar */
       box-shadow: 0 0 0 3px rgba(233, 30, 99, 0.2); /* Sombra de foco sutil */
       outline: none; /* Remove o outline padrão */
@@ -133,8 +133,8 @@
       color: var(--text-color-dark);
     }
 
-    /* Estilo para a seção de consulta de agendamentos */
-    #consulta-agendamentos-section {
+    /* Estilo para as seções de consulta e histórico */
+    .section-box { /* Nova classe para formulários/seções que podem ser exibidas/ocultadas */
       background-color: var(--accent-color); /* Fundo rosa claro */
       padding: 30px;
       border-radius: 10px;
@@ -142,11 +142,10 @@
       margin: 30px auto;
       box-shadow: 0 5px 15px var(--shadow-light);
       border: 1px solid var(--border-color);
-      display: none; /* Começa escondida */
     }
 
-    /* Itens da lista de consulta de agendamentos */
-    #lista-agendamentos-consulta li {
+    /* Itens da lista de consulta de agendamentos e histórico */
+    .lista-itens li { /* Unificado para listas de agendamentos e histórico */
       background-color: var(--text-color-light); /* Fundo branco para os itens da lista */
       margin: 10px 0;
       padding: 18px; /* Mais padding */
@@ -161,12 +160,13 @@
       line-height: 1.5;
     }
 
-    #lista-agendamentos-consulta li span {
+    .lista-itens li span {
       display: block; /* Cada parte da informação em uma nova linha */
       margin-bottom: 5px;
     }
 
-    #lista-agendamentos-consulta li span:first-child {
+    .lista-itens li span:first-child,
+    .lista-itens li strong { /* Para o título do item no histórico */
         font-weight: 600;
         color: var(--primary-color);
     }
@@ -184,6 +184,17 @@
       box-shadow: 0 2px 5px rgba(40, 167, 69, 0.1);
     }
 
+    /* Esconde seções por padrão */
+    #consulta-agendamentos-section,
+    #historico-cliente-section {
+        display: none;
+    }
+
+    /* Estilo para o select de clientes na seção de histórico */
+    #select-cliente-historico {
+        margin-bottom: 25px; /* Mais espaço após o select */
+    }
+
     /* Media Queries para responsividade */
     @media (max-width: 768px) {
       header h1 {
@@ -199,7 +210,7 @@
         padding: 20px;
       }
 
-      form, #consulta-agendamentos-section {
+      form, .section-box { /* Usa a nova classe aqui */
         max-width: 100%;
         margin: 20px auto;
         padding: 20px;
@@ -210,7 +221,7 @@
         font-size: 1em;
       }
 
-      #lista-agendamentos-consulta li {
+      .lista-itens li {
         padding: 15px;
         font-size: 0.9em;
       }
@@ -256,57 +267,93 @@
       <button type="submit">Cadastrar Cliente</button>
     </form>
 
+    ---
+
     <h2>🔍 Consultar Agendamentos</h2>
     <button id="mostrar-agendamentos">Mostrar Agendamentos</button>
-    <div id="consulta-agendamentos-section">
-      <ul id="lista-agendamentos-consulta"></ul>
+    <div id="consulta-agendamentos-section" class="section-box">
+      <ul id="lista-agendamentos-consulta" class="lista-itens"></ul>
       <button id="ocultar-agendamentos">Ocultar Agendamentos</button>
     </div>
     
+    ---
+
+    <h2>📋 Histórico de Procedimentos por Cliente</h2>
+    <button id="mostrar-historico-procedimentos">Mostrar Histórico</button>
+    <div id="historico-cliente-section" class="section-box">
+        <label for="select-cliente-historico">Selecione o Cliente:</label>
+        <select id="select-cliente-historico">
+            <option value="">Selecione um cliente para ver o histórico</option>
+        </select>
+
+        <div id="historico-detalhes-cliente">
+            <p>Selecione um cliente acima para ver ou adicionar procedimentos.</p>
+        </div>
+
+        <button id="ocultar-historico-procedimentos" style="margin-top: 20px;">Ocultar Histórico</button>
+    </div>
+
   </main>
 
   <script>
-    // AGENDAMENTO
-    const form = document.getElementById('form-agendamento');
+    // --- FUNÇÕES DE UTILIDADE ---
+    function getClientes() {
+      return JSON.parse(localStorage.getItem('clientes')) || [];
+    }
 
-    form.addEventListener('submit', function (e) {
+    function salvarClientes(clientes) {
+      localStorage.setItem('clientes', JSON.stringify(clientes));
+    }
+
+    function getAgendamentos() {
+      return JSON.parse(localStorage.getItem('agendamentos')) || [];
+    }
+
+    function salvarAgendamentos(agendamentos) {
+      localStorage.setItem('agendamentos', JSON.stringify(agendamentos));
+    }
+
+    // --- AGENDAMENTO ---
+    const formAgendamento = document.getElementById('form-agendamento');
+    const mensagemConfirmacao = document.getElementById('mensagem-confirmacao');
+
+    formAgendamento.addEventListener('submit', function (e) {
       e.preventDefault();
 
-      const cliente = document.getElementById('cliente').value;
+      const clienteId = document.getElementById('cliente').value; // Usamos o ID aqui
       const servico = document.getElementById('servico').value;
       const datahora = document.getElementById('datahora').value;
       const profissional = document.getElementById('profissional').value;
 
-      const agendamento = { cliente, servico, datahora, profissional };
-      adicionarNaLista(agendamento); // Esta função continua presente, mas não faz nada visual
-      salvarAgendamento(agendamento);
-      form.reset();
+      if (!clienteId) {
+        alert('Por favor, selecione um cliente.');
+        return;
+      }
 
-      const mensagem = document.getElementById('mensagem-confirmacao');
-      mensagem.textContent = `✅ Agendamento confirmado para ${cliente} em ${datahora} com ${profissional}.`;
-      setTimeout(() => mensagem.textContent = '', 5000);
+      const clientes = getClientes();
+      const clienteSelecionado = clientes.find(c => c.id === clienteId);
+      const clienteNome = clienteSelecionado ? clienteSelecionado.nome : 'Cliente Desconhecido';
 
-      const telefoneCliente = buscarTelefoneDoCliente(cliente);
-      if (telefoneCliente) {
-        const mensagemTexto = `Olá ${cliente}, seu agendamento para ${servico} com ${profissional} foi confirmado para ${datahora}.`;
-        const linkWhatsApp = `https://wa.me/55${telefoneCliente.replace(/\D/g, '')}?text=${encodeURIComponent(mensagemTexto)}`;
+
+      const agendamento = { cliente: clienteNome, servico, datahora, profissional };
+      
+      const agendamentos = getAgendamentos();
+      agendamentos.push(agendamento);
+      salvarAgendamentos(agendamentos);
+      formAgendamento.reset();
+
+      mensagemConfirmacao.textContent = `✅ Agendamento confirmado para ${clienteNome} em ${new Date(datahora).toLocaleString('pt-BR')}.`;
+      setTimeout(() => mensagemConfirmacao.textContent = '', 5000);
+
+      
+      if (clienteSelecionado && clienteSelecionado.telefone) {
+        const mensagemTexto = `Olá ${clienteNome}, seu agendamento para ${servico} com ${profissional} foi confirmado para ${new Date(datahora).toLocaleString('pt-BR')}.`;
+        const linkWhatsApp = `https://wa.me/55${clienteSelecionado.telefone.replace(/\D/g, '')}?text=${encodeURIComponent(mensagemTexto)}`;
         window.open(linkWhatsApp, '_blank');
       }
     });
 
-    // Esta função agora não faz nada visualmente.
-    function adicionarNaLista(agendamento) {
-      // Agendamentos são salvos em 'salvarAgendamento'.
-      // A exibição é controlada por 'exibirAgendamentosParaConsulta'.
-    }
-
-    function salvarAgendamento(agendamento) {
-      const agendamentos = JSON.parse(localStorage.getItem('agendamentos')) || [];
-      agendamentos.push(agendamento);
-      localStorage.setItem('agendamentos', JSON.stringify(agendamentos));
-    }
-
-    // CLIENTES
+    // --- CADASTRO DE CLIENTES ---
     const formCliente = document.getElementById('form-cliente');
 
     formCliente.addEventListener('submit', function (e) {
@@ -315,46 +362,51 @@
       const nome = document.getElementById('nome-cliente').value;
       const telefone = document.getElementById('telefone-cliente').value;
 
-      const cliente = { nome, telefone };
-      adicionarClienteNaLista(cliente); // Esta função continua presente, mas não faz nada visual
-      salvarCliente(cliente);
+      // Cada cliente agora terá um ID único e um array para o histórico de procedimentos
+      const novoCliente = {
+        id: Date.now().toString(), // ID único baseado no timestamp
+        nome: nome,
+        telefone: telefone,
+        historicoProcedimentos: [] // Novo array para o histórico
+      };
+      
+      const clientes = getClientes();
+      clientes.push(novoCliente);
+      salvarClientes(clientes);
       formCliente.reset();
+      atualizarListasDeClientes(); // Atualiza todos os selects de clientes
     });
 
-    // Esta função agora não faz nada visualmente.
-    function adicionarClienteNaLista(cliente) {
-      // Clientes são salvos e o select é atualizado em 'salvarCliente'.
-    }
+    // --- ATUALIZAÇÃO DAS LISTAS DE CLIENTES (SELECTs) ---
+    function atualizarListasDeClientes() {
+      const selectsClientes = [
+        document.getElementById('cliente'), // Select do agendamento
+        document.getElementById('select-cliente-historico') // Novo select do histórico
+      ];
 
-    function salvarCliente(cliente) {
-      const clientes = JSON.parse(localStorage.getItem('clientes')) || [];
-      clientes.push(cliente);
-      localStorage.setItem('clientes', JSON.stringify(clientes));
-      atualizarListaDeClientes();
-    }
+      const clientes = getClientes();
 
-    function atualizarListaDeClientes() {
-      const select = document.getElementById('cliente');
-      if (!select) return;
+      selectsClientes.forEach(select => {
+        if (!select) return; // Garante que o elemento existe
 
-      select.innerHTML = '<option value="">Selecione um cliente</option>';
+        const valorAtual = select.value; // Salva o valor selecionado antes de limpar
+        select.innerHTML = '<option value="">Selecione um cliente</option>';
 
-      const clientes = JSON.parse(localStorage.getItem('clientes')) || [];
-      clientes.forEach(cliente => {
-        const option = document.createElement('option');
-        option.value = cliente.nome;
-        option.textContent = cliente.nome;
-        select.appendChild(option);
+        clientes.forEach(cliente => {
+          const option = document.createElement('option');
+          option.value = cliente.id; // Agora usa o ID do cliente como valor
+          option.textContent = cliente.nome;
+          select.appendChild(option);
+        });
+
+        // Tenta restaurar a seleção anterior se ainda existir
+        if (valorAtual && clientes.some(c => c.id === valorAtual)) {
+            select.value = valorAtual;
+        }
       });
     }
 
-    function buscarTelefoneDoCliente(nome) {
-      const clientes = JSON.parse(localStorage.getItem('clientes')) || [];
-      const cliente = clientes.find(c => c.nome === nome);
-      return cliente ? cliente.telefone : '';
-    }
-
-    // NOVA FUNCIONALIDADE: CONSULTAR AGENDAMENTOS
+    // --- CONSULTAR AGENDAMENTOS (EXISTENTE) ---
     const btnMostrarAgendamentos = document.getElementById('mostrar-agendamentos');
     const btnOcultarAgendamentos = document.getElementById('ocultar-agendamentos');
     const consultaAgendamentosSection = document.getElementById('consulta-agendamentos-section');
@@ -362,27 +414,29 @@
 
     btnMostrarAgendamentos.addEventListener('click', () => {
       exibirAgendamentosParaConsulta();
-      consultaAgendamentosSection.style.display = 'block'; // Mostra a seção
-      btnMostrarAgendamentos.style.display = 'none'; // Esconde o botão "Mostrar"
+      consultaAgendamentosSection.style.display = 'block';
+      btnMostrarAgendamentos.style.display = 'none';
     });
 
     btnOcultarAgendamentos.addEventListener('click', () => {
-      consultaAgendamentosSection.style.display = 'none'; // Esconde a seção
-      btnMostrarAgendamentos.style.display = 'block'; // Mostra o botão "Mostrar"
-      listaAgendamentosConsulta.innerHTML = ''; // Limpa a lista ao ocultar
+      consultaAgendamentosSection.style.display = 'none';
+      btnMostrarAgendamentos.style.display = 'block';
+      listaAgendamentosConsulta.innerHTML = '';
     });
 
     function exibirAgendamentosParaConsulta() {
-      listaAgendamentosConsulta.innerHTML = ''; // Limpa a lista antes de preencher
-      const agendamentos = JSON.parse(localStorage.getItem('agendamentos')) || [];
+      listaAgendamentosConsulta.innerHTML = '';
+      const agendamentos = getAgendamentos();
       if (agendamentos.length === 0) {
         const item = document.createElement('li');
-        item.innerHTML = '<span>Nenhum agendamento encontrado.</span>'; /* Usando span para consistência */
+        item.innerHTML = '<span>Nenhum agendamento encontrado.</span>';
         listaAgendamentosConsulta.appendChild(item);
       } else {
+        // Ordenar agendamentos do mais recente para o mais antigo
+        agendamentos.sort((a, b) => new Date(b.datahora) - new Date(a.datahora));
+
         agendamentos.forEach(agendamento => {
           const item = document.createElement('li');
-          // Formatando a exibição para que cada informação fique em uma linha separada
           item.innerHTML = `
             <span>Cliente: ${agendamento.cliente}</span>
             <span>Serviço: ${agendamento.servico}</span>
@@ -394,11 +448,137 @@
       }
     }
 
-    // CARREGAR DADOS AO INICIAR
+    // --- NOVA FUNCIONALIDADE: HISTÓRICO DE PROCEDIMENTOS ---
+    const btnMostrarHistorico = document.getElementById('mostrar-historico-procedimentos');
+    const btnOcultarHistorico = document.getElementById('ocultar-historico-procedimentos');
+    const historicoClienteSection = document.getElementById('historico-cliente-section');
+    const selectClienteHistorico = document.getElementById('select-cliente-historico');
+    const historicoDetalhesCliente = document.getElementById('historico-detalhes-cliente');
+
+    btnMostrarHistorico.addEventListener('click', () => {
+        historicoClienteSection.style.display = 'block';
+        btnMostrarHistorico.style.display = 'none';
+        // Se já houver um cliente selecionado no dropdown, exibe o histórico dele
+        if (selectClienteHistorico.value) {
+            exibirHistoricoDoCliente(selectClienteHistorico.value);
+        } else {
+            historicoDetalhesCliente.innerHTML = '<p>Selecione um cliente acima para ver ou adicionar procedimentos.</p>';
+        }
+    });
+
+    btnOcultarHistorico.addEventListener('click', () => {
+        historicoClienteSection.style.display = 'none';
+        btnMostrarHistorico.style.display = 'block';
+        historicoDetalhesCliente.innerHTML = ''; // Limpa os detalhes do histórico ao ocultar
+        selectClienteHistorico.value = ''; // Reseta o select
+    });
+
+    // Quando o cliente muda no select de histórico
+    selectClienteHistorico.addEventListener('change', (event) => {
+        const clienteId = event.target.value;
+        if (clienteId) {
+            exibirHistoricoDoCliente(clienteId);
+        } else {
+            historicoDetalhesCliente.innerHTML = '<p>Selecione um cliente acima para ver ou adicionar procedimentos.</p>';
+        }
+    });
+
+    function exibirHistoricoDoCliente(clienteId) {
+        const clientes = getClientes();
+        const cliente = clientes.find(c => c.id === clienteId);
+
+        if (!cliente) {
+            historicoDetalhesCliente.innerHTML = '<p>Cliente não encontrado.</p>';
+            return;
+        }
+
+        historicoDetalhesCliente.innerHTML = `
+            <h3>Histórico de ${cliente.nome}</h3>
+            <ul id="lista-procedimentos-cliente" class="lista-itens"></ul>
+
+            <h4>Registrar Novo Procedimento</h4>
+            <form id="form-adicionar-procedimento">
+                <label for="procData">Data:</label>
+                <input type="date" id="procData" required><br><br>
+
+                <label for="procServico">Serviço:</label>
+                <input type="text" id="procServico" required><br><br>
+
+                <label for="procValor">Valor (R$):</label>
+                <input type="number" id="procValor" step="0.01" required><br><br>
+
+                <label for="procProfissional">Profissional (Opcional):</label>
+                <input type="text" id="procProfissional"><br><br>
+
+                <label for="procObs">Observações (Opcional):</label>
+                <textarea id="procObs" rows="3"></textarea><br><br>
+
+                <button type="submit">Adicionar Procedimento</button>
+            </form>
+        `;
+
+        const listaProcCliente = document.getElementById('lista-procedimentos-cliente');
+        if (cliente.historicoProcedimentos && cliente.historicoProcedimentos.length > 0) {
+            // Ordena os procedimentos do mais recente para o mais antigo
+            cliente.historicoProcedimentos.sort((a, b) => new Date(b.data) - new Date(a.data));
+
+            cliente.historicoProcedimentos.forEach(proc => {
+                const item = document.createElement('li');
+                item.innerHTML = `
+                    <strong>Data: ${new Date(proc.data + 'T00:00:00').toLocaleDateString('pt-BR')}</strong><br>
+                    <span>Serviço: ${proc.nomeServico}</span>
+                    <span>Valor: R$ ${proc.valor ? proc.valor.toFixed(2) : '0.00'}</span>
+                    ${proc.profissional ? `<span>Profissional: ${proc.profissional}</span>` : ''}
+                    ${proc.observacoes ? `<span>Obs: ${proc.observacoes}</span>` : ''}
+                `;
+                listaProcCliente.appendChild(item);
+            });
+        } else {
+            listaProcCliente.innerHTML = '<li><span>Nenhum procedimento registrado para este cliente.</span></li>';
+        }
+
+        // Adicionar o event listener para o novo formulário de procedimento
+        // IMPORTANTE: Este event listener é adicionado após o HTML do formulário ser criado
+        const formAdicionarProcedimento = document.getElementById('form-adicionar-procedimento');
+        formAdicionarProcedimento.addEventListener('submit', (event) => {
+            event.preventDefault();
+            adicionarProcedimentoAoCliente(clienteId, formAdicionarProcedimento);
+        });
+    }
+
+    function adicionarProcedimentoAoCliente(clienteId, form) {
+        const clientes = getClientes();
+        const clienteIndex = clientes.findIndex(c => c.id === clienteId);
+
+        if (clienteIndex === -1) {
+            alert('Erro: Cliente não encontrado para adicionar procedimento.');
+            return;
+        }
+
+        const data = form.elements['procData'].value;
+        const nomeServico = form.elements['procServico'].value;
+        const valor = parseFloat(form.elements['procValor'].value);
+        const profissional = form.elements['procProfissional'].value;
+        const observacoes = form.elements['procObs'].value;
+
+        const novoProc = {
+            data: data,
+            nomeServico: nomeServico,
+            valor: valor,
+            profissional: profissional,
+            observacoes: observacoes
+        };
+
+        clientes[clienteIndex].historicoProcedimentos.push(novoProc);
+        salvarClientes(clientes);
+        form.reset(); // Limpa o formulário após adicionar
+        alert('Procedimento adicionado com sucesso!');
+        exibirHistoricoDoCliente(clienteId); // Recarrega a visualização para mostrar o novo item
+    }
+
+    // --- CARREGAR DADOS AO INICIAR ---
     window.addEventListener('load', () => {
-      // As chamadas para adicionarNaLista e adicionarClienteNaLista foram removidas daqui,
-      // pois as listas não são mais exibidas automaticamente ao carregar.
-      atualizarListaDeClientes(); // Garante que o select de clientes é populado ao carregar
+      atualizarListasDeClientes(); // Garante que todos os selects de clientes são populados
     });
   </script>
 
