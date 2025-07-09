@@ -3,152 +3,215 @@
 <head>
   <meta charset="UTF-8">
   <title>Espaço Tai Botelho</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
   <style>
+    /* Variáveis de Cores */
+    :root {
+      --primary-color: #e91e63; /* Rosa Principal */
+      --secondary-color: #9c27b0; /* Roxo Secundário */
+      --accent-color: #fce4ec; /* Rosa Claro para fundos de seções */
+      --text-color-dark: #4a4a4a; /* Cinza escuro para texto principal */
+      --text-color-light: #ffffff; /* Branco para texto em fundos escuros */
+      --bg-light: #fefefe; /* Branco muito suave para o corpo */
+      --border-color: #e0e0e0; /* Cinza claro para bordas */
+      --shadow-light: rgba(0, 0, 0, 0.05);
+      --shadow-medium: rgba(0, 0, 0, 0.1);
+    }
+
     body {
       font-family: 'Poppins', sans-serif;
-      background-color: #fff0f5;
+      background-color: var(--bg-light); /* Fundo branco suave */
       margin: 0;
       padding: 0;
-      color: #333;
+      color: var(--text-color-dark); /* Texto principal cinza escuro */
+      line-height: 1.6;
     }
 
     header {
-      background-color: #e91e63;
-      color: white;
-      padding: 20px;
+      background: linear-gradient(135deg, var(--primary-color), #d81b60); /* Gradiente suave */
+      color: var(--text-color-light);
+      padding: 25px 20px; /* Mais padding */
       text-align: center;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      box-shadow: 0 4px 10px var(--shadow-medium); /* Sombra mais pronunciada */
+      position: relative;
+      overflow: hidden;
+    }
+
+    header::before { /* Efeito de fundo sutil no header */
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="40" fill="%23ffffff" fill-opacity="0.05" /></svg>') repeat;
+      opacity: 0.8;
+      z-index: 0;
     }
 
     header h1 {
       margin: 0;
-      font-weight: 600;
-      font-size: 2.5em;
+      font-weight: 700; /* Mais encorpado */
+      font-size: 3em; /* Um pouco maior */
+      letter-spacing: 1px; /* Espaçamento entre letras */
+      position: relative;
+      z-index: 1;
     }
 
     h2 {
-      color: #e91e63;
-      border-bottom: 2px solid #f8bbd0;
-      padding-bottom: 10px;
-      margin-top: 30px;
-      margin-bottom: 20px;
+      color: var(--primary-color); /* Rosa principal */
+      border-bottom: 2px solid var(--accent-color); /* Linha sutil rosa claro */
+      padding-bottom: 12px;
+      margin-top: 40px; /* Mais espaço acima */
+      margin-bottom: 25px; /* Mais espaço abaixo */
+      font-weight: 600;
+      font-size: 1.8em;
+      text-align: center;
     }
 
     main {
       max-width: 800px;
-      margin: 20px auto;
-      padding: 20px;
-      background-color: white;
-      border-radius: 8px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.08);
+      margin: 30px auto; /* Mais margem */
+      padding: 30px; /* Mais padding */
+      background-color: var(--text-color-light); /* Fundo branco puro */
+      border-radius: 12px; /* Cantos mais arredondados */
+      box-shadow: 0 8px 20px var(--shadow-medium); /* Sombra mais suave e espalhada */
     }
 
     form {
-      background-color: #fce4ec;
-      padding: 25px;
-      border-radius: 8px;
+      background-color: var(--accent-color); /* Fundo rosa claro */
+      padding: 30px; /* Mais padding */
+      border-radius: 10px; /* Cantos arredondados */
       max-width: 450px;
-      margin: 20px auto;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      margin: 30px auto; /* Centraliza o formulário */
+      box-shadow: 0 5px 15px var(--shadow-light); /* Sombra suave */
+      border: 1px solid var(--border-color); /* Borda fina e clara */
     }
 
     input, select {
-      border: 1px solid #f8bbd0;
-      border-radius: 5px;
-      padding: 10px;
+      border: 1px solid var(--border-color); /* Borda cinza clara */
+      border-radius: 6px; /* Cantos levemente mais arredondados */
+      padding: 12px; /* Mais padding interno */
       margin-top: 8px;
-      margin-bottom: 15px;
+      margin-bottom: 18px; /* Mais espaço abaixo */
       box-sizing: border-box;
       width: 100%;
+      font-size: 1em;
+      color: var(--text-color-dark);
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--primary-color); /* Borda rosa ao focar */
+      box-shadow: 0 0 0 3px rgba(233, 30, 99, 0.2); /* Sombra de foco sutil */
+      outline: none; /* Remove o outline padrão */
     }
 
     button {
-      background-color: #e91e63;
-      color: white;
-      padding: 12px 20px;
+      background: linear-gradient(45deg, var(--primary-color), var(--secondary-color)); /* Gradiente nos botões */
+      color: var(--text-color-light);
+      padding: 15px 25px; /* Mais padding para botões maiores */
       border: none;
-      border-radius: 5px;
+      border-radius: 8px; /* Cantos mais arredondados */
       cursor: pointer;
-      font-size: 1em;
+      font-size: 1.1em; /* Fonte um pouco maior */
       font-weight: 600;
-      transition: background-color 0.3s ease;
+      transition: transform 0.2s ease, box-shadow 0.2s ease; /* Transição de escala e sombra */
       width: 100%;
-      margin-top: 10px; /* Adicionado um pouco de margem acima dos botões */
+      letter-spacing: 0.5px;
     }
 
     button:hover {
-      background-color: #d81b60;
+      transform: translateY(-2px); /* Leve levantamento */
+      box-shadow: 0 6px 15px var(--shadow-medium); /* Sombra ao passar o mouse */
     }
 
     label {
       font-weight: 500;
       display: block;
-      margin-bottom: 5px;
-      color: #555;
-    }
-
-    ul {
-      list-style: none;
-      padding: 0;
-      margin-top: 20px;
-    }
-
-    li {
-      background-color: #f8bbd0;
-      margin: 10px 0;
-      padding: 15px;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.08);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      color: #444;
-      font-size: 0.95em;
-    }
-
-    #mensagem-confirmacao {
-      text-align: center;
-      padding: 10px;
-      background-color: #e0ffe0;
-      border: 1px solid #aaddaa;
-      border-radius: 5px;
-      margin-top: 15px;
-      font-size: 1.1em;
-      font-weight: bold;
-      color: green;
+      margin-bottom: 8px; /* Mais espaço abaixo do label */
+      color: var(--text-color-dark);
     }
 
     /* Estilo para a seção de consulta de agendamentos */
     #consulta-agendamentos-section {
-      background-color: #fce4ec; /* Mesma cor dos formulários */
-      padding: 25px;
-      border-radius: 8px;
+      background-color: var(--accent-color); /* Fundo rosa claro */
+      padding: 30px;
+      border-radius: 10px;
       max-width: 450px;
-      margin: 20px auto;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      margin: 30px auto;
+      box-shadow: 0 5px 15px var(--shadow-light);
+      border: 1px solid var(--border-color);
       display: none; /* Começa escondida */
+    }
+
+    /* Itens da lista de consulta de agendamentos */
+    #lista-agendamentos-consulta li {
+      background-color: var(--text-color-light); /* Fundo branco para os itens da lista */
+      margin: 10px 0;
+      padding: 18px; /* Mais padding */
+      border-radius: 8px;
+      box-shadow: 0 2px 8px var(--shadow-light); /* Sombra mais suave */
+      border-left: 5px solid var(--primary-color); /* Linha colorida na esquerda */
+      color: var(--text-color-dark);
+      font-size: 0.95em;
+      display: flex;
+      flex-direction: column; /* Para empilhar as informações */
+      align-items: flex-start;
+      line-height: 1.5;
+    }
+
+    #lista-agendamentos-consulta li span {
+      display: block; /* Cada parte da informação em uma nova linha */
+      margin-bottom: 5px;
+    }
+
+    #lista-agendamentos-consulta li span:first-child {
+        font-weight: 600;
+        color: var(--primary-color);
+    }
+
+    #mensagem-confirmacao {
+      text-align: center;
+      padding: 15px;
+      background-color: #e0ffe0; /* Verde claro */
+      border: 1px solid #aaddaa;
+      border-radius: 8px;
+      margin-top: 20px;
+      font-size: 1.1em;
+      font-weight: bold;
+      color: #28a745; /* Verde mais escuro */
+      box-shadow: 0 2px 5px rgba(40, 167, 69, 0.1);
     }
 
     /* Media Queries para responsividade */
     @media (max-width: 768px) {
       header h1 {
-        font-size: 2em;
+        font-size: 2.5em;
+      }
+
+      h2 {
+        font-size: 1.5em;
       }
 
       main {
-        margin: 10px;
-        padding: 15px;
-      }
-
-      form, #consulta-agendamentos-section { /* Aplica a largura total também para a nova seção */
-        max-width: 100%;
-        margin: 15px auto;
+        margin: 20px 15px; /* Margem lateral em telas pequenas */
         padding: 20px;
       }
 
-      li {
-        padding: 12px;
+      form, #consulta-agendamentos-section {
+        max-width: 100%;
+        margin: 20px auto;
+        padding: 20px;
+      }
+
+      button {
+        padding: 12px 20px;
+        font-size: 1em;
+      }
+
+      #lista-agendamentos-consulta li {
+        padding: 15px;
         font-size: 0.9em;
       }
     }
@@ -163,19 +226,19 @@
   <main>
     <h2>📅 Agendar Atendimento</h2>
     <form id="form-agendamento">
-      <label>Nome do Cliente:</label><br>
+      <label>Nome do Cliente:</label>
       <select id="cliente" required>
         <option value="">Selecione um cliente</option>
-      </select><br><br>
+      </select>
 
-      <label>Serviço:</label><br>
-      <input type="text" id="servico" required><br><br>
+      <label>Serviço:</label>
+      <input type="text" id="servico" required>
 
-      <label>Data e Hora:</label><br>
-      <input type="datetime-local" id="datahora" required><br><br>
+      <label>Data e Hora:</label>
+      <input type="datetime-local" id="datahora" required>
 
-      <label>Profissional:</label><br>
-      <input type="text" id="profissional" required><br><br>
+      <label>Profissional:</label>
+      <input type="text" id="profissional" required>
 
       <button type="submit">Agendar</button>
     </form>
@@ -184,11 +247,11 @@
     
     <h2>👩‍🦰 Cadastro de Clientes</h2>
     <form id="form-cliente">
-      <label>Nome:</label><br>
-      <input type="text" id="nome-cliente" required><br><br>
+      <label>Nome:</label>
+      <input type="text" id="nome-cliente" required>
 
-      <label>Telefone:</label><br>
-      <input type="tel" id="telefone-cliente" required><br><br>
+      <label>Telefone:</label>
+      <input type="tel" id="telefone-cliente" required>
 
       <button type="submit">Cadastrar Cliente</button>
     </form>
@@ -205,7 +268,6 @@
   <script>
     // AGENDAMENTO
     const form = document.getElementById('form-agendamento');
-    // A constante 'lista' que referenciava 'lista-agendamentos' não é mais necessária para exibir.
 
     form.addEventListener('submit', function (e) {
       e.preventDefault();
@@ -216,8 +278,7 @@
       const profissional = document.getElementById('profissional').value;
 
       const agendamento = { cliente, servico, datahora, profissional };
-      // A função adicionarNaLista agora não faz nada visual.
-      adicionarNaLista(agendamento); // Mantida para consistência, mas não faz nada visual
+      adicionarNaLista(agendamento); // Esta função continua presente, mas não faz nada visual
       salvarAgendamento(agendamento);
       form.reset();
 
@@ -233,10 +294,10 @@
       }
     });
 
-    // Esta função agora não faz nada, pois a lista de agendamentos não será exibida automaticamente.
+    // Esta função agora não faz nada visualmente.
     function adicionarNaLista(agendamento) {
-      // O agendamento é salvo em 'salvarAgendamento'.
-      // A exibição será feita pela nova função 'exibirAgendamentosParaConsulta'.
+      // Agendamentos são salvos em 'salvarAgendamento'.
+      // A exibição é controlada por 'exibirAgendamentosParaConsulta'.
     }
 
     function salvarAgendamento(agendamento) {
@@ -255,16 +316,14 @@
       const telefone = document.getElementById('telefone-cliente').value;
 
       const cliente = { nome, telefone };
-      // A função adicionarClienteNaLista foi esvaziada para não exibir o cliente.
-      adicionarClienteNaLista(cliente); // Mantida para consistência, mas não faz nada visual
+      adicionarClienteNaLista(cliente); // Esta função continua presente, mas não faz nada visual
       salvarCliente(cliente);
       formCliente.reset();
     });
 
-    // Esta função agora não faz nada, pois a lista de clientes não será exibida.
+    // Esta função agora não faz nada visualmente.
     function adicionarClienteNaLista(cliente) {
-      // O cliente é salvo e o select de agendamento é atualizado em 'salvarCliente'.
-      // Não precisamos mais exibir o cliente nesta lista visual.
+      // Clientes são salvos e o select é atualizado em 'salvarCliente'.
     }
 
     function salvarCliente(cliente) {
@@ -318,12 +377,18 @@
       const agendamentos = JSON.parse(localStorage.getItem('agendamentos')) || [];
       if (agendamentos.length === 0) {
         const item = document.createElement('li');
-        item.textContent = 'Nenhum agendamento encontrado.';
+        item.innerHTML = '<span>Nenhum agendamento encontrado.</span>'; /* Usando span para consistência */
         listaAgendamentosConsulta.appendChild(item);
       } else {
         agendamentos.forEach(agendamento => {
           const item = document.createElement('li');
-          item.textContent = `${agendamento.datahora} - ${agendamento.cliente} | ${agendamento.servico} com ${agendamento.profissional}`;
+          // Formatando a exibição para que cada informação fique em uma linha separada
+          item.innerHTML = `
+            <span>Cliente: ${agendamento.cliente}</span>
+            <span>Serviço: ${agendamento.servico}</span>
+            <span>Profissional: ${agendamento.profissional}</span>
+            <span>Data e Hora: ${new Date(agendamento.datahora).toLocaleString('pt-BR')}</span>
+          `;
           listaAgendamentosConsulta.appendChild(item);
         });
       }
@@ -333,7 +398,6 @@
     window.addEventListener('load', () => {
       // As chamadas para adicionarNaLista e adicionarClienteNaLista foram removidas daqui,
       // pois as listas não são mais exibidas automaticamente ao carregar.
-      
       atualizarListaDeClientes(); // Garante que o select de clientes é populado ao carregar
     });
   </script>
