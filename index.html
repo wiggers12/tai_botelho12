@@ -178,7 +178,7 @@
         color: var(--text-color-light);
     }
 
-    /* Estilo para o submenu de Clientes */
+    /* Estilo para o submenu de Clientes e Financeiro */
     .submenu {
         display: none; /* Inicia oculto */
         list-style: none;
@@ -299,7 +299,7 @@
       background-color: var(--accent-color);
       padding: 30px;
       border-radius: 10px;
-      max-width: 450px;
+      max-width: 800px; /* Aumentado para a tabela de extrato */
       margin: 30px auto;
       box-shadow: 0 5px 15px var(--shadow-light);
       border: 1px solid var(--border-color);
@@ -365,6 +365,87 @@
 
     #select-cliente-historico {
         margin-bottom: 25px;
+    }
+
+    /* Estilos para o extrato financeiro */
+    .finance-summary {
+        display: flex;
+        justify-content: space-around;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .finance-summary div {
+        background-color: var(--text-color-light);
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px var(--shadow-light);
+        text-align: center;
+        flex: 1;
+        min-width: 200px;
+        border-left: 5px solid;
+    }
+
+    .finance-summary div.receita {
+        border-color: var(--secondary-color); /* Verde */
+    }
+    .finance-summary div.despesa {
+        border-color: var(--primary-color); /* Azul */
+    }
+    .finance-summary div.saldo {
+        border-color: #ffc107; /* Amarelo */
+    }
+
+    .finance-summary h4 {
+        margin-top: 0;
+        color: var(--text-color-dark);
+        font-size: 1.1em;
+    }
+
+    .finance-summary p {
+        font-size: 1.8em;
+        font-weight: 700;
+        margin: 5px 0 0;
+    }
+    
+    .finance-summary p.positive {
+        color: var(--secondary-color);
+    }
+    .finance-summary p.negative {
+        color: #dc3545; /* Vermelho */
+    }
+
+    .finance-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    .finance-table th, .finance-table td {
+        border: 1px solid var(--border-color);
+        padding: 12px;
+        text-align: left;
+    }
+
+    .finance-table th {
+        background-color: var(--primary-color);
+        color: var(--text-color-light);
+        font-weight: 600;
+    }
+
+    .finance-table tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+
+    .finance-table td.receita-val {
+        color: var(--secondary-color);
+        font-weight: 600;
+    }
+
+    .finance-table td.despesa-val {
+        color: #dc3545; /* Vermelho */
+        font-weight: 600;
     }
 
     /* Media Queries para responsividade */
@@ -445,6 +526,10 @@
           padding: 8px 20px; 
           margin-top: 30px;
       }
+
+      .finance-summary {
+          flex-direction: column;
+      }
     }
   </style>
 </head>
@@ -452,7 +537,7 @@
   <div id="splash-screen">
     <h1 class="splash-initials">TB</h1>
     <p class="splash-full-name">Espaço Tai Botelho</p>
-    <button id="splash-enter-button">Bem-vinda</button>
+    <button id="splash-enter-button">Comece aqui</button>
   </div>
   <header>
     <h1>Espaço Tai Botelho</h1>
@@ -470,7 +555,14 @@
                 <li><a href="#" id="menu-historico-procedimentos">Histórico de Procedimentos por Cliente</a></li>
             </ul>
         </li>
-        <li><a href="#" id="menu-financeiro">💰 Financeiro</a></li>
+        <li>
+            <a href="#" id="menu-financeiro">💰 Financeiro</a>
+            <ul class="submenu" id="submenu-financeiro">
+                <li><a href="#" id="menu-registrar-receita">Registrar Receita</a></li>
+                <li><a href="#" id="menu-registrar-despesa">Registrar Despesa</a></li>
+                <li><a href="#" id="menu-extrato-financeiro">Extrato/Fluxo de Caixa</a></li>
+            </ul>
+        </li>
       </ul>
     </nav>
 
@@ -546,10 +638,36 @@
 
       <section id="section-financeiro" class="content-section">
           <h2>💰 Controle Financeiro</h2>
-          <div class="section-box">
-              <p>Esta é a nova seção para o controle financeiro.</p>
-              <p>Você pode adicionar formulários para registrar receitas/despesas, exibir gráficos, etc. aqui.</p>
-              <h4>Registrar Despesa</h4>
+          
+          <div id="sub-section-registrar-receita" class="finance-sub-section active-sub-section">
+              <h4>Adicionar Receita</h4>
+              <form id="form-receita">
+                  <div id="feedback-receita" class="feedback-message"></div>
+                  <label for="receita-descricao">Origem/Serviço:</label>
+                  <input type="text" id="receita-descricao" required>
+
+                  <label for="receita-valor">Valor (R$):</label>
+                  <input type="number" id="receita-valor" step="0.01" required>
+
+                  <label for="receita-data">Data:</label>
+                  <input type="date" id="receita-data" required>
+
+                  <label for="receita-forma-pagamento">Forma de Pagamento:</label>
+                  <select id="receita-forma-pagamento" required>
+                    <option value="">Selecione</option>
+                    <option value="dinheiro">Dinheiro</option>
+                    <option value="pix">PIX</option>
+                    <option value="cartao-credito">Cartão de Crédito</option>
+                    <option value="cartao-debito">Cartão de Débito</option>
+                    <option value="transferencia">Transferência Bancária</option>
+                  </select>
+
+                  <button type="submit">Adicionar Receita</button>
+              </form>
+          </div>
+
+          <div id="sub-section-registrar-despesa" class="finance-sub-section" style="display:none;">
+              <h4>Adicionar Despesa</h4>
               <form id="form-despesa">
                   <div id="feedback-despesa" class="feedback-message"></div>
                   <label for="despesa-descricao">Descrição:</label>
@@ -561,12 +679,53 @@
                   <label for="despesa-data">Data:</label>
                   <input type="date" id="despesa-data" required>
 
+                  <label for="despesa-categoria">Categoria:</label>
+                  <select id="despesa-categoria" required>
+                    <option value="">Selecione</option>
+                    <option value="aluguel">Aluguel</option>
+                    <option value="material">Material/Insumos</option>
+                    <option value="salario">Salário/Pró-labore</option>
+                    <option value="marketing">Marketing</option>
+                    <option value="contas">Contas (água, luz, internet)</option>
+                    <option value="outros">Outros</option>
+                  </select>
+
                   <button type="submit">Adicionar Despesa</button>
               </form>
-
-              <h4>Total de Despesas (Exemplo)</h4>
-              <p id="total-despesas">R$ 0.00</p>
           </div>
+
+          <div id="sub-section-extrato-financeiro" class="finance-sub-section" style="display:none;">
+              <h4>Resumo Financeiro</h4>
+              <div class="finance-summary">
+                  <div class="receita">
+                      <h4>Total de Receitas</h4>
+                      <p id="total-receitas">R$ 0.00</p>
+                  </div>
+                  <div class="despesa">
+                      <h4>Total de Despesas</h4>
+                      <p id="total-despesas">R$ 0.00</p>
+                  </div>
+                  <div class="saldo">
+                      <h4>Saldo Atual</h4>
+                      <p id="saldo-atual" class="positive">R$ 0.00</p>
+                  </div>
+              </div>
+
+              <h4>Extrato Detalhado</h4>
+              <table class="finance-table">
+                  <thead>
+                      <tr>
+                          <th>Data</th>
+                          <th>Tipo</th>
+                          <th>Descrição/Origem</th>
+                          <th>Valor</th>
+                      </tr>
+                  </thead>
+                  <tbody id="tabela-extrato-body">
+                      </tbody>
+              </table>
+          </div>
+
       </section>
 
     </main>
@@ -597,6 +756,14 @@
         localStorage.setItem('despesas', JSON.stringify(despesas));
     }
 
+    function getReceitas() {
+        return JSON.parse(localStorage.getItem('receitas')) || [];
+    }
+
+    function salvarReceitas(receitas) {
+        localStorage.setItem('receitas', JSON.stringify(receitas));
+    }
+
     // --- FUNÇÃO PARA EXIBIR FEEDBACK ---
     function showFeedback(elementId, message, type) {
         const feedbackDiv = document.getElementById(elementId);
@@ -613,18 +780,22 @@
     }
 
     // --- CONTROLE DO MENU E SEÇÕES ---
-    const menuLinks = document.querySelectorAll('nav ul li a');
     const contentSections = document.querySelectorAll('.content-section');
     const submenuClientes = document.getElementById('submenu-clientes');
     const menuClientes = document.getElementById('menu-clientes');
+    const submenuFinanceiro = document.getElementById('submenu-financeiro');
+    const menuFinanceiro = document.getElementById('menu-financeiro');
 
     function hideAllSections() {
       contentSections.forEach(section => {
         section.classList.remove('active');
       });
-      document.querySelectorAll('nav ul li a').forEach(link => { // Seleciona todos os links, incluindo submenus
+      document.querySelectorAll('nav ul li a').forEach(link => { 
         link.classList.remove('active');
       });
+      // Esconde todos os submenus ao mudar de seção principal
+      submenuClientes.classList.remove('active');
+      submenuFinanceiro.classList.remove('active');
     }
 
     function showSection(sectionId, activeLink) {
@@ -638,21 +809,31 @@
       }
     }
 
+    function showFinanceSubSection(subSectionId) {
+        document.querySelectorAll('.finance-sub-section').forEach(sub => {
+            sub.style.display = 'none';
+        });
+        const targetSub = document.getElementById(subSectionId);
+        if (targetSub) {
+            targetSub.style.display = 'block';
+        }
+    }
+
+
     // Lógica para o menu principal "Clientes" e seu submenu
     menuClientes.addEventListener('click', (e) => {
         e.preventDefault();
-        submenuClientes.classList.toggle('active'); // Alterna a visibilidade do submenu
-        // Oculta outras seções se o menu principal for clicado
+        submenuClientes.classList.toggle('active'); 
+        submenuFinanceiro.classList.remove('active'); // Garante que o submenu de finanças está fechado
         hideAllSections(); 
-        menuClientes.classList.toggle('active'); // Marca o item "Clientes" como ativo/inativo
+        menuClientes.classList.toggle('active');
     });
 
-    // Adiciona event listeners para os links do submenu
-    const subMenuLinks = submenuClientes.querySelectorAll('a');
-    subMenuLinks.forEach(link => {
+    // Adiciona event listeners para os links do submenu de Clientes
+    const subMenuClientesLinks = submenuClientes.querySelectorAll('a');
+    subMenuClientesLinks.forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
-            // Mantém o item "Clientes" ativo quando um submenu é clicado
             menuClientes.classList.add('active'); 
             const id = link.id;
             
@@ -678,12 +859,39 @@
         });
     });
 
-    // Event listener para o menu Financeiro (fora do submenu de clientes)
-    document.getElementById('menu-financeiro').addEventListener('click', (e) => {
+    // Lógica para o menu principal "Financeiro" e seu submenu
+    menuFinanceiro.addEventListener('click', (e) => {
         e.preventDefault();
-        submenuClientes.classList.remove('active'); // Garante que o submenu de clientes esteja fechado
-        showSection('section-financeiro', e.target); // e.target é o link clicado
-        carregarFinancas();
+        submenuFinanceiro.classList.toggle('active'); 
+        submenuClientes.classList.remove('active'); // Garante que o submenu de clientes está fechado
+        hideAllSections(); 
+        menuFinanceiro.classList.toggle('active');
+        // Ao clicar no menu principal Financeiro, mostra a primeira subseção por padrão
+        showFinanceSubSection('sub-section-registrar-receita');
+    });
+
+    // Adiciona event listeners para os links do submenu de Financeiro
+    const subMenuFinanceiroLinks = submenuFinanceiro.querySelectorAll('a');
+    subMenuFinanceiroLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            menuFinanceiro.classList.add('active'); 
+            showSection('section-financeiro', link); // Ativa a seção principal Financeiro
+            const id = link.id;
+            
+            switch (id) {
+                case 'menu-registrar-receita':
+                    showFinanceSubSection('sub-section-registrar-receita');
+                    break;
+                case 'menu-registrar-despesa':
+                    showFinanceSubSection('sub-section-registrar-despesa');
+                    break;
+                case 'menu-extrato-financeiro':
+                    showFinanceSubSection('sub-section-extrato-financeiro');
+                    carregarExtratoFinanceiro(); // Carrega o extrato
+                    break;
+            }
+        });
     });
 
     // --- AGENDAMENTO ---
@@ -942,31 +1150,57 @@
     }
 
     // --- FUNÇÕES PARA A NOVA SEÇÃO FINANCEIRO ---
+
+    // REGISTRAR RECEITA
+    const formReceita = document.getElementById('form-receita');
+    formReceita.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const descricao = document.getElementById('receita-descricao').value.trim();
+        const valor = parseFloat(document.getElementById('receita-valor').value);
+        const data = document.getElementById('receita-data').value;
+        const formaPagamento = document.getElementById('receita-forma-pagamento').value;
+
+        if (!descricao || isNaN(valor) || valor <= 0 || !data || !formaPagamento) {
+            showFeedback('feedback-receita', 'Por favor, preencha todos os campos da receita corretamente.', 'error');
+            return;
+        }
+
+        const novaReceita = {
+            tipo: 'receita', // Identifica como receita
+            descricao: descricao,
+            valor: valor,
+            data: data,
+            formaPagamento: formaPagamento
+        };
+
+        const receitas = getReceitas();
+        receitas.push(novaReceita);
+        salvarReceitas(receitas);
+        formReceita.reset();
+        showFeedback('feedback-receita', `✅ Receita de R$ ${valor.toFixed(2)} (${descricao}) adicionada!`, 'success');
+        // Não chamamos carregarFinancas() aqui diretamente, pois o extrato será atualizado ao abrir a seção
+    });
+
+    // REGISTRAR DESPESA
     const formDespesa = document.getElementById('form-despesa');
-    const totalDespesasElement = document.getElementById('total-despesas');
-
-    function carregarFinancas() {
-        const despesas = getDespesas();
-        let total = 0;
-        despesas.forEach(d => total += d.valor);
-        totalDespesasElement.textContent = `R$ ${total.toFixed(2)}`;
-    }
-
     formDespesa.addEventListener('submit', (e) => {
         e.preventDefault();
         const descricao = document.getElementById('despesa-descricao').value.trim();
         const valor = parseFloat(document.getElementById('despesa-valor').value);
         const data = document.getElementById('despesa-data').value;
+        const categoria = document.getElementById('despesa-categoria').value;
 
-        if (!descricao || isNaN(valor) || valor <= 0 || !data) {
+        if (!descricao || isNaN(valor) || valor <= 0 || !data || !categoria) {
             showFeedback('feedback-despesa', 'Por favor, preencha todos os campos da despesa corretamente.', 'error');
             return;
         }
 
         const novaDespesa = {
+            tipo: 'despesa', // Identifica como despesa
             descricao: descricao,
             valor: valor,
-            data: data
+            data: data,
+            categoria: categoria
         };
 
         const despesas = getDespesas();
@@ -974,8 +1208,64 @@
         salvarDespesas(despesas);
         formDespesa.reset();
         showFeedback('feedback-despesa', `✅ Despesa "${descricao}" de R$ ${valor.toFixed(2)} adicionada!`, 'success');
-        carregarFinancas();
+        // Não chamamos carregarFinancas() aqui diretamente, pois o extrato será atualizado ao abrir a seção
     });
+
+    // EXTRATO FINANCEIRO
+    const totalReceitasElement = document.getElementById('total-receitas');
+    const totalDespesasElement = document.getElementById('total-despesas');
+    const saldoAtualElement = document.getElementById('saldo-atual');
+    const tabelaExtratoBody = document.getElementById('tabela-extrato-body');
+
+    function carregarExtratoFinanceiro() {
+        const receitas = getReceitas();
+        const despesas = getDespesas();
+
+        let totalReceitas = 0;
+        receitas.forEach(r => totalReceitas += r.valor);
+
+        let totalDespesas = 0;
+        despesas.forEach(d => totalDespesas += d.valor);
+
+        const saldoAtual = totalReceitas - totalDespesas;
+
+        totalReceitasElement.textContent = `R$ ${totalReceitas.toFixed(2)}`;
+        totalDespesasElement.textContent = `R$ ${totalDespesas.toFixed(2)}`;
+        saldoAtualElement.textContent = `R$ ${saldoAtual.toFixed(2)}`;
+        
+        saldoAtualElement.className = saldoAtual >= 0 ? 'positive' : 'negative';
+
+        // Preencher tabela do extrato
+        tabelaExtratoBody.innerHTML = '';
+        const todosLancamentos = [...receitas, ...despesas];
+        
+        // Ordenar por data (mais recente primeiro)
+        todosLancamentos.sort((a, b) => new Date(b.data) - new Date(a.data));
+
+        if (todosLancamentos.length === 0) {
+            const row = tabelaExtratoBody.insertRow();
+            const cell = row.insertCell(0);
+            cell.colSpan = 4;
+            cell.textContent = 'Nenhum lançamento financeiro registrado.';
+            cell.style.textAlign = 'center';
+            cell.style.padding = '20px';
+        } else {
+            todosLancamentos.forEach(lancamento => {
+                const row = tabelaExtratoBody.insertRow();
+                const dataFormatada = new Date(lancamento.data + 'T00:00:00').toLocaleDateString('pt-BR');
+                const valorFormatado = `R$ ${lancamento.valor.toFixed(2)}`;
+
+                row.insertCell(0).textContent = dataFormatada;
+                row.insertCell(1).textContent = lancamento.tipo.charAt(0).toUpperCase() + lancamento.tipo.slice(1); // Receita ou Despesa
+                row.insertCell(2).textContent = lancamento.descricao;
+                
+                const valorCell = row.insertCell(3);
+                valorCell.textContent = valorFormatado;
+                valorCell.classList.add(lancamento.tipo === 'receita' ? 'receita-val' : 'despesa-val');
+            });
+        }
+    }
+
 
     // --- LÓGICA DA SPLASH SCREEN ---
     window.addEventListener('load', () => {
