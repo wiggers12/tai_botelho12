@@ -16,6 +16,8 @@
       --border-color: #e0e0e0; /* Cinza claro para bordas */
       --shadow-light: rgba(0, 0, 0, 0.05);
       --shadow-medium: rgba(0, 0, 0, 0.1);
+      --menu-bg: #f8f8f8; /* Fundo do menu suave */
+      --menu-link-hover: #f0f0f0; /* Cor ao passar o mouse no link do menu */
     }
 
     body {
@@ -58,6 +60,44 @@
       z-index: 1;
     }
 
+    /* --- Menu de Navegação --- */
+    nav {
+        background-color: var(--menu-bg);
+        box-shadow: 0 2px 5px var(--shadow-light);
+        padding: 10px 0;
+        text-align: center;
+    }
+
+    nav ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex; /* Para colocar os itens lado a lado */
+        justify-content: center; /* Centralizar itens */
+        flex-wrap: wrap; /* Permitir quebra de linha em telas pequenas */
+    }
+
+    nav li {
+        margin: 0 15px; /* Espaçamento entre os itens do menu */
+    }
+
+    nav a {
+        text-decoration: none;
+        color: var(--primary-color);
+        font-weight: 600;
+        padding: 10px 15px;
+        display: block;
+        transition: background-color 0.3s ease, color 0.3s ease;
+        border-radius: 5px;
+    }
+
+    nav a:hover,
+    nav a.active { /* Estilo para o link ativo */
+        background-color: var(--primary-color);
+        color: var(--text-color-light);
+    }
+
+
     h2 {
       color: var(--primary-color); /* Rosa principal */
       border-bottom: 2px solid var(--accent-color); /* Linha sutil rosa claro */
@@ -78,6 +118,17 @@
       box-shadow: 0 8px 20px var(--shadow-medium); /* Sombra mais suave e espalhada */
     }
 
+    /* --- Seções de Conteúdo --- */
+    .content-section { /* Nova classe para as seções que serão exibidas/ocultadas */
+        display: none; /* Todas as seções começam escondidas */
+        padding: 20px 0; /* Padding interno das seções */
+    }
+
+    .content-section.active { /* A seção ativa será exibida */
+        display: block;
+    }
+
+
     form {
       background-color: var(--accent-color); /* Fundo rosa claro */
       padding: 30px; /* Mais padding */
@@ -88,7 +139,7 @@
       border: 1px solid var(--border-color); /* Borda fina e clara */
     }
 
-    input, select, textarea { /* Adicionado textarea aqui */
+    input, select, textarea { 
       border: 1px solid var(--border-color); /* Borda cinza clara */
       border-radius: 6px; /* Cantos levemente mais arredondados */
       padding: 12px; /* Mais padding interno */
@@ -101,7 +152,7 @@
       transition: border-color 0.3s ease, box-shadow 0.3s ease;
     }
 
-    input:focus, select:focus, textarea:focus { /* Adicionado textarea aqui */
+    input:focus, select:focus, textarea:focus {
       border-color: var(--primary-color); /* Borda rosa ao focar */
       box-shadow: 0 0 0 3px rgba(233, 30, 99, 0.2); /* Sombra de foco sutil */
       outline: none; /* Remove o outline padrão */
@@ -134,7 +185,7 @@
     }
 
     /* Estilo para as seções de consulta e histórico */
-    .section-box { /* Nova classe para formulários/seções que podem ser exibidas/ocultadas */
+    .section-box { /* Classe para formulários/seções dentro das abas */
       background-color: var(--accent-color); /* Fundo rosa claro */
       padding: 30px;
       border-radius: 10px;
@@ -184,12 +235,6 @@
       box-shadow: 0 2px 5px rgba(40, 167, 69, 0.1);
     }
 
-    /* Esconde seções por padrão */
-    #consulta-agendamentos-section,
-    #historico-cliente-section {
-        display: none;
-    }
-
     /* Estilo para o select de clientes na seção de histórico */
     #select-cliente-historico {
         margin-bottom: 25px; /* Mais espaço após o select */
@@ -201,6 +246,15 @@
         font-size: 2.5em;
       }
 
+      nav ul {
+        flex-direction: column; /* Empilha os itens do menu em telas pequenas */
+        align-items: center;
+      }
+
+      nav li {
+        margin: 5px 0;
+      }
+
       h2 {
         font-size: 1.5em;
       }
@@ -210,7 +264,7 @@
         padding: 20px;
       }
 
-      form, .section-box { /* Usa a nova classe aqui */
+      form, .section-box {
         max-width: 100%;
         margin: 20px auto;
         padding: 20px;
@@ -234,79 +288,86 @@
     <h1>Espaço Tai Botelho</h1>
   </header>
 
+  <nav>
+    <ul>
+      <li><a href="#" id="menu-cadastro-clientes">Cadastro de Clientes</a></li>
+      <li><a href="#" id="menu-agendamento-cliente">Agendamento de Cliente</a></li>
+      <li><a href="#" id="menu-consultar-agendamentos">Consultar Agendamentos</a></li>
+      <li><a href="#" id="menu-historico-procedimentos">Histórico de Procedimentos por Cliente</a></li>
+    </ul>
+  </nav>
+
   <main>
-    <h2>📅 Agendar Atendimento</h2>
-    <form id="form-agendamento">
-      <label>Nome do Cliente:</label>
-      <select id="cliente" required>
-        <option value="">Selecione um cliente</option>
-      </select>
+    <section id="section-cadastro-clientes" class="content-section">
+        <h2>👩‍🦰 Cadastro de Clientes</h2>
+        <form id="form-cliente">
+            <label>Nome:</label>
+            <input type="text" id="nome-cliente" required>
 
-      <label>Serviço:</label>
-      <input type="text" id="servico" required>
+            <label>Telefone:</label>
+            <input type="tel" id="telefone-cliente" required>
 
-      <label>Data e Hora:</label>
-      <input type="datetime-local" id="datahora" required>
+            <label>Idade:</label>
+            <input type="number" id="idade-cliente" min="0" max="120">
 
-      <label>Profissional:</label>
-      <input type="text" id="profissional" required>
+            <label>Gênero:</label>
+            <select id="genero-cliente">
+                <option value="">Selecione</option>
+                <option value="feminino">Feminino</option>
+                <option value="masculino">Masculino</option>
+                <option value="nao_informar">Prefiro não informar</option>
+                <option value="outro">Outro</option>
+            </select>
 
-      <button type="submit">Agendar</button>
-    </form>
+            <label>Cliente desde:</label>
+            <input type="date" id="cliente-desde">
 
-    <p id="mensagem-confirmacao"></p>
-    
-    <h2>👩‍🦰 Cadastro de Clientes</h2>
-    <form id="form-cliente">
-      <label>Nome:</label>
-      <input type="text" id="nome-cliente" required>
+            <button type="submit">Cadastrar Cliente</button>
+        </form>
+    </section>
 
-      <label>Telefone:</label>
-      <input type="tel" id="telefone-cliente" required>
+    <section id="section-agendamento-cliente" class="content-section">
+        <h2>📅 Agendar Atendimento</h2>
+        <form id="form-agendamento">
+            <label>Nome do Cliente:</label>
+            <select id="cliente" required>
+                <option value="">Selecione um cliente</option>
+            </select>
 
-      <label>Idade:</label>
-      <input type="number" id="idade-cliente" min="0" max="120">
+            <label>Serviço:</label>
+            <input type="text" id="servico" required>
 
-      <label>Gênero:</label>
-      <select id="genero-cliente">
-        <option value="">Selecione</option>
-        <option value="feminino">Feminino</option>
-        <option value="masculino">Masculino</option>
-        <option value="nao_informar">Prefiro não informar</option>
-        <option value="outro">Outro</option>
-      </select>
+            <label>Data e Hora:</label>
+            <input type="datetime-local" id="datahora" required>
 
-      <label>Cliente desde:</label>
-      <input type="date" id="cliente-desde">
+            <label>Profissional:</label>
+            <input type="text" id="profissional" required>
 
-      <button type="submit">Cadastrar Cliente</button>
-    </form>
+            <button type="submit">Agendar</button>
+        </form>
+        <p id="mensagem-confirmacao"></p>
+    </section>
 
-    ---
-
-    <h2>🔍 Consultar Agendamentos</h2>
-    <button id="mostrar-agendamentos">Mostrar Agendamentos</button>
-    <div id="consulta-agendamentos-section" class="section-box">
-      <ul id="lista-agendamentos-consulta" class="lista-itens"></ul>
-      <button id="ocultar-agendamentos">Ocultar Agendamentos</button>
-    </div>
-    
-    ---
-
-    <h2>📋 Histórico de Procedimentos por Cliente</h2>
-    <button id="mostrar-historico-procedimentos">Mostrar Histórico</button>
-    <div id="historico-cliente-section" class="section-box">
-        <label for="select-cliente-historico">Selecione o Cliente:</label>
-        <select id="select-cliente-historico">
-            <option value="">Selecione um cliente para ver o histórico</option>
-        </select>
-
-        <div id="historico-detalhes-cliente">
-            <p>Selecione um cliente acima para ver ou adicionar procedimentos.</p>
+    <section id="section-consultar-agendamentos" class="content-section">
+        <h2>🔍 Consultar Agendamentos</h2>
+        <div class="section-box">
+            <ul id="lista-agendamentos-consulta" class="lista-itens"></ul>
         </div>
+    </section>
+    
+    <section id="section-historico-procedimentos" class="content-section">
+        <h2>📋 Histórico de Procedimentos por Cliente</h2>
+        <div class="section-box">
+            <label for="select-cliente-historico">Selecione o Cliente:</label>
+            <select id="select-cliente-historico">
+                <option value="">Selecione um cliente para ver o histórico</option>
+            </select>
 
-        <button id="ocultar-historico-procedimentos" style="margin-top: 20px;">Ocultar Histórico</button>
-    </div>
+            <div id="historico-detalhes-cliente">
+                <p>Selecione um cliente acima para ver ou adicionar procedimentos.</p>
+            </div>
+        </div>
+    </section>
 
   </main>
 
@@ -328,6 +389,58 @@
       localStorage.setItem('agendamentos', JSON.stringify(agendamentos));
     }
 
+    // --- CONTROLE DO MENU E SEÇÕES ---
+    const menuLinks = document.querySelectorAll('nav ul li a');
+    const contentSections = document.querySelectorAll('.content-section');
+
+    function hideAllSections() {
+      contentSections.forEach(section => {
+        section.classList.remove('active');
+      });
+      menuLinks.forEach(link => {
+        link.classList.remove('active');
+      });
+    }
+
+    function showSection(sectionId, activeLink) {
+      hideAllSections();
+      const targetSection = document.getElementById(sectionId);
+      if (targetSection) {
+        targetSection.classList.add('active');
+      }
+      if (activeLink) {
+        activeLink.classList.add('active');
+      }
+    }
+
+    menuLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const id = link.id;
+        
+        switch (id) {
+          case 'menu-cadastro-clientes':
+            showSection('section-cadastro-clientes', link);
+            break;
+          case 'menu-agendamento-cliente':
+            showSection('section-agendamento-cliente', link);
+            atualizarListasDeClientes(); // Garante que o select esteja preenchido
+            break;
+          case 'menu-consultar-agendamentos':
+            showSection('section-consultar-agendamentos', link);
+            exibirAgendamentosParaConsulta(); // Carrega os agendamentos ao mostrar a seção
+            break;
+          case 'menu-historico-procedimentos':
+            showSection('section-historico-procedimentos', link);
+            atualizarListasDeClientes(); // Garante que o select esteja preenchido
+            // Limpa e reinicia a exibição do histórico para evitar dados antigos
+            document.getElementById('historico-detalhes-cliente').innerHTML = '<p>Selecione um cliente acima para ver ou adicionar procedimentos.</p>';
+            document.getElementById('select-cliente-historico').value = '';
+            break;
+        }
+      });
+    });
+
     // --- AGENDAMENTO ---
     const formAgendamento = document.getElementById('form-agendamento');
     const mensagemConfirmacao = document.getElementById('mensagem-confirmacao');
@@ -335,7 +448,7 @@
     formAgendamento.addEventListener('submit', function (e) {
       e.preventDefault();
 
-      const clienteId = document.getElementById('cliente').value; // Usamos o ID aqui
+      const clienteId = document.getElementById('cliente').value; 
       const servico = document.getElementById('servico').value;
       const datahora = document.getElementById('datahora').value;
       const profissional = document.getElementById('profissional').value;
@@ -376,74 +489,58 @@
 
       const nome = document.getElementById('nome-cliente').value;
       const telefone = document.getElementById('telefone-cliente').value;
-      const idade = document.getElementById('idade-cliente').value; // Novo campo
-      const genero = document.getElementById('genero-cliente').value; // Novo campo
-      const clienteDesde = document.getElementById('cliente-desde').value; // Novo campo
+      const idade = document.getElementById('idade-cliente').value;
+      const genero = document.getElementById('genero-cliente').value;
+      const clienteDesde = document.getElementById('cliente-desde').value;
 
-      // Cada cliente agora terá um ID único e um array para o histórico de procedimentos
       const novoCliente = {
-        id: Date.now().toString(), // ID único baseado no timestamp
+        id: Date.now().toString(), 
         nome: nome,
         telefone: telefone,
-        idade: idade || null, // Salva a idade ou null se vazio
-        genero: genero || null, // Salva o gênero ou null se vazio
-        clienteDesde: clienteDesde || null, // Salva a data ou null se vazio
-        historicoProcedimentos: [] // Novo array para o histórico
+        idade: idade || null,
+        genero: genero || null,
+        clienteDesde: clienteDesde || null,
+        historicoProcedimentos: [] 
       };
       
       const clientes = getClientes();
       clientes.push(novoCliente);
       salvarClientes(clientes);
       formCliente.reset();
-      atualizarListasDeClientes(); // Atualiza todos os selects de clientes
+      atualizarListasDeClientes(); 
+      alert('Cliente cadastrado com sucesso!'); // Feedback para o usuário
     });
 
     // --- ATUALIZAÇÃO DAS LISTAS DE CLIENTES (SELECTs) ---
     function atualizarListasDeClientes() {
       const selectsClientes = [
-        document.getElementById('cliente'), // Select do agendamento
-        document.getElementById('select-cliente-historico') // Novo select do histórico
+        document.getElementById('cliente'), 
+        document.getElementById('select-cliente-historico') 
       ];
 
       const clientes = getClientes();
 
       selectsClientes.forEach(select => {
-        if (!select) return; // Garante que o elemento existe
+        if (!select) return; 
 
-        const valorAtual = select.value; // Salva o valor selecionado antes de limpar
+        const valorAtual = select.value; 
         select.innerHTML = '<option value="">Selecione um cliente</option>';
 
         clientes.forEach(cliente => {
           const option = document.createElement('option');
-          option.value = cliente.id; // Agora usa o ID do cliente como valor
+          option.value = cliente.id; 
           option.textContent = cliente.nome;
           select.appendChild(option);
         });
 
-        // Tenta restaurar a seleção anterior se ainda existir
         if (valorAtual && clientes.some(c => c.id === valorAtual)) {
             select.value = valorAtual;
         }
       });
     }
 
-    // --- CONSULTAR AGENDAMENTOS (EXISTENTE) ---
-    const btnMostrarAgendamentos = document.getElementById('mostrar-agendamentos');
-    const btnOcultarAgendamentos = document.getElementById('ocultar-agendamentos');
-    const consultaAgendamentosSection = document.getElementById('consulta-agendamentos-section');
+    // --- CONSULTAR AGENDAMENTOS ---
     const listaAgendamentosConsulta = document.getElementById('lista-agendamentos-consulta');
-
-    btnMostrarAgendamentos.addEventListener('click', () => {
-      exibirAgendamentosParaConsulta();
-      consultaAgendamentosSection.style.display = 'block';
-      btnMostrarAgendamentos.style.display = 'none';
-    });
-
-    btnOcultarAgendamentos.addEventListener('click', () => {
-      consultaAgendamentosSection.style.display = 'none';
-      btnMostrarAgendamentos.style.display = 'block';
-      listaAgendamentosConsulta.innerHTML = '';
-    });
 
     function exibirAgendamentosParaConsulta() {
       listaAgendamentosConsulta.innerHTML = '';
@@ -453,7 +550,6 @@
         item.innerHTML = '<span>Nenhum agendamento encontrado.</span>';
         listaAgendamentosConsulta.appendChild(item);
       } else {
-        // Ordenar agendamentos do mais recente para o mais antigo
         agendamentos.sort((a, b) => new Date(b.datahora) - new Date(a.datahora));
 
         agendamentos.forEach(agendamento => {
@@ -469,32 +565,10 @@
       }
     }
 
-    // --- NOVA FUNCIONALIDADE: HISTÓRICO DE PROCEDIMENTOS ---
-    const btnMostrarHistorico = document.getElementById('mostrar-historico-procedimentos');
-    const btnOcultarHistorico = document.getElementById('ocultar-historico-procedimentos');
-    const historicoClienteSection = document.getElementById('historico-cliente-section');
+    // --- HISTÓRICO DE PROCEDIMENTOS ---
     const selectClienteHistorico = document.getElementById('select-cliente-historico');
     const historicoDetalhesCliente = document.getElementById('historico-detalhes-cliente');
 
-    btnMostrarHistorico.addEventListener('click', () => {
-        historicoClienteSection.style.display = 'block';
-        btnMostrarHistorico.style.display = 'none';
-        // Se já houver um cliente selecionado no dropdown, exibe o histórico dele
-        if (selectClienteHistorico.value) {
-            exibirHistoricoDoCliente(selectClienteHistorico.value);
-        } else {
-            historicoDetalhesCliente.innerHTML = '<p>Selecione um cliente acima para ver ou adicionar procedimentos.</p>';
-        }
-    });
-
-    btnOcultarHistorico.addEventListener('click', () => {
-        historicoClienteSection.style.display = 'none';
-        btnMostrarHistorico.style.display = 'block';
-        historicoDetalhesCliente.innerHTML = ''; // Limpa os detalhes do histórico ao ocultar
-        selectClienteHistorico.value = ''; // Reseta o select
-    });
-
-    // Quando o cliente muda no select de histórico
     selectClienteHistorico.addEventListener('change', (event) => {
         const clienteId = event.target.value;
         if (clienteId) {
@@ -514,11 +588,13 @@
         }
 
         historicoDetalhesCliente.innerHTML = `
-            <h3>Histórico de ${cliente.nome}</h3>
-            <p>Telefone: ${cliente.telefone || 'Não informado'}</p>
-            <p>Idade: ${cliente.idade || 'Não informada'}</p>
-            <p>Gênero: ${cliente.genero ? (cliente.genero === 'nao_informar' ? 'Prefiro não informar' : cliente.genero.charAt(0).toUpperCase() + cliente.genero.slice(1)) : 'Não informado'}</p>
-            <p>Cliente desde: ${cliente.clienteDesde ? new Date(cliente.clienteDesde + 'T00:00:00').toLocaleDateString('pt-BR') : 'Não informado'}</p>
+            <h3>Informações e Histórico de ${cliente.nome}</h3>
+            <p><strong>Telefone:</strong> ${cliente.telefone || 'Não informado'}</p>
+            <p><strong>Idade:</strong> ${cliente.idade || 'Não informada'}</p>
+            <p><strong>Gênero:</strong> ${cliente.genero ? (cliente.genero === 'nao_informar' ? 'Prefiro não informar' : cliente.genero.charAt(0).toUpperCase() + cliente.genero.slice(1)) : 'Não informado'}</p>
+            <p><strong>Cliente desde:</strong> ${cliente.clienteDesde ? new Date(cliente.clienteDesde + 'T00:00:00').toLocaleDateString('pt-BR') : 'Não informado'}</p>
+            
+            <h4>Procedimentos Realizados</h4>
             <ul id="lista-procedimentos-cliente" class="lista-itens"></ul>
 
             <h4>Registrar Novo Procedimento</h4>
@@ -544,7 +620,6 @@
 
         const listaProcCliente = document.getElementById('lista-procedimentos-cliente');
         if (cliente.historicoProcedimentos && cliente.historicoProcedimentos.length > 0) {
-            // Ordena os procedimentos do mais recente para o mais antigo
             cliente.historicoProcedimentos.sort((a, b) => new Date(b.data) - new Date(a.data));
 
             cliente.historicoProcedimentos.forEach(proc => {
@@ -562,8 +637,6 @@
             listaProcCliente.innerHTML = '<li><span>Nenhum procedimento registrado para este cliente.</span></li>';
         }
 
-        // Adicionar o event listener para o novo formulário de procedimento
-        // IMPORTANTE: Este event listener é adicionado após o HTML do formulário ser criado
         const formAdicionarProcedimento = document.getElementById('form-adicionar-procedimento');
         formAdicionarProcedimento.addEventListener('submit', (event) => {
             event.preventDefault();
@@ -596,14 +669,16 @@
 
         clientes[clienteIndex].historicoProcedimentos.push(novoProc);
         salvarClientes(clientes);
-        form.reset(); // Limpa o formulário após adicionar
+        form.reset(); 
         alert('Procedimento adicionado com sucesso!');
-        exibirHistoricoDoCliente(clienteId); // Recarrega a visualização para mostrar o novo item
+        exibirHistoricoDoCliente(clienteId); 
     }
 
     // --- CARREGAR DADOS AO INICIAR ---
     window.addEventListener('load', () => {
-      atualizarListasDeClientes(); // Garante que todos os selects de clientes são populados
+      atualizarListasDeClientes(); 
+      // Mostra a seção de cadastro de clientes por padrão ao carregar a página
+      showSection('section-cadastro-clientes', document.getElementById('menu-cadastro-clientes'));
     });
   </script>
 
