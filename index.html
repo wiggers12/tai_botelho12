@@ -27,6 +27,9 @@
       padding: 0;
       color: var(--text-color-dark); /* Texto principal cinza escuro */
       line-height: 1.6;
+      min-height: 100vh; /* Garante que o body ocupa a altura total da viewport */
+      display: flex; /* Para flexbox no body, se necessário, ou para que o grid-container preencha */
+      flex-direction: column;
     }
 
     header {
@@ -37,6 +40,7 @@
       box-shadow: 0 4px 10px var(--shadow-medium); /* Sombra mais pronunciada */
       position: relative;
       overflow: hidden;
+      z-index: 100; /* Garante que o header fique acima do conteúdo */
     }
 
     header::before { /* Efeito de fundo sutil no header */
@@ -60,35 +64,46 @@
       z-index: 1;
     }
 
-    /* --- Menu de Navegação --- */
+    /* --- Container Principal com CSS Grid --- */
+    .grid-container {
+        display: grid;
+        grid-template-columns: 220px 1fr; /* Coluna esquerda (sidebar) fixa de 220px, coluna direita (conteúdo) flexível */
+        gap: 0; /* Espaço entre as colunas, podemos ajustar */
+        flex-grow: 1; /* Permite que o container cresça e ocupe o espaço restante */
+    }
+
+    /* --- Menu de Navegação (Sidebar) --- */
     nav {
         background-color: var(--menu-bg);
-        box-shadow: 0 2px 5px var(--shadow-light);
-        padding: 10px 0;
-        text-align: center;
+        box-shadow: 2px 0 5px var(--shadow-light); /* Sombra à direita da sidebar */
+        padding: 20px 0;
+        /* Remover text-align: center; */
+        display: flex; /* Para centralizar os itens verticalmente, se quiser */
+        flex-direction: column; /* Itens um embaixo do outro */
+        align-items: flex-start; /* Alinha os itens à esquerda dentro da nav */
     }
 
     nav ul {
         list-style: none;
         padding: 0;
         margin: 0;
-        display: flex; /* Para colocar os itens lado a lado */
-        justify-content: center; /* Centralizar itens */
-        flex-wrap: wrap; /* Permitir quebra de linha em telas pequenas */
+        width: 100%; /* Ocupa a largura total da nav */
     }
 
     nav li {
-        margin: 0 15px; /* Espaçamento entre os itens do menu */
+        margin-bottom: 5px; /* Espaçamento entre os itens do menu */
+        width: 100%;
     }
 
     nav a {
         text-decoration: none;
         color: var(--primary-color);
         font-weight: 600;
-        padding: 10px 15px;
+        padding: 12px 20px; /* Mais padding para botões de menu maiores */
         display: block;
         transition: background-color 0.3s ease, color 0.3s ease;
         border-radius: 5px;
+        text-align: left; /* Alinha o texto do link à esquerda */
     }
 
     nav a:hover,
@@ -96,7 +111,6 @@
         background-color: var(--primary-color);
         color: var(--text-color-light);
     }
-
 
     h2 {
       color: var(--primary-color); /* Rosa principal */
@@ -110,8 +124,8 @@
     }
 
     main {
-      max-width: 800px;
-      margin: 30px auto; /* Mais margem */
+      max-width: 100%; /* Ocupa a largura total da coluna de conteúdo */
+      margin: 0; /* Remove margens extras */
       padding: 30px; /* Mais padding */
       background-color: var(--text-color-light); /* Fundo branco puro */
       border-radius: 12px; /* Cantos mais arredondados */
@@ -127,7 +141,6 @@
     .content-section.active { /* A seção ativa será exibida */
         display: block;
     }
-
 
     form {
       background-color: var(--accent-color); /* Fundo rosa claro */
@@ -242,17 +255,33 @@
 
     /* Media Queries para responsividade */
     @media (max-width: 768px) {
-      header h1 {
-        font-size: 2.5em;
+      /* Em telas pequenas, a sidebar pode virar um menu "hamburger" ou empilhar */
+      .grid-container {
+        grid-template-columns: 1fr; /* Uma única coluna */
+      }
+
+      nav {
+        box-shadow: 0 2px 5px var(--shadow-light); /* Sombra embaixo do menu */
+        padding: 10px 0;
       }
 
       nav ul {
-        flex-direction: column; /* Empilha os itens do menu em telas pequenas */
-        align-items: center;
+        flex-direction: column; /* Empilha os itens do menu */
+        align-items: center; /* Centraliza os links do menu */
       }
 
       nav li {
         margin: 5px 0;
+        width: 90%; /* Ocupa mais largura */
+      }
+      
+      nav a {
+        text-align: center; /* Centraliza o texto do link */
+        padding: 10px 15px;
+      }
+
+      header h1 {
+        font-size: 2.5em;
       }
 
       h2 {
@@ -288,90 +317,90 @@
     <h1>Espaço Tai Botelho</h1>
   </header>
 
-  <nav>
-    <ul>
-      <li><a href="#" id="menu-cadastro-clientes">Cadastro de Clientes</a></li>
-      <li><a href="#" id="menu-agendamento-cliente">Agendamento de Cliente</a></li>
-      <li><a href="#" id="menu-consultar-agendamentos">Consultar Agendamentos</a></li>
-      <li><a href="#" id="menu-historico-procedimentos">Histórico de Procedimentos por Cliente</a></li>
-    </ul>
-  </nav>
+  <div class="grid-container">
+    <nav>
+      <ul>
+        <li><a href="#" id="menu-cadastro-clientes">Cadastro de Clientes</a></li>
+        <li><a href="#" id="menu-agendamento-cliente">Agendamento de Cliente</a></li>
+        <li><a href="#" id="menu-consultar-agendamentos">Consultar Agendamentos</a></li>
+        <li><a href="#" id="menu-historico-procedimentos">Histórico de Procedimentos por Cliente</a></li>
+      </ul>
+    </nav>
 
-  <main>
-    <section id="section-cadastro-clientes" class="content-section">
-        <h2>👩‍🦰 Cadastro de Clientes</h2>
-        <form id="form-cliente">
-            <label>Nome:</label>
-            <input type="text" id="nome-cliente" required>
+    <main>
+      <section id="section-cadastro-clientes" class="content-section">
+          <h2>👩‍🦰 Cadastro de Clientes</h2>
+          <form id="form-cliente">
+              <label>Nome:</label>
+              <input type="text" id="nome-cliente" required>
 
-            <label>Telefone:</label>
-            <input type="tel" id="telefone-cliente" required>
+              <label>Telefone:</label>
+              <input type="tel" id="telefone-cliente" required>
 
-            <label>Idade:</label>
-            <input type="number" id="idade-cliente" min="0" max="120">
+              <label>Idade:</label>
+              <input type="number" id="idade-cliente" min="0" max="120">
 
-            <label>Gênero:</label>
-            <select id="genero-cliente">
-                <option value="">Selecione</option>
-                <option value="feminino">Feminino</option>
-                <option value="masculino">Masculino</option>
-                <option value="nao_informar">Prefiro não informar</option>
-                <option value="outro">Outro</option>
-            </select>
+              <label>Gênero:</label>
+              <select id="genero-cliente">
+                  <option value="">Selecione</option>
+                  <option value="feminino">Feminino</option>
+                  <option value="masculino">Masculino</option>
+                  <option value="nao_informar">Prefiro não informar</option>
+                  <option value="outro">Outro</option>
+              </select>
 
-            <label>Cliente desde:</label>
-            <input type="date" id="cliente-desde">
+              <label>Cliente desde:</label>
+              <input type="date" id="cliente-desde">
 
-            <button type="submit">Cadastrar Cliente</button>
-        </form>
-    </section>
+              <button type="submit">Cadastrar Cliente</button>
+          </form>
+      </section>
 
-    <section id="section-agendamento-cliente" class="content-section">
-        <h2>📅 Agendar Atendimento</h2>
-        <form id="form-agendamento">
-            <label>Nome do Cliente:</label>
-            <select id="cliente" required>
-                <option value="">Selecione um cliente</option>
-            </select>
+      <section id="section-agendamento-cliente" class="content-section">
+          <h2>📅 Agendar Atendimento</h2>
+          <form id="form-agendamento">
+              <label>Nome do Cliente:</label>
+              <select id="cliente" required>
+                  <option value="">Selecione um cliente</option>
+              </select>
 
-            <label>Serviço:</label>
-            <input type="text" id="servico" required>
+              <label>Serviço:</label>
+              <input type="text" id="servico" required>
 
-            <label>Data e Hora:</label>
-            <input type="datetime-local" id="datahora" required>
+              <label>Data e Hora:</label>
+              <input type="datetime-local" id="datahora" required>
 
-            <label>Profissional:</label>
-            <input type="text" id="profissional" required>
+              <label>Profissional:</label>
+              <input type="text" id="profissional" required>
 
-            <button type="submit">Agendar</button>
-        </form>
-        <p id="mensagem-confirmacao"></p>
-    </section>
+              <button type="submit">Agendar</button>
+          </form>
+          <p id="mensagem-confirmacao"></p>
+      </section>
 
-    <section id="section-consultar-agendamentos" class="content-section">
-        <h2>🔍 Consultar Agendamentos</h2>
-        <div class="section-box">
-            <ul id="lista-agendamentos-consulta" class="lista-itens"></ul>
-        </div>
-    </section>
-    
-    <section id="section-historico-procedimentos" class="content-section">
-        <h2>📋 Histórico de Procedimentos por Cliente</h2>
-        <div class="section-box">
-            <label for="select-cliente-historico">Selecione o Cliente:</label>
-            <select id="select-cliente-historico">
-                <option value="">Selecione um cliente para ver o histórico</option>
-            </select>
+      <section id="section-consultar-agendamentos" class="content-section">
+          <h2>🔍 Consultar Agendamentos</h2>
+          <div class="section-box">
+              <ul id="lista-agendamentos-consulta" class="lista-itens"></ul>
+          </div>
+      </section>
+      
+      <section id="section-historico-procedimentos" class="content-section">
+          <h2>📋 Histórico de Procedimentos por Cliente</h2>
+          <div class="section-box">
+              <label for="select-cliente-historico">Selecione o Cliente:</label>
+              <select id="select-cliente-historico">
+                  <option value="">Selecione um cliente para ver o histórico</option>
+              </select>
 
-            <div id="historico-detalhes-cliente">
-                <p>Selecione um cliente acima para ver ou adicionar procedimentos.</p>
-            </div>
-        </div>
-    </section>
+              <div id="historico-detalhes-cliente">
+                  <p>Selecione um cliente acima para ver ou adicionar procedimentos.</p>
+              </div>
+          </div>
+      </section>
 
-  </main>
-
-  <script>
+    </main>
+  </div> <script>
     // --- FUNÇÕES DE UTILIDADE ---
     function getClientes() {
       return JSON.parse(localStorage.getItem('clientes')) || [];
@@ -638,10 +667,16 @@
         }
 
         const formAdicionarProcedimento = document.getElementById('form-adicionar-procedimento');
-        formAdicionarProcedimento.addEventListener('submit', (event) => {
+        // Remover o listener anterior se ele já existia para evitar múltiplos listeners
+        if (formAdicionarProcedimento._submitListener) {
+            formAdicionarProcedimento.removeEventListener('submit', formAdicionarProcedimento._submitListener);
+        }
+        const newSubmitListener = (event) => {
             event.preventDefault();
             adicionarProcedimentoAoCliente(clienteId, formAdicionarProcedimento);
-        });
+        };
+        formAdicionarProcedimento.addEventListener('submit', newSubmitListener);
+        formAdicionarProcedimento._submitListener = newSubmitListener; // Guarda a referência
     }
 
     function adicionarProcedimentoAoCliente(clienteId, form) {
