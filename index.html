@@ -435,6 +435,7 @@
         <li><a href="#" id="menu-agendamento-cliente">Agendamento de Cliente</a></li>
         <li><a href="#" id="menu-consultar-agendamentos">Consultar Agendamentos</a></li>
         <li><a href="#" id="menu-historico-procedimentos">Histórico de Procedimentos por Cliente</a></li>
+        <li><a href="#" id="menu-financeiro">Financeiro</a></li>
       </ul>
     </nav>
 
@@ -508,6 +509,31 @@
           </div>
       </section>
 
+      <section id="section-financeiro" class="content-section">
+          <h2>💰 Controle Financeiro</h2>
+          <div class="section-box">
+              <p>Esta é a nova seção para o controle financeiro.</p>
+              <p>Você pode adicionar formulários para registrar receitas/despesas, exibir gráficos, etc. aqui.</p>
+              <h4>Registrar Despesa</h4>
+              <form id="form-despesa">
+                  <div id="feedback-despesa" class="feedback-message"></div>
+                  <label for="despesa-descricao">Descrição:</label>
+                  <input type="text" id="despesa-descricao" required>
+
+                  <label for="despesa-valor">Valor (R$):</label>
+                  <input type="number" id="despesa-valor" step="0.01" required>
+
+                  <label for="despesa-data">Data:</label>
+                  <input type="date" id="despesa-data" required>
+
+                  <button type="submit">Adicionar Despesa</button>
+              </form>
+
+              <h4>Total de Despesas (Exemplo)</h4>
+              <p id="total-despesas">R$ 0.00</p>
+          </div>
+      </section>
+
     </main>
   </div> 
   <script>
@@ -526,6 +552,15 @@
 
     function salvarAgendamentos(agendamentos) {
       localStorage.setItem('agendamentos', JSON.stringify(agendamentos));
+    }
+
+    // NOVA FUNÇÃO: Obter e Salvar Despesas (Exemplo)
+    function getDespesas() {
+        return JSON.parse(localStorage.getItem('despesas')) || [];
+    }
+
+    function salvarDespesas(despesas) {
+        localStorage.setItem('despesas', JSON.stringify(despesas));
     }
 
     // --- FUNÇÃO PARA EXIBIR FEEDBACK ---
@@ -592,6 +627,10 @@
             // Limpa e reinicia a exibição do histórico para evitar dados antigos
             document.getElementById('historico-detalhes-cliente').innerHTML = '<p>Selecione um cliente acima para ver ou adicionar procedimentos.</p>';
             document.getElementById('select-cliente-historico').value = '';
+            break;
+          case 'menu-financeiro': // NOVO CASE PARA O ÍCONE FINANCEIRO
+            showSection('section-financeiro', link);
+            carregarFinancas(); // Chama a função para carregar dados financeiros
             break;
         }
       });
@@ -785,7 +824,7 @@
                 <label for="procProfissional">Profissional (Opcional):</label>
                 <input type="text" id="procProfissional">
 
-                <label for="procObs">Observações (Opcional):</label>
+                <label for="procObs">Observacoes (Opcional):</label>
                 <textarea id="procObs" rows="3"></textarea>
 
                 <button type="submit">Adicionar Procedimento</button>
@@ -859,6 +898,42 @@
         showFeedback('feedback-procedimento', `✅ Procedimento "${nomeServico}" adicionado com sucesso para ${clientes[clienteIndex].nome}!`, 'success');
         exibirHistoricoDoCliente(clienteId); 
     }
+
+    // --- FUNÇÕES PARA A NOVA SEÇÃO FINANCEIRO ---
+    const formDespesa = document.getElementById('form-despesa');
+    const totalDespesasElement = document.getElementById('total-despesas');
+
+    function carregarFinancas() {
+        const despesas = getDespesas();
+        let total = 0;
+        despesas.forEach(d => total += d.valor);
+        totalDespesasElement.textContent = `R$ ${total.toFixed(2)}`;
+    }
+
+    formDespesa.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const descricao = document.getElementById('despesa-descricao').value.trim();
+        const valor = parseFloat(document.getElementById('despesa-valor').value);
+        const data = document.getElementById('despesa-data').value;
+
+        if (!descricao || isNaN(valor) || valor <= 0 || !data) {
+            showFeedback('feedback-despesa', 'Por favor, preencha todos os campos da despesa corretamente.', 'error');
+            return;
+        }
+
+        const novaDespesa = {
+            descricao: descricao,
+            valor: valor,
+            data: data
+        };
+
+        const despesas = getDespesas();
+        despesas.push(novaDespesa);
+        salvarDespesas(despesas);
+        formDespesa.reset();
+        showFeedback('feedback-despesa', `✅ Despesa "${descricao}" de R$ ${valor.toFixed(2)} adicionada!`, 'success');
+        carregarFinancas(); // Atualiza o total de despesas
+    });
 
     // --- LÓGICA DA SPLASH SCREEN ---
     window.addEventListener('load', () => {
