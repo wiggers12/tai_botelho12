@@ -1,150 +1,151 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Espaço Tai Botelho</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <style>
-        /* CSS EMBUTIDO AQUI */
-        body {
-            margin: 0;
-            font-family: 'Poppins', sans-serif;
-            overflow: hidden; /* Evita rolagem durante a splash screen */
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Espaço Tai Botelho</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet"/>
 
-        #splash-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-color: #000; /* Fundo preto */
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999; /* Garante que fique acima de tudo */
-            opacity: 1;
-            transition: opacity 1s ease-out; /* Transição suave para desaparecer */
-        }
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      overflow: hidden;
+      visibility: hidden; /* Evita FOUC */
+    }
 
-        #splash-screen.hidden {
-            opacity: 0;
-            pointer-events: none; /* Desabilita interações quando invisível */
-        }
+    #splash-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: #000;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      opacity: 1;
+      transition: opacity 1s ease-out;
+    }
 
-        .splash-initials {
-            font-size: 8em; /* Tamanho grande para as iniciais */
-            font-weight: 700;
-            margin: 0;
-            background: linear-gradient(135deg, #FFD700, #DAA520, #B8860B); /* Gradiente dourado */
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 15px rgba(255, 215, 0, 0.8),
-                         0 0 30px rgba(255, 215, 0, 0.5); /* Sombra dourada */
-            letter-spacing: 5px;
-        }
+    #splash-screen.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
 
-        .splash-full-name {
-            color: #FFD700; /* Cor dourada para o nome completo */
-            font-size: 2.5em;
-            font-weight: 600;
-            margin-top: 10px;
-            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-            letter-spacing: 1px;
-        }
+    .splash-initials {
+      font-size: 8em;
+      font-weight: 700;
+      margin: 0;
+      background: linear-gradient(135deg, #FFD700, #DAA520, #B8860B);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 15px rgba(255, 215, 0, 0.8), 0 0 30px rgba(255, 215, 0, 0.5);
+      letter-spacing: 5px;
+    }
 
-        #splash-enter-button {
-            background: linear-gradient(45deg, #FFD700, #DAA520); /* Botão com gradiente dourado */
-            color: #000; /* Texto preto para contraste */
-            padding: 10px 30px;
-            border: none;
-            border-radius: 50px; /* Botão arredondado */
-            cursor: pointer;
-            font-size: 1.2em;
-            font-weight: 700;
-            margin-top: 40px;
-            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
-            transition: transform 0.2s ease, box-shadow 0.2s ease; /* Efeito ao passar o mouse */
-            letter-spacing: 0.5px;
-        }
+    .splash-full-name {
+      color: #FFD700;
+      font-size: 2.5em;
+      font-weight: 600;
+      margin-top: 10px;
+      text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+      letter-spacing: 1px;
+    }
 
-        #splash-enter-button:hover {
-            transform: translateY(-3px); /* Levanta um pouco no hover */
-            box-shadow: 0 8px 20px rgba(255, 215, 0, 0.6);
-        }
+    #splash-enter-button {
+      background: linear-gradient(45deg, #FFD700, #DAA520);
+      color: #000;
+      padding: 10px 30px;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      font-size: 1.2em;
+      font-weight: 700;
+      margin-top: 40px;
+      box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      letter-spacing: 0.5px;
+    }
 
-        /* Estilos para o conteúdo principal, que aparecerá depois */
-        #main-content {
-            padding: 20px;
-            text-align: center;
-            background-color: #f0f0f0; /* Um fundo suave para o conteúdo principal */
-            min-height: 100vh;
-            box-sizing: border-box; /* Inclui padding na altura total */
-        }
+    #splash-enter-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(255, 215, 0, 0.6);
+    }
 
-        /* Media Queries para responsividade da splash screen */
-        @media (max-width: 768px) {
-            .splash-initials {
-                font-size: 5em;
-            }
-            .splash-full-name {
-                font-size: 1.8em;
-            }
-            #splash-enter-button {
-                font-size: 1em;
-                padding: 8px 20px;
-                margin-top: 30px;
-            }
-        }
-    </style>
+    #main-content {
+      padding: 20px;
+      text-align: center;
+      background-color: #f0f0f0;
+      min-height: 100vh;
+      box-sizing: border-box;
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .splash-initials {
+        font-size: 5em;
+      }
+      .splash-full-name {
+        font-size: 1.8em;
+      }
+      #splash-enter-button {
+        font-size: 1em;
+        padding: 8px 20px;
+        margin-top: 30px;
+      }
+    }
+  </style>
+
+  <script>
+    // Torna o conteúdo visível após o DOM estar pronto
+    document.addEventListener("DOMContentLoaded", () => {
+      document.body.style.visibility = "visible";
+    });
+  </script>
 </head>
 <body>
+  <div id="splash-screen">
+    <h1 class="splash-initials">TB</h1>
+    <p class="splash-full-name">Espaço Tai Botelho</p>
+    <button id="splash-enter-button" aria-label="Entrar no site" role="button">Comece aqui</button>
+  </div>
 
-    <div id="splash-screen">
-        <h1 class="splash-initials">TB</h1>
-        <p class="splash-full-name">Espaço Tai Botelho</p>
-        <button id="splash-enter-button">Comece aqui</button>
-    </div>
+  <div id="main-content">
+    <h1>Bem-vindo ao Espaço Tai Botelho!</h1>
+    <p>Este é o conteúdo principal do seu site. Em breve, teremos novidades incríveis!</p>
+    <p>Explore, agende e aproveite sua beleza com sofisticação.</p>
+  </div>
 
-    <div id="main-content" style="display: none;">
-        <h1>Bem-vindo ao Espaço Tai Botelho!</h1>
-        <p>Este é o conteúdo principal do seu aplicativo. Em breve, estará cheio de funcionalidades!</p>
-        <p>Agora podemos começar a construir a interface principal.</p>
-    </div>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const splash = document.getElementById("splash-screen");
+      const button = document.getElementById("splash-enter-button");
+      const main = document.getElementById("main-content");
 
-    <script>
-        // JAVASCRIPT EMBUTIDO AQUI
-        document.addEventListener('DOMContentLoaded', () => {
-            const splashScreen = document.getElementById('splash-screen');
-            const enterButton = document.getElementById('splash-enter-button');
-            const mainContent = document.getElementById('main-content');
+      const showMain = () => {
+        if (!splash.classList.contains("hidden")) {
+          splash.classList.add("hidden");
+          splash.addEventListener(
+            "transitionend",
+            () => {
+              splash.style.display = "none";
+              main.style.display = "block";
+              document.body.style.overflow = "auto";
+            },
+            { once: true }
+          );
+        }
+      };
 
-            // Inicialmente, oculta o conteúdo principal
-            if (mainContent) {
-                mainContent.style.display = 'none';
-            }
+      // Ao clicar no botão
+      button.addEventListener("click", showMain);
 
-            // Adiciona o evento de clique ao botão
-            if (enterButton) {
-                enterButton.addEventListener('click', () => {
-                    if (splashScreen) {
-                        // Adiciona a classe 'hidden' para iniciar a transição de opacidade
-                        splashScreen.classList.add('hidden');
-
-                        // Espera a transição terminar antes de ocultar o display e mostrar o conteúdo principal
-                        splashScreen.addEventListener('transitionend', () => {
-                            splashScreen.style.display = 'none'; // Oculta a splash screen
-                            if (mainContent) {
-                                mainContent.style.display = 'block'; // Mostra o conteúdo principal
-                                document.body.style.overflow = 'auto'; // Habilita a rolagem novamente
-                            }
-                        }, { once: true }); // Garante que o evento é executado apenas uma vez
-                    }
-                });
-            }
-        });
-    </script>
+      // Ou após 6 segundos automaticamente
+      setTimeout(showMain, 6000);
+    });
+  </script>
 </body>
 </html>
