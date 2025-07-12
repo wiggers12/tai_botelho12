@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Espaço Tai Botelho - Sistema Completo</title>
 
-<!-- Chart.js para gráficos -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
@@ -23,8 +22,8 @@
     flex-direction: column;
   }
 
-  /* Splash Screen */
-  #splash {
+  /* Splash Screen / Login Screen */
+  #splash, #loginScreen {
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -35,11 +34,59 @@
     transition: opacity 0.6s ease;
     padding: 20px;
   }
-  #splash h1 {
+  #splash h1, #loginScreen h1 {
     font-size: 3rem;
     margin-bottom: 20px;
     text-shadow: 1px 1px 4px #6d3c77;
   }
+  #loginScreen {
+      display: none; /* Inicia oculto, será mostrado após splash */
+  }
+  #loginForm {
+      background: rgba(255, 255, 255, 0.9);
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+      text-align: center;
+      color: #4a2c4d;
+      max-width: 400px;
+      width: 90%;
+  }
+  #loginForm label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+      text-align: left;
+  }
+  #loginForm input[type="password"] {
+      width: calc(100% - 20px);
+      padding: 10px;
+      margin-bottom: 20px;
+      border: 1px solid #ce93d8;
+      border-radius: 8px;
+      font-size: 1.1rem;
+  }
+  #loginForm button {
+      background: #7b1fa2;
+      border: none;
+      padding: 12px 30px;
+      font-size: 1.2rem;
+      border-radius: 25px;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 4px 10px #4a0072;
+      transition: background-color 0.3s ease;
+  }
+  #loginForm button:hover {
+      background: #9c27b0;
+  }
+  #loginError {
+      color: #e53935;
+      margin-top: 10px;
+      font-weight: bold;
+      display: none;
+  }
+
   #btnEntrar {
     background: #7b1fa2;
     border: none;
@@ -154,9 +201,21 @@
     font-size: 1rem;
     transition: background-color 0.3s ease;
     margin-top: 10px;
+    margin-right: 8px; /* Espaçamento entre botões */
   }
   button:hover {
     background: #9c27b0;
+  }
+
+  /* Validação de formulário */
+  input.error, select.error, textarea.error {
+    border-color: #e53935;
+  }
+  .error-message {
+    color: #e53935;
+    font-size: 0.85rem;
+    margin-top: 4px;
+    display: block;
   }
 
   /* Busca */
@@ -187,7 +246,8 @@
     color: #7b1fa2cc;
   }
   .item button {
-    margin-left: 10px;
+    margin-left: 0; /* Remove margin-left para melhor layout */
+    margin-top: 8px;
     border-radius: 20px;
     padding: 5px 12px;
     font-size: 0.9rem;
@@ -211,7 +271,7 @@
     flex: 1 1 150px;
   }
 
-  /* Responsivo */
+  /* Responsive */
   @media(max-width: 768px){
     .menu {
       justify-content: center;
@@ -225,7 +285,13 @@
       font-size: 2rem;
     }
     button {
-      width: 100%;
+      width: auto; /* Permite que o width seja auto nos botões */
+      display: inline-block; /* Para que os botões fiquem lado a lado se houver espaço */
+    }
+    /* Força botões de item a irem para nova linha em telas pequenas */
+    .item button {
+        width: 100%;
+        margin-right: 0;
     }
   }
 
@@ -238,6 +304,29 @@
     margin: 5px;
     min-width: 120px;
   }
+
+  /* Toast Notification */
+  .toast {
+      visibility: hidden;
+      min-width: 250px;
+      margin-left: -125px;
+      background-color: #333;
+      color: #fff;
+      text-align: center;
+      border-radius: 8px;
+      padding: 16px;
+      position: fixed;
+      z-index: 1;
+      left: 50%;
+      bottom: 30px;
+      font-size: 17px;
+      opacity: 0;
+      transition: opacity 0.5s, visibility 0.5s;
+  }
+  .toast.show {
+      visibility: visible;
+      opacity: 1;
+  }
 </style>
 </head>
 <body>
@@ -245,6 +334,16 @@
 <div id="splash">
   <h1>Espaço Tai Botelho</h1>
   <button id="btnEntrar">Entrar</button>
+</div>
+
+<div id="loginScreen">
+  <h1>Acesso Restrito</h1>
+  <div id="loginForm">
+    <label for="password">Senha:</label>
+    <input type="password" id="password" placeholder="Digite a senha" />
+    <span id="loginError" class="error-message">Senha incorreta!</span>
+    <button id="btnLogin">Acessar Sistema</button>
+  </div>
 </div>
 
 <div id="main">
@@ -255,26 +354,26 @@
     <div class="menu-item" onclick="abrirSecao('produtosSection')"><span>🧴</span><p>Produtos</p></div>
     <div class="menu-item" onclick="abrirSecao('agendamentosSection')"><span>📅</span><p>Agendamentos</p></div>
     <div class="menu-item" onclick="abrirSecao('financeiroSection')"><span>💰</span><p>Financeiro</p></div>
+    <div class="menu-item" onclick="abrirSecao('backupSection')"><span>💾</span><p>Backup</p></div>
   </div>
 
-  <!-- Dashboard -->
   <section id="dashboardSection" style="display:none;">
     <h3>Dashboard</h3>
     <p><strong>Total Clientes:</strong> <span id="dashTotalClientes">0</span></p>
     <p><strong>Total Profissionais:</strong> <span id="dashTotalProfissionais">0</span></p>
     <p><strong>Total Produtos no Estoque:</strong> <span id="dashTotalProdutos">0</span></p>
     <p><strong>Agendamentos Pendentes:</strong> <span id="dashTotalAgendamentos">0</span></p>
-    <p><strong>Caixa Atual:</strong> R$ <span id="dashCaixaAtual">0,00</span></p>
+    <p><strong>Caixa Atual:</strong> <span id="dashCaixaAtual">R$ 0,00</span></p>
 
     <canvas id="graficoFinanceiro" style="max-width: 100%; margin-top:20px;"></canvas>
   </section>
 
-  <!-- Clientes -->
   <section id="clientesSection" style="display:none;">
     <h3>Cadastro de Clientes</h3>
     <div class="form-group">
       <label for="nomeCliente">Nome:</label>
-      <input type="text" id="nomeCliente" />
+      <input type="text" id="nomeCliente" required />
+      <span class="error-message" id="errorNomeCliente"></span>
     </div>
     <div class="form-group">
       <label for="telefoneCliente">Telefone:</label>
@@ -289,6 +388,7 @@
       <textarea id="obsCliente"></textarea>
     </div>
     <button onclick="salvarCliente()">Salvar Cliente</button>
+    <button onclick="limparCamposCliente()">Novo/Limpar</button>
 
     <div class="busca">
       <input type="text" id="buscaCliente" placeholder="Buscar cliente..." oninput="listarClientes()" />
@@ -296,26 +396,30 @@
     <div id="listaClientes"></div>
   </section>
 
-  <!-- Profissionais -->
   <section id="profissionaisSection" style="display:none;">
     <h3>Cadastro de Profissionais</h3>
     <div class="form-group">
       <label for="nomeProf">Nome:</label>
-      <input type="text" id="nomeProf" />
+      <input type="text" id="nomeProf" required />
+      <span class="error-message" id="errorNomeProf"></span>
     </div>
     <div class="form-group">
       <label for="espProf">Especialidade:</label>
-      <input type="text" id="espProf" />
+      <input type="text" id="espProf" required />
+      <span class="error-message" id="errorEspProf"></span>
     </div>
     <div class="form-group">
-      <label for="servicoProf">Serviço:</label>
-      <input type="text" id="servicoProf" />
+      <label for="servicoProf">Serviço Principal:</label>
+      <input type="text" id="servicoProf" required />
+      <span class="error-message" id="errorServicoProf"></span>
     </div>
     <div class="form-group">
       <label for="valorProf">Valor (R$):</label>
-      <input type="number" id="valorProf" min="0" step="0.01" />
+      <input type="number" id="valorProf" min="0" step="0.01" required />
+      <span class="error-message" id="errorValorProf"></span>
     </div>
     <button onclick="salvarProfissional()">Salvar Profissional</button>
+    <button onclick="limparCamposProfissional()">Novo/Limpar</button>
 
     <div class="busca">
       <input type="text" id="buscaProfissional" placeholder="Buscar profissional..." oninput="listarProfissionais()" />
@@ -323,30 +427,34 @@
     <div id="listaProfissionais"></div>
   </section>
 
-  <!-- Produtos -->
   <section id="produtosSection" style="display:none;">
     <h3>Cadastro de Produtos</h3>
     <div class="form-group">
       <label for="nomeProduto">Nome do Produto:</label>
-      <input type="text" id="nomeProduto" />
+      <input type="text" id="nomeProduto" required />
+      <span class="error-message" id="errorNomeProduto"></span>
     </div>
     <div class="form-group">
       <label for="tipoProduto">Tipo do Produto:</label>
-      <input type="text" id="tipoProduto" />
+      <input type="text" id="tipoProduto" required />
+      <span class="error-message" id="errorTipoProduto"></span>
     </div>
     <div class="form-group">
       <label for="quantidadeProduto">Quantidade em Estoque:</label>
-      <input type="number" id="quantidadeProduto" min="0" />
+      <input type="number" id="quantidadeProduto" min="0" required />
+      <span class="error-message" id="errorQuantidadeProduto"></span>
     </div>
     <div class="form-group">
       <label for="minQuantidadeProduto">Quantidade Mínima para Alerta:</label>
-      <input type="number" id="minQuantidadeProduto" min="0" />
+      <input type="number" id="minQuantidadeProduto" min="0" required />
+      <span class="error-message" id="errorMinQuantidadeProduto"></span>
     </div>
     <div class="form-group">
       <label for="validadeProduto">Data de Validade (opcional):</label>
       <input type="date" id="validadeProduto" />
     </div>
     <button onclick="salvarProduto()">Salvar Produto</button>
+    <button onclick="limparCamposProduto()">Novo/Limpar</button>
 
     <div class="busca">
       <input type="text" id="buscaProduto" placeholder="Buscar produto..." oninput="listarProdutos()" />
@@ -367,28 +475,32 @@
     <div id="historicoMovimentacoes"></div>
   </section>
 
-  <!-- Agendamentos -->
   <section id="agendamentosSection" style="display:none;">
     <h3>Agendamento de Clientes</h3>
     <div class="form-group">
       <label for="selectClienteAgendamento">Cliente:</label>
-      <select id="selectClienteAgendamento"></select>
+      <select id="selectClienteAgendamento" required></select>
+      <span class="error-message" id="errorSelectClienteAgendamento"></span>
     </div>
     <div class="form-group">
       <label for="selectProfissionalAgendamento">Profissional:</label>
-      <select id="selectProfissionalAgendamento" onchange="atualizarServicosProfissional()"></select>
+      <select id="selectProfissionalAgendamento" onchange="atualizarServicosProfissional()" required></select>
+      <span class="error-message" id="errorSelectProfissionalAgendamento"></span>
     </div>
     <div class="form-group">
       <label for="selectServicoAgendamento">Serviço:</label>
-      <select id="selectServicoAgendamento"></select>
+      <select id="selectServicoAgendamento" required></select>
+      <span class="error-message" id="errorSelectServicoAgendamento"></span>
     </div>
     <div class="form-group">
       <label for="dataAgendamento">Data:</label>
-      <input type="date" id="dataAgendamento" />
+      <input type="date" id="dataAgendamento" required />
+      <span class="error-message" id="errorDataAgendamento"></span>
     </div>
     <div class="form-group">
       <label for="horaAgendamento">Hora:</label>
-      <input type="time" id="horaAgendamento" />
+      <input type="time" id="horaAgendamento" required />
+      <span class="error-message" id="errorHoraAgendamento"></span>
     </div>
     <button onclick="salvarAgendamento()">Salvar Agendamento</button>
 
@@ -410,7 +522,6 @@
     <div id="listaAgendamentos"></div>
   </section>
 
-  <!-- Financeiro -->
   <section id="financeiroSection" style="display:none;">
     <h3>Financeiro</h3>
 
@@ -426,15 +537,18 @@
     <h4>Gastos</h4>
     <div class="form-group">
       <label for="descricaoGasto">Descrição:</label>
-      <input type="text" id="descricaoGasto" />
+      <input type="text" id="descricaoGasto" required />
+      <span class="error-message" id="errorDescricaoGasto"></span>
     </div>
     <div class="form-group">
       <label for="valorGasto">Valor (R$):</label>
-      <input type="number" id="valorGasto" min="0" step="0.01" />
+      <input type="number" id="valorGasto" min="0" step="0.01" required />
+      <span class="error-message" id="errorValorGasto"></span>
     </div>
     <div class="form-group">
       <label for="dataGasto">Data:</label>
-      <input type="date" id="dataGasto" />
+      <input type="date" id="dataGasto" required />
+      <span class="error-message" id="errorDataGasto"></span>
     </div>
     <button onclick="salvarGasto()">Salvar Gasto</button>
 
@@ -442,13 +556,12 @@
     <div id="listaGastos" style="max-height: 150px; overflow-y: auto; background: #fce4ec; padding: 10px; border-radius: 12px;"></div>
 
     <h4>Resumo Financeiro Mensal</h4>
-    <p><strong>Caixa Atual:</strong> R$ <span id="caixaAtual">0,00</span></p>
-    <p><strong>Ganhos Totais:</strong> R$ <span id="ganhosTotais">0,00</span></p>
-    <p><strong>Gastos Totais:</strong> R$ <span id="gastosTotais">0,00</span></p>
-    <p><strong>Lucro Total:</strong> R$ <span id="lucroTotal">0,00</span></p>
+    <p><strong>Caixa Atual:</strong> <span id="caixaAtual">R$ 0,00</span></p>
+    <p><strong>Ganhos Totais:</strong> <span id="ganhosTotais">R$ 0,00</span></p>
+    <p><strong>Gastos Totais:</strong> <span id="gastosTotais">R$ 0,00</span></p>
+    <p><strong>Lucro Total:</strong> <span id="lucroTotal">R$ 0,00</span></p>
   </section>
 
-  <!-- Backup / Restore -->
   <section id="backupSection" style="display:none;">
     <h3>Backup e Restauração de Dados</h3>
     <button onclick="exportarDados()">Exportar Dados (Backup)</button>
@@ -457,8 +570,10 @@
   </section>
 </div>
 
+<div id="toastNotification" class="toast"></div>
+
 <script>
-  // Dados em memória
+  // Variáveis globais para os dados (simulando um banco de dados local)
   let clientes = JSON.parse(localStorage.getItem("clientes")) || [];
   let profissionais = JSON.parse(localStorage.getItem("profissionais")) || [];
   let produtos = JSON.parse(localStorage.getItem("produtos")) || [];
@@ -466,25 +581,103 @@
   let gastos = JSON.parse(localStorage.getItem("gastos")) || [];
   let caixaInicial = parseFloat(localStorage.getItem("caixaInicial")) || 0;
 
-  // Estados edição
-  let clienteEditando = null;
-  let profissionalEditando = null;
-  let produtoEditando = null;
+  // Variáveis de controle de edição
+  let clienteEditandoId = null;
+  let profissionalEditandoId = null;
+  let produtoEditandoId = null;
 
-  // ====== CONTROLE DE SEÇÕES =======
+  // Constante para a senha de acesso (pode ser alterada)
+  const MASTER_PASSWORD = "admin"; // Senha simples para controle de acesso básico
+
+  // Objeto para formatar moeda
+  const currencyFormatter = new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+  });
+
+  // Função para exibir notificações Toast
+  function showToast(message, duration = 3000) {
+      const toast = document.getElementById("toastNotification");
+      toast.textContent = message;
+      toast.classList.add("show");
+      setTimeout(() => {
+          toast.classList.remove("show");
+      }, duration);
+  }
+
+  // Função para gerar IDs únicos (UUID simples)
+  function generateUUID() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      const r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  }
+
+  // Função de validação de formulário genérica
+  function validateField(fieldId, errorId, message) {
+      const field = document.getElementById(fieldId);
+      const errorSpan = document.getElementById(errorId);
+      if (field.value.trim() === '') {
+          field.classList.add('error');
+          errorSpan.textContent = message;
+          return false;
+      }
+      field.classList.remove('error');
+      errorSpan.textContent = '';
+      return true;
+  }
+
+  // ====== CONTROLE DE SEÇÕES E LOGIN =======
+  document.getElementById("btnEntrar").onclick = () => {
+    document.getElementById("splash").style.opacity = 0;
+    setTimeout(() => {
+      document.getElementById("splash").style.display = "none";
+      document.getElementById("loginScreen").style.display = "flex"; // Mostra a tela de login
+    }, 600);
+  };
+
+  document.getElementById("btnLogin").onclick = () => {
+      const passwordInput = document.getElementById("password");
+      const loginError = document.getElementById("loginError");
+      if (passwordInput.value === MASTER_PASSWORD) {
+          document.getElementById("loginScreen").style.opacity = 0;
+          setTimeout(() => {
+              document.getElementById("loginScreen").style.display = "none";
+              document.getElementById("main").style.display = "block";
+              abrirSecao("dashboardSection"); // Abre o dashboard após o login
+          }, 600);
+      } else {
+          loginError.textContent = "Senha incorreta!";
+          loginError.style.display = "block";
+          passwordInput.classList.add('error');
+          setTimeout(() => {
+            loginError.style.display = "none";
+            passwordInput.classList.remove('error');
+          }, 3000);
+      }
+  };
+
   function abrirSecao(id) {
     document.querySelectorAll("section").forEach(sec => {
       sec.style.display = "none";
     });
     document.getElementById(id).style.display = "block";
 
-    if (id === "clientesSection") listarClientes();
-    if (id === "profissionaisSection") listarProfissionais();
+    // Recarregar listas e selects ao abrir a seção
+    if (id === "clientesSection") {
+      listarClientes();
+      limparCamposCliente(); // Limpa os campos para um novo cadastro ou edição
+    }
+    if (id === "profissionaisSection") {
+      listarProfissionais();
+      limparCamposProfissional();
+    }
     if (id === "produtosSection") {
       listarProdutos();
       listarProdutosEmFalta();
       preencherSelectProdutosUso();
       listarMovimentacoes();
+      limparCamposProduto();
     }
     if (id === "agendamentosSection") {
       preencherSelectClienteAgendamento();
@@ -499,32 +692,28 @@
     if (id === "backupSection") { }
   }
 
-  // Entrar
-  document.getElementById("btnEntrar").onclick = () => {
-    document.getElementById("splash").style.opacity = 0;
-    setTimeout(() => {
-      document.getElementById("splash").style.display = "none";
-      document.getElementById("main").style.display = "block";
-      abrirSecao("dashboardSection");
-    }, 600);
-  };
-
   // ================== CLIENTES ======================
   function salvarCliente() {
-    const nome = document.getElementById("nomeCliente").value.trim();
+    const nomeInput = document.getElementById("nomeCliente");
     const telefone = document.getElementById("telefoneCliente").value.trim();
     const email = document.getElementById("emailCliente").value.trim();
     const obs = document.getElementById("obsCliente").value.trim();
 
-    if (!nome) return alert("Nome do cliente é obrigatório.");
+    if (!validateField('nomeCliente', 'errorNomeCliente', 'Nome é obrigatório.')) return;
 
-    const dados = { nome, telefone, email, obs };
+    let dados = { nome: nomeInput.value.trim(), telefone, email, obs };
 
-    if (clienteEditando !== null) {
-      clientes[clienteEditando] = dados;
-      clienteEditando = null;
+    if (clienteEditandoId !== null) {
+      const index = clientes.findIndex(c => c.id === clienteEditandoId);
+      if (index !== -1) {
+        clientes[index] = { ...clientes[index], ...dados }; // Mantém o ID original
+        showToast("Cliente atualizado com sucesso!");
+      }
+      clienteEditandoId = null;
     } else {
+      dados.id = generateUUID(); // Atribui um ID único ao novo cliente
       clientes.push(dados);
+      showToast("Cliente salvo com sucesso!");
     }
     localStorage.setItem("clientes", JSON.stringify(clientes));
     listarClientes();
@@ -536,57 +725,85 @@
     document.getElementById("telefoneCliente").value = "";
     document.getElementById("emailCliente").value = "";
     document.getElementById("obsCliente").value = "";
+    document.getElementById("nomeCliente").classList.remove('error');
+    document.getElementById("errorNomeCliente").textContent = '';
+    clienteEditandoId = null; // Garante que não estamos em modo de edição
   }
   function listarClientes() {
     const busca = document.getElementById("buscaCliente").value.toLowerCase();
     const lista = document.getElementById("listaClientes");
     lista.innerHTML = "";
-    clientes.forEach((c, i) => {
+    clientes.forEach(c => {
       if (!c.nome.toLowerCase().includes(busca)) return;
       lista.innerHTML += `
       <div class="item">
         <strong>${c.nome}</strong> <small>${c.telefone || ""} | ${c.email || ""}</small><br>
         <small>${c.obs || ""}</small>
-        <button class="editar" onclick="editarCliente(${i})">Editar</button>
-        <button class="excluir" onclick="excluirCliente(${i})">Excluir</button>
+        <div>
+            <button class="editar" onclick="editarCliente('${c.id}')">Editar</button>
+            <button class="excluir" onclick="excluirCliente('${c.id}')">Excluir</button>
+        </div>
       </div>`;
     });
   }
-  function editarCliente(i) {
-    const c = clientes[i];
-    document.getElementById("nomeCliente").value = c.nome;
-    document.getElementById("telefoneCliente").value = c.telefone;
-    document.getElementById("emailCliente").value = c.email;
-    document.getElementById("obsCliente").value = c.obs;
-    clienteEditando = i;
+  function editarCliente(id) {
+    const c = clientes.find(cliente => cliente.id === id);
+    if (c) {
+      document.getElementById("nomeCliente").value = c.nome;
+      document.getElementById("telefoneCliente").value = c.telefone;
+      document.getElementById("emailCliente").value = c.email;
+      document.getElementById("obsCliente").value = c.obs;
+      clienteEditandoId = c.id; // Define o ID do cliente que está sendo editado
+    }
   }
-  function excluirCliente(i) {
-    if (confirm("Excluir cliente?")) {
-      clientes.splice(i, 1);
+  function excluirCliente(id) {
+    if (confirm("Deseja realmente excluir este cliente?")) {
+      clientes = clientes.filter(c => c.id !== id);
       localStorage.setItem("clientes", JSON.stringify(clientes));
       listarClientes();
       atualizarDashboard();
+      showToast("Cliente excluído!");
     }
   }
 
   // ================== PROFISSIONAIS ======================
   function salvarProfissional() {
-    const nome = document.getElementById("nomeProf").value.trim();
-    const esp = document.getElementById("espProf").value.trim();
-    const servNome = document.getElementById("servicoProf").value.trim();
-    const servValor = parseFloat(document.getElementById("valorProf").value);
+    const nomeInput = document.getElementById("nomeProf");
+    const espInput = document.getElementById("espProf");
+    const servicoNomeInput = document.getElementById("servicoProf");
+    const valorProfInput = document.getElementById("valorProf");
 
-    if (!nome || !esp || !servNome || isNaN(servValor) || servValor < 0) return alert("Preencha todos os campos corretamente.");
-
-    let servicos = [{ nome: servNome, valor: servValor }];
-
-    const dados = { nome, especialidade: esp, servicos };
-
-    if (profissionalEditando !== null) {
-      profissionais[profissionalEditando] = dados;
-      profissionalEditando = null;
+    let isValid = true;
+    isValid = validateField('nomeProf', 'errorNomeProf', 'Nome é obrigatório.') && isValid;
+    isValid = validateField('espProf', 'errorEspProf', 'Especialidade é obrigatória.') && isValid;
+    isValid = validateField('servicoProf', 'errorServicoProf', 'Serviço é obrigatório.') && isValid;
+    
+    const servValor = parseFloat(valorProfInput.value);
+    if (isNaN(servValor) || servValor < 0) {
+        valorProfInput.classList.add('error');
+        document.getElementById("errorValorProf").textContent = 'Valor inválido.';
+        isValid = false;
     } else {
+        valorProfInput.classList.remove('error');
+        document.getElementById("errorValorProf").textContent = '';
+    }
+
+    if (!isValid) return;
+
+    let servicos = [{ nome: servicoNomeInput.value.trim(), valor: servValor }];
+    let dados = { nome: nomeInput.value.trim(), especialidade: espInput.value.trim(), servicos };
+
+    if (profissionalEditandoId !== null) {
+      const index = profissionais.findIndex(p => p.id === profissionalEditandoId);
+      if (index !== -1) {
+        profissionais[index] = { ...profissionais[index], ...dados };
+        showToast("Profissional atualizado com sucesso!");
+      }
+      profissionalEditandoId = null;
+    } else {
+      dados.id = generateUUID();
       profissionais.push(dados);
+      showToast("Profissional salvo com sucesso!");
     }
     localStorage.setItem("profissionais", JSON.stringify(profissionais));
     listarProfissionais();
@@ -598,60 +815,103 @@
     document.getElementById("espProf").value = "";
     document.getElementById("servicoProf").value = "";
     document.getElementById("valorProf").value = "";
+    document.getElementById("nomeProf").classList.remove('error');
+    document.getElementById("errorNomeProf").textContent = '';
+    document.getElementById("espProf").classList.remove('error');
+    document.getElementById("errorEspProf").textContent = '';
+    document.getElementById("servicoProf").classList.remove('error');
+    document.getElementById("errorServicoProf").textContent = '';
+    document.getElementById("valorProf").classList.remove('error');
+    document.getElementById("errorValorProf").textContent = '';
+    profissionalEditandoId = null;
   }
   function listarProfissionais() {
     const busca = document.getElementById("buscaProfissional").value.toLowerCase();
     const lista = document.getElementById("listaProfissionais");
     lista.innerHTML = "";
-    profissionais.forEach((p, i) => {
+    profissionais.forEach(p => {
       if (!p.nome.toLowerCase().includes(busca)) return;
-      let servicosHTML = p.servicos.map(s => `<li>${s.nome} - R$${s.valor.toFixed(2)}</li>`).join("");
+      let servicosHTML = p.servicos.map(s => `<li>${s.nome} - ${currencyFormatter.format(s.valor)}</li>`).join("");
       lista.innerHTML += `
       <div class="item">
         <strong>${p.nome}</strong> <small>(${p.especialidade})</small>
         <ul>${servicosHTML}</ul>
-        <button class="editar" onclick="editarProfissional(${i})">Editar</button>
-        <button class="excluir" onclick="excluirProfissional(${i})">Excluir</button>
+        <div>
+            <button class="editar" onclick="editarProfissional('${p.id}')">Editar</button>
+            <button class="excluir" onclick="excluirProfissional('${p.id}')">Excluir</button>
+        </div>
       </div>`;
     });
   }
-  function editarProfissional(i) {
-    const p = profissionais[i];
-    document.getElementById("nomeProf").value = p.nome;
-    document.getElementById("espProf").value = p.especialidade;
-    document.getElementById("servicoProf").value = p.servicos[0]?.nome || "";
-    document.getElementById("valorProf").value = p.servicos[0]?.valor || "";
-    profissionalEditando = i;
+  function editarProfissional(id) {
+    const p = profissionais.find(prof => prof.id === id);
+    if (p) {
+      document.getElementById("nomeProf").value = p.nome;
+      document.getElementById("espProf").value = p.especialidade;
+      document.getElementById("servicoProf").value = p.servicos[0]?.nome || "";
+      document.getElementById("valorProf").value = p.servicos[0]?.valor || "";
+      profissionalEditandoId = p.id;
+    }
   }
-  function excluirProfissional(i) {
-    if (confirm("Excluir profissional?")) {
-      profissionais.splice(i, 1);
+  function excluirProfissional(id) {
+    if (confirm("Deseja realmente excluir este profissional?")) {
+      profissionais = profissionais.filter(p => p.id !== id);
       localStorage.setItem("profissionais", JSON.stringify(profissionais));
       listarProfissionais();
       atualizarDashboard();
+      showToast("Profissional excluído!");
     }
   }
 
   // ================== PRODUTOS (Estoque avançado) ======================
   function salvarProduto() {
-    const nome = document.getElementById("nomeProduto").value.trim();
-    const tipo = document.getElementById("tipoProduto").value.trim();
-    const quantidade = parseInt(document.getElementById("quantidadeProduto").value);
-    const minQtd = parseInt(document.getElementById("minQuantidadeProduto").value);
+    const nomeInput = document.getElementById("nomeProduto");
+    const tipoInput = document.getElementById("tipoProduto");
+    const quantidadeInput = document.getElementById("quantidadeProduto");
+    const minQtdInput = document.getElementById("minQuantidadeProduto");
     const validade = document.getElementById("validadeProduto").value;
 
-    if (!nome || !tipo || isNaN(quantidade) || quantidade < 0 || isNaN(minQtd) || minQtd < 0) {
-      return alert("Preencha todos os campos corretamente.");
+    let isValid = true;
+    isValid = validateField('nomeProduto', 'errorNomeProduto', 'Nome é obrigatório.') && isValid;
+    isValid = validateField('tipoProduto', 'errorTipoProduto', 'Tipo é obrigatório.') && isValid;
+
+    const quantidade = parseInt(quantidadeInput.value);
+    if (isNaN(quantidade) || quantidade < 0) {
+        quantidadeInput.classList.add('error');
+        document.getElementById("errorQuantidadeProduto").textContent = 'Quantidade inválida.';
+        isValid = false;
+    } else {
+        quantidadeInput.classList.remove('error');
+        document.getElementById("errorQuantidadeProduto").textContent = '';
     }
 
-    const dados = { nome, tipo, quantidade, minQtd, validade, movimentacoes: produtos[produtoEditando]?.movimentacoes || [] };
-
-    if (produtoEditando !== null) {
-      dados.movimentacoes = produtos[produtoEditando].movimentacoes || [];
-      produtos[produtoEditando] = dados;
-      produtoEditando = null;
+    const minQtd = parseInt(minQtdInput.value);
+    if (isNaN(minQtd) || minQtd < 0) {
+        minQtdInput.classList.add('error');
+        document.getElementById("errorMinQuantidadeProduto").textContent = 'Quantidade mínima inválida.';
+        isValid = false;
     } else {
+        minQtdInput.classList.remove('error');
+        document.getElementById("errorMinQuantidadeProduto").textContent = '';
+    }
+
+    if (!isValid) return;
+
+    let dados = { nome: nomeInput.value.trim(), tipo: tipoInput.value.trim(), quantidade, minQtd, validade };
+
+    if (produtoEditandoId !== null) {
+      const index = produtos.findIndex(p => p.id === produtoEditandoId);
+      if (index !== -1) {
+        dados.movimentacoes = produtos[index].movimentacoes || []; // Mantém movimentações existentes
+        produtos[index] = { ...produtos[index], ...dados };
+        showToast("Produto atualizado com sucesso!");
+      }
+      produtoEditandoId = null;
+    } else {
+      dados.id = generateUUID(); // Atribui um ID único ao novo produto
+      dados.movimentacoes = []; // Inicia com array vazio de movimentações
       produtos.push(dados);
+      showToast("Produto salvo com sucesso!");
     }
 
     localStorage.setItem("produtos", JSON.stringify(produtos));
@@ -668,20 +928,31 @@
     document.getElementById("quantidadeProduto").value = "";
     document.getElementById("minQuantidadeProduto").value = "";
     document.getElementById("validadeProduto").value = "";
+    document.getElementById("nomeProduto").classList.remove('error');
+    document.getElementById("errorNomeProduto").textContent = '';
+    document.getElementById("tipoProduto").classList.remove('error');
+    document.getElementById("errorTipoProduto").textContent = '';
+    document.getElementById("quantidadeProduto").classList.remove('error');
+    document.getElementById("errorQuantidadeProduto").textContent = '';
+    document.getElementById("minQuantidadeProduto").classList.remove('error');
+    document.getElementById("errorMinQuantidadeProduto").textContent = '';
+    produtoEditandoId = null;
   }
   function listarProdutos() {
     const busca = document.getElementById("buscaProduto").value.toLowerCase();
     const lista = document.getElementById("listaProdutos");
     lista.innerHTML = "";
-    produtos.forEach((p, i) => {
+    produtos.forEach(p => {
       if (!p.nome.toLowerCase().includes(busca)) return;
       const validadeText = p.validade ? ` | Validade: ${p.validade}` : "";
       lista.innerHTML += `
       <div class="item">
         <strong>${p.nome}</strong> <small>(${p.tipo})</small><br>
         <small>Quantidade: ${p.quantidade} | Mínimo: ${p.minQtd}${validadeText}</small><br>
-        <button class="editar" onclick="editarProduto(${i})">Editar</button>
-        <button class="excluir" onclick="excluirProduto(${i})">Excluir</button>
+        <div>
+            <button class="editar" onclick="editarProduto('${p.id}')">Editar</button>
+            <button class="excluir" onclick="excluirProduto('${p.id}')">Excluir</button>
+        </div>
       </div>`;
     });
   }
@@ -697,49 +968,60 @@
       div.innerHTML += `<div class="item"><strong>${p.nome}</strong> - Quantidade: ${p.quantidade} (mínimo: ${p.minQtd})</div>`;
     });
   }
-  function editarProduto(i) {
-    const p = produtos[i];
-    document.getElementById("nomeProduto").value = p.nome;
-    document.getElementById("tipoProduto").value = p.tipo;
-    document.getElementById("quantidadeProduto").value = p.quantidade;
-    document.getElementById("minQuantidadeProduto").value = p.minQtd;
-    document.getElementById("validadeProduto").value = p.validade || "";
-    produtoEditando = i;
+  function editarProduto(id) {
+    const p = produtos.find(produto => produto.id === id);
+    if (p) {
+      document.getElementById("nomeProduto").value = p.nome;
+      document.getElementById("tipoProduto").value = p.tipo;
+      document.getElementById("quantidadeProduto").value = p.quantidade;
+      document.getElementById("minQuantidadeProduto").value = p.minQtd;
+      document.getElementById("validadeProduto").value = p.validade || "";
+      produtoEditandoId = p.id;
+    }
   }
-  function excluirProduto(i) {
-    if (confirm("Deseja excluir este produto?")) {
-      produtos.splice(i, 1);
+  function excluirProduto(id) {
+    if (confirm("Deseja realmente excluir este produto?")) {
+      produtos = produtos.filter(p => p.id !== id);
       localStorage.setItem("produtos", JSON.stringify(produtos));
       listarProdutos();
       listarProdutosEmFalta();
       preencherSelectProdutosUso();
       listarMovimentacoes();
       atualizarDashboard();
+      showToast("Produto excluído!");
     }
   }
   function preencherSelectProdutosUso() {
     const select = document.getElementById("selectProdutoUso");
     select.innerHTML = "<option value=''>-- Selecione um produto --</option>";
-    produtos.forEach((p, i) => {
-      select.innerHTML += `<option value="${i}">${p.nome} (Qtd: ${p.quantidade})</option>`;
+    produtos.forEach(p => {
+      select.innerHTML += `<option value="${p.id}">${p.nome} (Qtd: ${p.quantidade})</option>`;
     });
   }
   function usarProduto() {
     const select = document.getElementById("selectProdutoUso");
-    const index = parseInt(select.value);
-    const qtdUso = parseInt(document.getElementById("quantidadeUso").value);
+    const produtoId = select.value;
+    const qtdUsoInput = document.getElementById("quantidadeUso");
+    const qtdUso = parseInt(qtdUsoInput.value);
 
-    if (isNaN(index) || index < 0 || index >= produtos.length) return alert("Selecione um produto válido.");
-    if (isNaN(qtdUso) || qtdUso <= 0) return alert("Informe uma quantidade válida.");
-
-    if (produtos[index].quantidade < qtdUso) {
-      return alert("Quantidade insuficiente em estoque.");
+    if (!produtoId) {
+      return showToast("Selecione um produto válido.");
+    }
+    if (isNaN(qtdUso) || qtdUso <= 0) {
+      return showToast("Informe uma quantidade válida para uso.");
     }
 
-    produtos[index].quantidade -= qtdUso;
+    const produto = produtos.find(p => p.id === produtoId);
+    if (!produto) return showToast("Produto não encontrado.");
+
+    if (produto.quantidade < qtdUso) {
+      return showToast("Quantidade insuficiente em estoque.");
+    }
+
+    produto.quantidade -= qtdUso;
     const hoje = new Date().toISOString().slice(0,10);
-    produtos[index].movimentacoes = produtos[index].movimentacoes || [];
-    produtos[index].movimentacoes.push({
+    produto.movimentacoes.push({
+      id: generateUUID(),
       tipo: "Saída",
       quantidade: qtdUso,
       data: hoje,
@@ -751,9 +1033,10 @@
     listarProdutosEmFalta();
     preencherSelectProdutosUso();
     listarMovimentacoes();
-    document.getElementById("quantidadeUso").value = "";
-    select.value = "";
+    qtdUsoInput.value = "";
+    select.value = ""; // Limpa o select
     atualizarDashboard();
+    showToast(`Usado ${qtdUso} de ${produto.nome}.`);
   }
   function listarMovimentacoes() {
     const div = document.getElementById("historicoMovimentacoes");
@@ -771,52 +1054,95 @@
   function preencherSelectClienteAgendamento() {
     const select = document.getElementById("selectClienteAgendamento");
     select.innerHTML = "<option value=''>-- Selecione um cliente --</option>";
-    clientes.forEach((c, i) => {
-      select.innerHTML += `<option value="${i}">${c.nome}</option>`;
+    clientes.forEach(c => {
+      select.innerHTML += `<option value="${c.id}">${c.nome}</option>`;
     });
   }
   function preencherSelectProfissionalAgendamento() {
     const select = document.getElementById("selectProfissionalAgendamento");
     select.innerHTML = "<option value=''>-- Selecione um profissional --</option>";
-    profissionais.forEach((p, i) => {
-      select.innerHTML += `<option value="${i}">${p.nome}</option>`;
+    profissionais.forEach(p => {
+      select.innerHTML += `<option value="${p.id}">${p.nome}</option>`;
     });
     document.getElementById("selectServicoAgendamento").innerHTML = "<option value=''>-- Selecione o serviço --</option>";
   }
   function atualizarServicosProfissional() {
-    const profIndex = parseInt(document.getElementById("selectProfissionalAgendamento").value);
+    const profId = document.getElementById("selectProfissionalAgendamento").value;
     const selectServico = document.getElementById("selectServicoAgendamento");
     selectServico.innerHTML = "<option value=''>-- Selecione o serviço --</option>";
-    if (isNaN(profIndex) || profIndex < 0 || profIndex >= profissionais.length) return;
-    profissionais[profIndex].servicos.forEach((s, i) => {
-      selectServico.innerHTML += `<option value="${i}">${s.nome} - R$${s.valor.toFixed(2)}</option>`;
+    const profissional = profissionais.find(p => p.id === profId);
+    if (!profissional) return;
+    
+    profissional.servicos.forEach((s, i) => {
+      // O valor do option será o índice do serviço no array, pois é um array simples
+      selectServico.innerHTML += `<option value="${i}">${s.nome} - ${currencyFormatter.format(s.valor)}</option>`;
     });
   }
   function salvarAgendamento() {
-    const clienteIndex = parseInt(document.getElementById("selectClienteAgendamento").value);
-    const profIndex = parseInt(document.getElementById("selectProfissionalAgendamento").value);
-    const servIndex = parseInt(document.getElementById("selectServicoAgendamento").value);
+    const clienteId = document.getElementById("selectClienteAgendamento").value;
+    const profId = document.getElementById("selectProfissionalAgendamento").value;
+    const servIndex = document.getElementById("selectServicoAgendamento").value; // Este é o INDEX do serviço
     const data = document.getElementById("dataAgendamento").value;
     const hora = document.getElementById("horaAgendamento").value;
 
-    if (isNaN(clienteIndex) || isNaN(profIndex) || isNaN(servIndex) || !data || !hora) {
-      return alert("Preencha todos os campos corretamente.");
-    }
+    let isValid = true;
+    isValid = validateField('selectClienteAgendamento', 'errorSelectClienteAgendamento', 'Cliente é obrigatório.') && isValid;
+    isValid = validateField('selectProfissionalAgendamento', 'errorSelectProfissionalAgendamento', 'Profissional é obrigatório.') && isValid;
+    isValid = validateField('selectServicoAgendamento', 'errorSelectServicoAgendamento', 'Serviço é obrigatório.') && isValid;
+    isValid = validateField('dataAgendamento', 'errorDataAgendamento', 'Data é obrigatória.') && isValid;
+    isValid = validateField('horaAgendamento', 'errorHoraAgendamento', 'Hora é obrigatória.') && isValid;
 
-    const agendamento = {
-      clienteIndex,
-      profIndex,
-      servIndex,
+    if (!isValid) return;
+
+    let agendamento = {
+      id: generateUUID(), // ID único para o agendamento
+      clienteId,
+      profId,
+      servIndex: parseInt(servIndex), // Garante que seja um número
       data,
       hora,
       status: "Pendente"
     };
 
-    agendamentos.push(agendamento);
+    // Verificar se é uma edição
+    if (document.getElementById("agendamentoEditandoId") && document.getElementById("agendamentoEditandoId").value !== "") {
+        const agendamentoIdToEdit = document.getElementById("agendamentoEditandoId").value;
+        const index = agendamentos.findIndex(a => a.id === agendamentoIdToEdit);
+        if (index !== -1) {
+            agendamentos[index] = { ...agendamentos[index], ...agendamento };
+            showToast("Agendamento atualizado com sucesso!");
+        }
+        document.getElementById("agendamentoEditandoId").value = ""; // Limpa o ID de edição
+    } else {
+        agendamentos.push(agendamento);
+        showToast("Agendamento salvo com sucesso!");
+    }
+    
     localStorage.setItem("agendamentos", JSON.stringify(agendamentos));
     listarAgendamentos();
     atualizarDashboard();
     carregarFinanceiro();
+    limparCamposAgendamento();
+  }
+
+  function limparCamposAgendamento() {
+      document.getElementById("selectClienteAgendamento").value = "";
+      document.getElementById("selectProfissionalAgendamento").value = "";
+      document.getElementById("selectServicoAgendamento").innerHTML = "<option value=''>-- Selecione o serviço --</option>";
+      document.getElementById("dataAgendamento").value = "";
+      document.getElementById("horaAgendamento").value = "";
+
+      // Remove classes de erro e mensagens
+      document.getElementById("selectClienteAgendamento").classList.remove('error');
+      document.getElementById("errorSelectClienteAgendamento").textContent = '';
+      document.getElementById("selectProfissionalAgendamento").classList.remove('error');
+      document.getElementById("errorSelectProfissionalAgendamento").textContent = '';
+      document.getElementById("selectServicoAgendamento").classList.remove('error');
+      document.getElementById("errorSelectServicoAgendamento").textContent = '';
+      document.getElementById("dataAgendamento").classList.remove('error');
+      document.getElementById("errorDataAgendamento").textContent = '';
+      document.getElementById("horaAgendamento").classList.remove('error');
+      document.getElementById("errorHoraAgendamento").textContent = '';
   }
 
   function listarAgendamentos() {
@@ -827,61 +1153,83 @@
     const lista = document.getElementById("listaAgendamentos");
     lista.innerHTML = "";
 
-    agendamentos.forEach((a, i) => {
-      const clienteNome = clientes[a.clienteIndex]?.nome || "";
-      if (!clienteNome.toLowerCase().includes(busca)) return;
+    const agendamentosExibidos = agendamentos.filter(a => {
+        const clienteNome = clientes.find(c => c.id === a.clienteId)?.nome || "";
+        if (!clienteNome.toLowerCase().includes(busca)) return false;
 
-      if (filtroPendentes && a.status !== "Pendente") return;
-      if (filtroData && a.data !== filtroData) return;
+        if (filtroPendentes && a.status !== "Pendente") return false;
+        if (filtroData && a.data !== filtroData) return false;
+        return true;
+    });
 
-      const profissional = profissionais[a.profIndex];
-      const servico = profissional?.servicos[a.servIndex];
+    agendamentosExibidos.forEach(a => {
+      const clienteNome = clientes.find(c => c.id === a.clienteId)?.nome || "N/A";
+      const profissional = profissionais.find(p => p.id === a.profId);
+      const servico = profissional?.servicos[a.servIndex]; // Usa servIndex para encontrar o serviço
 
       lista.innerHTML += `
       <div class="item">
         <strong>${clienteNome}</strong> - ${a.data} ${a.hora} <br>
         Profissional: ${profissional?.nome || "N/A"}<br>
-        Serviço: ${servico?.nome || "N/A"} - R$${servico?.valor?.toFixed(2) || "0.00"}<br>
+        Serviço: ${servico?.nome || "N/A"} - ${currencyFormatter.format(servico?.valor || 0)}<br>
         Status: ${a.status}
-        <button class="editar" onclick="editarAgendamento(${i})">Editar</button>
-        <button class="excluir" onclick="excluirAgendamento(${i})">Excluir</button>
-        <button onclick="alterarStatusAgendamento(${i})">${a.status === 'Pendente' ? 'Concluir' : 'Reabrir'}</button>
+        <div>
+            <button class="editar" onclick="editarAgendamento('${a.id}')">Editar</button>
+            <button class="excluir" onclick="excluirAgendamento('${a.id}')">Excluir</button>
+            <button onclick="alterarStatusAgendamento('${a.id}')">${a.status === 'Pendente' ? 'Concluir' : 'Reabrir'}</button>
+        </div>
       </div>`;
     });
   }
-  function editarAgendamento(i) {
-    const a = agendamentos[i];
-    document.getElementById("selectClienteAgendamento").value = a.clienteIndex;
-    document.getElementById("selectProfissionalAgendamento").value = a.profIndex;
-    atualizarServicosProfissional();
-    document.getElementById("selectServicoAgendamento").value = a.servIndex;
-    document.getElementById("dataAgendamento").value = a.data;
-    document.getElementById("horaAgendamento").value = a.hora;
 
-    // Remover o antigo e editar após salvar
-    agendamentos.splice(i, 1);
-    localStorage.setItem("agendamentos", JSON.stringify(agendamentos));
-    listarAgendamentos();
+  function editarAgendamento(id) {
+    const a = agendamentos.find(agend => agend.id === id);
+    if (a) {
+      document.getElementById("selectClienteAgendamento").value = a.clienteId;
+      document.getElementById("selectProfissionalAgendamento").value = a.profId;
+      atualizarServicosProfissional(); // Preenche os serviços com base no profissional selecionado
+      document.getElementById("selectServicoAgendamento").value = a.servIndex;
+      document.getElementById("dataAgendamento").value = a.data;
+      document.getElementById("horaAgendamento").value = a.hora;
+
+      // Adiciona um campo oculto para armazenar o ID do agendamento em edição
+      let hiddenInput = document.getElementById("agendamentoEditandoId");
+      if (!hiddenInput) {
+          hiddenInput = document.createElement("input");
+          hiddenInput.type = "hidden";
+          hiddenInput.id = "agendamentoEditandoId";
+          document.getElementById("agendamentosSection").appendChild(hiddenInput);
+      }
+      hiddenInput.value = a.id;
+      showToast("Editando agendamento. Salve para confirmar.");
+    }
   }
-  function excluirAgendamento(i) {
-    if (confirm("Excluir agendamento?")) {
-      agendamentos.splice(i, 1);
+
+  function excluirAgendamento(id) {
+    if (confirm("Deseja realmente excluir este agendamento?")) {
+      agendamentos = agendamentos.filter(a => a.id !== id);
       localStorage.setItem("agendamentos", JSON.stringify(agendamentos));
       listarAgendamentos();
       atualizarDashboard();
       carregarFinanceiro();
+      showToast("Agendamento excluído!");
     }
   }
-  function alterarStatusAgendamento(i) {
-    if (agendamentos[i].status === "Pendente") {
-      agendamentos[i].status = "Concluído";
-    } else {
-      agendamentos[i].status = "Pendente";
+  function alterarStatusAgendamento(id) {
+    const agendamento = agendamentos.find(a => a.id === id);
+    if (agendamento) {
+        if (agendamento.status === "Pendente") {
+            agendamento.status = "Concluído";
+            showToast("Agendamento concluído!");
+        } else {
+            agendamento.status = "Pendente";
+            showToast("Agendamento reaberto!");
+        }
+        localStorage.setItem("agendamentos", JSON.stringify(agendamentos));
+        listarAgendamentos();
+        carregarFinanceiro();
+        atualizarDashboard();
     }
-    localStorage.setItem("agendamentos", JSON.stringify(agendamentos));
-    listarAgendamentos();
-    carregarFinanceiro();
-    atualizarDashboard();
   }
   function limparFiltrosAgendamento() {
     document.getElementById("buscaAgendamento").value = "";
@@ -893,26 +1241,28 @@
   // ================== FINANCEIRO ======================
   function salvarCaixaInicial() {
     const valor = parseFloat(document.getElementById("caixaInicial").value);
-    if (isNaN(valor) || valor < 0) return alert("Valor inválido.");
+    if (isNaN(valor) || valor < 0) return showToast("Valor inválido para o caixa inicial.");
     caixaInicial = valor;
     localStorage.setItem("caixaInicial", caixaInicial);
-    alert("Caixa inicial salvo.");
+    showToast("Caixa inicial salvo.");
     atualizarDashboard();
     carregarFinanceiro();
   }
 
   function carregarFinanceiro() {
+    document.getElementById("caixaInicial").value = caixaInicial.toFixed(2);
+
     // Ganhos = soma dos agendamentos concluídos
     let ganhos = 0;
     let ganhosHTML = "";
     agendamentos.forEach(a => {
       if (a.status === "Concluído") {
-        const prof = profissionais[a.profIndex];
+        const prof = profissionais.find(p => p.id === a.profId);
         const serv = prof?.servicos[a.servIndex];
         if (serv) {
           ganhos += serv.valor;
-          const clienteNome = clientes[a.clienteIndex]?.nome || "N/A";
-          ganhosHTML += `<div>${clienteNome} - Serviço: ${serv.nome} - R$${serv.valor.toFixed(2)}</div>`;
+          const clienteNome = clientes.find(c => c.id === a.clienteId)?.nome || "N/A";
+          ganhosHTML += `<div>${clienteNome} - Serviço: ${serv.nome} - ${currencyFormatter.format(serv.valor)}</div>`;
         }
       }
     });
@@ -923,31 +1273,46 @@
     let gastosHTML = "";
     gastos.forEach(g => {
       gastosTotal += g.valor;
-      gastosHTML += `<div>${g.data} - ${g.descricao} - R$${g.valor.toFixed(2)}</div>`;
+      gastosHTML += `<div>${g.data} - ${g.descricao} - ${currencyFormatter.format(g.valor)}</div>`;
     });
     document.getElementById("listaGastos").innerHTML = gastosHTML;
 
     // Atualizar resumo financeiro
     const lucro = caixaInicial + ganhos - gastosTotal;
-    document.getElementById("caixaAtual").textContent = lucro.toFixed(2).replace('.', ',');
-    document.getElementById("ganhosTotais").textContent = ganhos.toFixed(2).replace('.', ',');
-    document.getElementById("gastosTotais").textContent = gastosTotal.toFixed(2).replace('.', ',');
-    document.getElementById("lucroTotal").textContent = lucro.toFixed(2).replace('.', ',');
+    document.getElementById("caixaAtual").textContent = currencyFormatter.format(lucro);
+    document.getElementById("ganhosTotais").textContent = currencyFormatter.format(ganhos);
+    document.getElementById("gastosTotais").textContent = currencyFormatter.format(gastosTotal);
+    document.getElementById("lucroTotal").textContent = currencyFormatter.format(lucro);
   }
   function salvarGasto() {
-    const descricao = document.getElementById("descricaoGasto").value.trim();
-    const valor = parseFloat(document.getElementById("valorGasto").value);
-    const data = document.getElementById("dataGasto").value;
+    const descricaoInput = document.getElementById("descricaoGasto");
+    const valorGastoInput = document.getElementById("valorGasto");
+    const dataGastoInput = document.getElementById("dataGasto");
 
-    if (!descricao || isNaN(valor) || valor <= 0 || !data) return alert("Preencha todos os campos corretamente.");
+    let isValid = true;
+    isValid = validateField('descricaoGasto', 'errorDescricaoGasto', 'Descrição é obrigatória.') && isValid;
+    isValid = validateField('dataGasto', 'errorDataGasto', 'Data é obrigatória.') && isValid;
 
-    gastos.push({ descricao, valor, data });
+    const valor = parseFloat(valorGastoInput.value);
+    if (isNaN(valor) || valor <= 0) {
+        valorGastoInput.classList.add('error');
+        document.getElementById("errorValorGasto").textContent = 'Valor inválido.';
+        isValid = false;
+    } else {
+        valorGastoInput.classList.remove('error');
+        document.getElementById("errorValorGasto").textContent = '';
+    }
+
+    if (!isValid) return;
+
+    gastos.push({ id: generateUUID(), descricao: descricaoInput.value.trim(), valor, data: dataGastoInput.value });
     localStorage.setItem("gastos", JSON.stringify(gastos));
     carregarFinanceiro();
 
-    document.getElementById("descricaoGasto").value = "";
-    document.getElementById("valorGasto").value = "";
-    document.getElementById("dataGasto").value = "";
+    descricaoInput.value = "";
+    valorGastoInput.value = "";
+    dataGastoInput.value = "";
+    showToast("Gasto salvo com sucesso!");
   }
 
   // =========== DASHBOARD ==============
@@ -956,16 +1321,19 @@
     document.getElementById("dashTotalProfissionais").textContent = profissionais.length;
     document.getElementById("dashTotalProdutos").textContent = produtos.reduce((acc, p) => acc + p.quantidade, 0);
     document.getElementById("dashTotalAgendamentos").textContent = agendamentos.filter(a => a.status === "Pendente").length;
-    const lucroAtual = caixaInicial + agendamentos.reduce((acc,a) => {
+    
+    const ganhosCalculados = agendamentos.reduce((acc,a) => {
       if(a.status === "Concluído"){
-        const p = profissionais[a.profIndex];
-        if(p && p.servicos[a.servIndex]){
-          return acc + p.servicos[a.servIndex].valor;
+        const prof = profissionais.find(p => p.id === a.profId);
+        if(prof && prof.servicos[a.servIndex]){
+          return acc + prof.servicos[a.servIndex].valor;
         }
       }
       return acc;
-    }, 0) - gastos.reduce((acc,g) => acc + g.valor, 0);
-    document.getElementById("dashCaixaAtual").textContent = lucroAtual.toFixed(2).replace('.', ',');
+    }, 0);
+    const gastosCalculados = gastos.reduce((acc,g) => acc + g.valor, 0);
+    const lucroAtual = caixaInicial + ganhosCalculados - gastosCalculados;
+    document.getElementById("dashCaixaAtual").textContent = currencyFormatter.format(lucroAtual);
   }
 
   // ======= GRÁFICO FINANCEIRO ========
@@ -979,7 +1347,7 @@
 
     agendamentos.forEach(a => {
       if (a.status !== "Concluído") return;
-      const prof = profissionais[a.profIndex];
+      const prof = profissionais.find(p => p.id === a.profId);
       const serv = prof?.servicos[a.servIndex];
       if (!serv) return;
 
@@ -1042,6 +1410,11 @@
               display: true,
               text: 'R$',
             },
+            ticks: {
+                callback: function(value) {
+                    return currencyFormatter.format(value);
+                }
+            }
           },
           y1: {
             beginAtZero: true,
@@ -1053,11 +1426,28 @@
               display: true,
               text: 'Lucro R$',
             },
+            ticks: {
+                callback: function(value) {
+                    return currencyFormatter.format(value);
+                }
+            }
           }
         },
         plugins: {
           tooltip: {
             enabled: true,
+            callbacks: {
+                label: function(context) {
+                    let label = context.dataset.label || '';
+                    if (label) {
+                        label += ': ';
+                    }
+                    if (context.parsed.y !== null) {
+                        label += currencyFormatter.format(context.parsed.y);
+                    }
+                    return label;
+                }
+            }
           },
           legend: {
             labels: {
@@ -1079,15 +1469,23 @@
       gastos,
       caixaInicial
     };
-    const json = JSON.stringify(dados, null, 2);
-    const blob = new Blob([json], {type: "application/json"});
-    const url = URL.createObjectURL(blob);
+    try {
+        const json = JSON.stringify(dados, null, 2);
+        const blob = new Blob([json], {type: "application/json"});
+        const url = URL.createObjectURL(blob);
 
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "backup_espaco_tai_botelho.json";
-    a.click();
-    URL.revokeObjectURL(url);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "backup_espaco_tai_botelho.json";
+        document.body.appendChild(a); // Necessário para Firefox
+        a.click();
+        document.body.removeChild(a); // Limpa o elemento
+        URL.revokeObjectURL(url);
+        showToast("Dados exportados com sucesso!");
+    } catch (error) {
+        showToast("Erro ao exportar dados: " + error.message);
+        console.error("Erro ao exportar dados:", error);
+    }
   }
   function importarDados(event) {
     const file = event.target.files[0];
@@ -1096,7 +1494,10 @@
     reader.onload = (e) => {
       try {
         const dados = JSON.parse(e.target.result);
-        if (!confirm("Importar irá substituir os dados atuais. Deseja continuar?")) return;
+        if (!confirm("Importar irá substituir TODOS os dados atuais. Deseja continuar?")) {
+            event.target.value = ""; // Limpa o campo do arquivo para permitir nova seleção
+            return;
+        }
 
         clientes = dados.clientes || [];
         profissionais = dados.profissionais || [];
@@ -1112,10 +1513,13 @@
         localStorage.setItem("gastos", JSON.stringify(gastos));
         localStorage.setItem("caixaInicial", caixaInicial);
 
-        alert("Dados importados com sucesso!");
-        abrirSecao("dashboardSection");
+        showToast("Dados importados com sucesso!");
+        abrirSecao("dashboardSection"); // Volta para o dashboard e recarrega tudo
       } catch (error) {
-        alert("Arquivo inválido!");
+        showToast("Arquivo de backup inválido! Verifique o formato.");
+        console.error("Erro ao importar dados:", error);
+      } finally {
+          event.target.value = ""; // Limpa o campo do arquivo
       }
     };
     reader.readAsText(file);
@@ -1123,7 +1527,10 @@
 
   // Inicializar dashboard ao carregar
   window.onload = () => {
-    atualizarDashboard();
+    // Esconder a tela principal até o login ou entrada
+    document.getElementById("main").style.display = "none";
+    document.getElementById("splash").style.display = "flex"; // Garante que a splash screen está visível
+    atualizarDashboard(); // Atualiza os números no dashboard mesmo que não esteja visível
   };
 </script>
 
