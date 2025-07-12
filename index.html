@@ -40,7 +40,7 @@
     text-shadow: 1px 1px 4px #6d3c77;
   }
   #loginScreen {
-      /* display: none; */ /* Remove esta linha, onAuthStateChanged vai controlar */
+      display: none; /* Inicia oculto, será mostrado após splash */
   }
   #loginForm {
       background: rgba(255, 255, 255, 0.9);
@@ -58,7 +58,6 @@
       font-weight: bold;
       text-align: left;
   }
-  #loginForm input[type="email"],
   #loginForm input[type="password"] {
       width: calc(100% - 20px);
       padding: 10px;
@@ -77,7 +76,6 @@
       cursor: pointer;
       box-shadow: 0 4px 10px #4a0072;
       transition: background-color 0.3s ease;
-      margin-top: 10px; /* Adicionado para espaçar botões de login/registro */
   }
   #loginForm button:hover {
       background: #9c27b0;
@@ -106,7 +104,7 @@
 
   /* Main container */
   #main {
-    display: none; /* Inicia oculto */
+    display: none;
     flex: 1;
     padding: 20px;
     max-width: 1200px;
@@ -148,13 +146,6 @@
     font-weight: 700;
     font-size: 1.1rem;
     margin: 0;
-  }
-  .menu-item.logout {
-    background: #e53935; /* Cor para o botão de logout */
-    color: white;
-  }
-  .menu-item.logout:hover {
-      background: #c62828;
   }
 
   /* Sections */
@@ -304,7 +295,7 @@
     }
   }
 
-  /* Export/Import Buttons (Backup local não será mais necessário, mas os botões permanecem para exportar/importar dados para o Firebase) */
+  /* Export/Import Buttons */
   #backupSection {
     margin-top: 15px;
     text-align: center;
@@ -348,13 +339,10 @@
 <div id="loginScreen">
   <h1>Acesso Restrito</h1>
   <div id="loginForm">
-    <label for="emailLogin">Email:</label>
-    <input type="email" id="emailLogin" placeholder="Digite seu email" required />
     <label for="password">Senha:</label>
-    <input type="password" id="password" placeholder="Digite a senha" required />
-    <span id="loginError" class="error-message"></span>
+    <input type="password" id="password" placeholder="Digite a senha" />
+    <span id="loginError" class="error-message">Senha incorreta!</span>
     <button id="btnLogin">Acessar Sistema</button>
-    <button style="background: #28a745; margin-top: 15px;" onclick="criarPrimeiroUsuarioManual()">Registrar Primeiro Acesso</button>
   </div>
 </div>
 
@@ -367,7 +355,6 @@
     <div class="menu-item" onclick="abrirSecao('agendamentosSection')"><span>📅</span><p>Agendamentos</p></div>
     <div class="menu-item" onclick="abrirSecao('financeiroSection')"><span>💰</span><p>Financeiro</p></div>
     <div class="menu-item" onclick="abrirSecao('backupSection')"><span>💾</span><p>Backup</p></div>
-    <div class="menu-item logout" onclick="logout()"><span>🚪</span><p>Sair</p></div>
   </div>
 
   <section id="dashboardSection" style="display:none;">
@@ -577,55 +564,30 @@
 
   <section id="backupSection" style="display:none;">
     <h3>Backup e Restauração de Dados</h3>
-    <button onclick="exportarDadosFirestore()">Exportar Dados (Firestore JSON)</button>
-    <button onclick="document.getElementById('inputImportFirestore').click()">Importar Dados (Firestore JSON)</button>
-    <input type="file" id="inputImportFirestore" accept="application/json" style="display:none" onchange="importarDadosFirestore(event)" />
-    <p style="margin-top:20px;">*Esta função de backup exporta/importa os dados do seu Firestore. Não é mais necessário o backup local do navegador.</p>
+    <button onclick="exportarDados()">Exportar Dados (Backup)</button>
+    <button onclick="document.getElementById('inputImport').click()">Importar Dados</button>
+    <input type="file" id="inputImport" accept="application/json" style="display:none" onchange="importarDados(event)" />
   </section>
 </div>
 
 <div id="toastNotification" class="toast"></div>
 
-<script type="module">
-  // Importar as funções necessárias do Firebase SDK
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-  import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, orderBy, onSnapshot, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-analytics.js"; // Se você estiver usando Analytics
-
-  // Suas configurações do Firebase (as que você me enviou)
-  const firebaseConfig = {
-    apiKey: "AIzaSyAbfoZCpgltNGqzC1SKtOXBJLIiABR1Uek",
-    authDomain: "tainan-salao.firebaseapp.com",
-    projectId: "tainan-salao",
-    storageBucket: "tainan-salao.firebasestorage.app",
-    messagingSenderId: "965996001179",
-    appId: "1:965996001179:web:e805a9e1087aaa9306533e",
-    measurementId: "G-E6EN58PXVB"
-  };
-
-  // Inicializar Firebase
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app); // Inicializa o serviço de autenticação
-  const db = getFirestore(app); // Inicializa o serviço Firestore
-  const analytics = getAnalytics(app); // Se você estiver usando Analytics
-
-  // =============================================================================================================
-  // VARIÁVEIS GLOBAIS (Serão preenchidas pelo Firestore)
-  // =============================================================================================================
-
-  let clientes = [];
-  let profissionais = [];
-  let produtos = [];
-  let agendamentos = [];
-  let gastos = [];
-  let caixaInicial = 0;
+<script>
+  // Variáveis globais para os dados (simulando um banco de dados local)
+  let clientes = JSON.parse(localStorage.getItem("clientes")) || [];
+  let profissionais = JSON.parse(localStorage.getItem("profissionais")) || [];
+  let produtos = JSON.parse(localStorage.getItem("produtos")) || [];
+  let agendamentos = JSON.parse(localStorage.getItem("agendamentos")) || [];
+  let gastos = JSON.parse(localStorage.getItem("gastos")) || [];
+  let caixaInicial = parseFloat(localStorage.getItem("caixaInicial")) || 0;
 
   // Variáveis de controle de edição
   let clienteEditandoId = null;
   let profissionalEditandoId = null;
   let produtoEditandoId = null;
-  let agendamentoEditandoId = null; // Para edição de agendamentos
+
+  // Constante para a senha de acesso (pode ser alterada)
+  const MASTER_PASSWORD = "admin"; // Senha simples para controle de acesso básico
 
   // Objeto para formatar moeda
   const currencyFormatter = new Intl.NumberFormat('pt-BR', {
@@ -643,6 +605,14 @@
       }, duration);
   }
 
+  // Função para gerar IDs únicos (UUID simples)
+  function generateUUID() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      const r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  }
+
   // Função de validação de formulário genérica
   function validateField(fieldId, errorId, message) {
       const field = document.getElementById(fieldId);
@@ -657,203 +627,73 @@
       return true;
   }
 
-  // =============================================================================================================
-  // AUTENTICAÇÃO COM FIREBASE
-  // =============================================================================================================
-
+  // ====== CONTROLE DE SEÇÕES E LOGIN =======
   document.getElementById("btnEntrar").onclick = () => {
     document.getElementById("splash").style.opacity = 0;
-    // Removendo o setTimeout para mostrar o loginScreen aqui.
-    // onAuthStateChanged vai lidar com a exibição de login/main.
     setTimeout(() => {
-        document.getElementById("splash").style.display = "none";
+      document.getElementById("splash").style.display = "none";
+      document.getElementById("loginScreen").style.display = "flex"; // Mostra a tela de login
     }, 600);
   };
 
-  document.getElementById("btnLogin").onclick = async () => {
-    const emailInput = document.getElementById("emailLogin");
-    const passwordInput = document.getElementById("password");
-    const loginError = document.getElementById("loginError");
-
-    const email = emailInput.value.trim();
-    const password = passwordInput.value.trim();
-
-    if (!email || !password) {
-      loginError.textContent = "Email e senha são obrigatórios.";
-      loginError.style.display = "block";
-      emailInput.classList.toggle('error', !email);
-      passwordInput.classList.toggle('error', !password);
-      return;
-    }
-
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-      showToast("Login bem-sucedido!");
-      loginError.style.display = "none";
-      emailInput.classList.remove('error');
-      passwordInput.classList.remove('error');
-    } catch (error) {
-      console.error("Erro de login:", error.code, error.message);
-      let errorMessage = "Erro ao fazer login. Verifique suas credenciais.";
-      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-        errorMessage = "Email ou senha incorretos.";
-      } else if (error.code === 'auth/invalid-email') {
-        errorMessage = "Formato de email inválido.";
+  document.getElementById("btnLogin").onclick = () => {
+      const passwordInput = document.getElementById("password");
+      const loginError = document.getElementById("loginError");
+      if (passwordInput.value === MASTER_PASSWORD) {
+          document.getElementById("loginScreen").style.opacity = 0;
+          setTimeout(() => {
+              document.getElementById("loginScreen").style.display = "none";
+              document.getElementById("main").style.display = "block";
+              abrirSecao("dashboardSection"); // Abre o dashboard após o login
+          }, 600);
+      } else {
+          loginError.textContent = "Senha incorreta!";
+          loginError.style.display = "block";
+          passwordInput.classList.add('error');
+          setTimeout(() => {
+            loginError.style.display = "none";
+            passwordInput.classList.remove('error');
+          }, 3000);
       }
-      loginError.textContent = errorMessage;
-      loginError.style.display = "block";
-      emailInput.classList.add('error');
-      passwordInput.classList.add('error');
-    }
   };
 
-  // Função para criar um novo usuário (usada para o primeiro acesso/admin)
-  async function criarPrimeiroUsuario(email, password) {
-    try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      console.log("Usuário registrado:", userCredential.user);
-      showToast("Primeiro usuário registrado com sucesso! Faça login.");
-      document.getElementById("emailLogin").value = email;
-      document.getElementById("password").value = password;
-    } catch (error) {
-      console.error("Erro ao registrar usuário:", error.code, error.message);
-      let errorMessage = "Erro ao registrar usuário. Tente novamente.";
-      if (error.code === 'auth/email-already-in-use') {
-        errorMessage = "Este email já está em uso.";
-      } else if (error.code === 'auth/weak-password') {
-        errorMessage = "Senha muito fraca (mínimo 6 caracteres).";
-      }
-      showToast(errorMessage);
+  function abrirSecao(id) {
+    document.querySelectorAll("section").forEach(sec => {
+      sec.style.display = "none";
+    });
+    document.getElementById(id).style.display = "block";
+
+    // Recarregar listas e selects ao abrir a seção
+    if (id === "clientesSection") {
+      listarClientes();
+      limparCamposCliente(); // Limpa os campos para um novo cadastro ou edição
     }
-  }
-
-  function criarPrimeiroUsuarioManual() {
-      const email = prompt("Digite o email para o primeiro acesso/admin:");
-      const password = prompt("Digite a senha para o primeiro acesso/admin (mínimo 6 caracteres):");
-      if (email && password) {
-          criarPrimeiroUsuario(email, password);
-      } else {
-          showToast("Email e senha não podem ser vazios.");
-      }
-  }
-
-  // Observar o estado de autenticação para redirecionar o usuário
-  onAuthStateChanged(auth, (user) => {
-    const splashScreen = document.getElementById("splash");
-    const loginScreen = document.getElementById("loginScreen");
-    const mainScreen = document.getElementById("main");
-
-    if (user) {
-      // Usuário logado
-      splashScreen.style.display = "none";
-      loginScreen.style.display = "none";
-      mainScreen.style.display = "block";
-      abrirSecao("dashboardSection"); // Abre o dashboard após o login
-      carregarTodosOsDadosDoFirestore(); // Carrega todos os dados do Firestore
-    } else {
-      // Usuário deslogado ou não logado
-      splashScreen.style.display = "none"; // Garante que a splash não apareça
-      loginScreen.style.display = "flex"; // Mostra a tela de login
-      mainScreen.style.display = "none";
+    if (id === "profissionaisSection") {
+      listarProfissionais();
+      limparCamposProfissional();
     }
-  });
-
-  async function logout() {
-    try {
-      await signOut(auth);
-      showToast("Você foi desconectado.");
-      // onAuthStateChanged vai ser acionado e fará a tela de login aparecer
-    } catch (error) {
-      console.error("Erro ao fazer logout:", error);
-      showToast("Erro ao desconectar.");
+    if (id === "produtosSection") {
+      listarProdutos();
+      listarProdutosEmFalta();
+      preencherSelectProdutosUso();
+      listarMovimentacoes();
+      limparCamposProduto();
     }
-  }
-
-  // =============================================================================================================
-  // FUNÇÕES DE MANIPULAÇÃO DO FIRESTORE
-  // =============================================================================================================
-
-  // Carregar todos os dados do Firestore e configurar listeners em tempo real
-  async function carregarTodosOsDadosDoFirestore() {
-      showToast("Carregando dados...");
-      carregarClientesFirestore();
-      carregarProfissionaisFirestore();
-      carregarProdutosFirestore();
-      carregarAgendamentosFirestore();
-      carregarGastosFirestore();
-      carregarCaixaInicialFirestore();
-  }
-
-  // Funções de CARREGAMENTO (onSnapshot para tempo real)
-  function carregarClientesFirestore() {
-      onSnapshot(query(collection(db, "clientes"), orderBy("nome", "asc")), (snapshot) => {
-          clientes = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-          listarClientes();
-          atualizarDashboard();
-          preencherSelectClienteAgendamento();
-      }, (error) => { console.error("Erro ao carregar clientes:", error); showToast("Erro ao carregar clientes."); });
-  }
-
-  function carregarProfissionaisFirestore() {
-      onSnapshot(query(collection(db, "profissionais"), orderBy("nome", "asc")), (snapshot) => {
-          profissionais = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-          listarProfissionais();
-          atualizarDashboard();
-          preencherSelectProfissionalAgendamento();
-      }, (error) => { console.error("Erro ao carregar profissionais:", error); showToast("Erro ao carregar profissionais."); });
-  }
-
-  function carregarProdutosFirestore() {
-      onSnapshot(query(collection(db, "produtos"), orderBy("nome", "asc")), (snapshot) => {
-          produtos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-          listarProdutos();
-          listarProdutosEmFalta();
-          preencherSelectProdutosUso();
-          listarMovimentacoes();
-          atualizarDashboard();
-      }, (error) => { console.error("Erro ao carregar produtos:", error); showToast("Erro ao carregar produtos."); });
-  }
-
-  function carregarAgendamentosFirestore() {
-      onSnapshot(query(collection(db, "agendamentos"), orderBy("data", "desc"), orderBy("hora", "desc")), (snapshot) => {
-          agendamentos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-          listarAgendamentos();
-          atualizarDashboard();
-          carregarFinanceiro(); // Financeiro depende dos agendamentos concluídos
-          desenharGraficoFinanceiro();
-      }, (error) => { console.error("Erro ao carregar agendamentos:", error); showToast("Erro ao carregar agendamentos."); });
-  }
-
-  function carregarGastosFirestore() {
-      onSnapshot(query(collection(db, "gastos"), orderBy("data", "desc")), (snapshot) => {
-          gastos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-          carregarFinanceiro(); // Financeiro depende dos gastos
-          desenharGraficoFinanceiro();
-      }, (error) => { console.error("Erro ao carregar gastos:", error); showToast("Erro ao carregar gastos."); });
-  }
-
-  async function carregarCaixaInicialFirestore() {
-      const configRef = doc(db, "configuracoes", "caixaInicial");
-      try {
-          const docSnap = await getDoc(configRef);
-          if (docSnap.exists()) {
-              caixaInicial = parseFloat(docSnap.data().valor) || 0;
-          } else {
-              // Se não existir, crie com valor padrão
-              await setDoc(configRef, { valor: 0 }); // Use setDoc para criar/substituir o documento
-              caixaInicial = 0;
-          }
-          document.getElementById("caixaInicial").value = caixaInicial.toFixed(2);
-          carregarFinanceiro();
-          atualizarDashboard();
-      } catch (error) {
-          console.error("Erro ao carregar/criar caixa inicial:", error);
-          showToast("Erro ao carregar caixa inicial.");
-      }
+    if (id === "agendamentosSection") {
+      preencherSelectClienteAgendamento();
+      preencherSelectProfissionalAgendamento();
+      listarAgendamentos();
+    }
+    if (id === "financeiroSection") carregarFinanceiro();
+    if (id === "dashboardSection") {
+      atualizarDashboard();
+      desenharGraficoFinanceiro();
+    }
+    if (id === "backupSection") { }
   }
 
   // ================== CLIENTES ======================
-  async function salvarCliente() {
+  function salvarCliente() {
     const nomeInput = document.getElementById("nomeCliente");
     const telefone = document.getElementById("telefoneCliente").value.trim();
     const email = document.getElementById("emailCliente").value.trim();
@@ -863,21 +703,22 @@
 
     let dados = { nome: nomeInput.value.trim(), telefone, email, obs };
 
-    try {
-      if (clienteEditandoId !== null) {
-        const clienteRef = doc(db, "clientes", clienteEditandoId);
-        await updateDoc(clienteRef, dados);
+    if (clienteEditandoId !== null) {
+      const index = clientes.findIndex(c => c.id === clienteEditandoId);
+      if (index !== -1) {
+        clientes[index] = { ...clientes[index], ...dados }; // Mantém o ID original
         showToast("Cliente atualizado com sucesso!");
-      } else {
-        await addDoc(collection(db, "clientes"), dados);
-        showToast("Cliente salvo com sucesso!");
       }
-      limparCamposCliente();
       clienteEditandoId = null;
-    } catch (e) {
-      console.error("Erro ao salvar cliente: ", e);
-      showToast("Erro ao salvar cliente.");
+    } else {
+      dados.id = generateUUID(); // Atribui um ID único ao novo cliente
+      clientes.push(dados);
+      showToast("Cliente salvo com sucesso!");
     }
+    localStorage.setItem("clientes", JSON.stringify(clientes));
+    listarClientes();
+    limparCamposCliente();
+    atualizarDashboard();
   }
   function limparCamposCliente() {
     document.getElementById("nomeCliente").value = "";
@@ -886,7 +727,7 @@
     document.getElementById("obsCliente").value = "";
     document.getElementById("nomeCliente").classList.remove('error');
     document.getElementById("errorNomeCliente").textContent = '';
-    clienteEditandoId = null;
+    clienteEditandoId = null; // Garante que não estamos em modo de edição
   }
   function listarClientes() {
     const busca = document.getElementById("buscaCliente").value.toLowerCase();
@@ -912,24 +753,21 @@
       document.getElementById("telefoneCliente").value = c.telefone;
       document.getElementById("emailCliente").value = c.email;
       document.getElementById("obsCliente").value = c.obs;
-      clienteEditandoId = c.id;
-      showToast("Modo de edição de cliente.");
+      clienteEditandoId = c.id; // Define o ID do cliente que está sendo editado
     }
   }
-  async function excluirCliente(id) {
+  function excluirCliente(id) {
     if (confirm("Deseja realmente excluir este cliente?")) {
-      try {
-        await deleteDoc(doc(db, "clientes", id));
-        showToast("Cliente excluído!");
-      } catch (e) {
-        console.error("Erro ao excluir cliente: ", e);
-        showToast("Erro ao excluir cliente.");
-      }
+      clientes = clientes.filter(c => c.id !== id);
+      localStorage.setItem("clientes", JSON.stringify(clientes));
+      listarClientes();
+      atualizarDashboard();
+      showToast("Cliente excluído!");
     }
   }
 
   // ================== PROFISSIONAIS ======================
-  async function salvarProfissional() {
+  function salvarProfissional() {
     const nomeInput = document.getElementById("nomeProf");
     const espInput = document.getElementById("espProf");
     const servicoNomeInput = document.getElementById("servicoProf");
@@ -955,21 +793,22 @@
     let servicos = [{ nome: servicoNomeInput.value.trim(), valor: servValor }];
     let dados = { nome: nomeInput.value.trim(), especialidade: espInput.value.trim(), servicos };
 
-    try {
-      if (profissionalEditandoId !== null) {
-        const profRef = doc(db, "profissionais", profissionalEditandoId);
-        await updateDoc(profRef, dados);
+    if (profissionalEditandoId !== null) {
+      const index = profissionais.findIndex(p => p.id === profissionalEditandoId);
+      if (index !== -1) {
+        profissionais[index] = { ...profissionais[index], ...dados };
         showToast("Profissional atualizado com sucesso!");
-      } else {
-        await addDoc(collection(db, "profissionais"), dados);
-        showToast("Profissional salvo com sucesso!");
       }
-      limparCamposProfissional();
       profissionalEditandoId = null;
-    } catch (e) {
-      console.error("Erro ao salvar profissional: ", e);
-      showToast("Erro ao salvar profissional.");
+    } else {
+      dados.id = generateUUID();
+      profissionais.push(dados);
+      showToast("Profissional salvo com sucesso!");
     }
+    localStorage.setItem("profissionais", JSON.stringify(profissionais));
+    listarProfissionais();
+    limparCamposProfissional();
+    atualizarDashboard();
   }
   function limparCamposProfissional() {
     document.getElementById("nomeProf").value = "";
@@ -1012,23 +851,20 @@
       document.getElementById("servicoProf").value = p.servicos[0]?.nome || "";
       document.getElementById("valorProf").value = p.servicos[0]?.valor || "";
       profissionalEditandoId = p.id;
-      showToast("Modo de edição de profissional.");
     }
   }
-  async function excluirProfissional(id) {
+  function excluirProfissional(id) {
     if (confirm("Deseja realmente excluir este profissional?")) {
-      try {
-        await deleteDoc(doc(db, "profissionais", id));
-        showToast("Profissional excluído!");
-      } catch (e) {
-        console.error("Erro ao excluir profissional: ", e);
-        showToast("Erro ao excluir profissional.");
-      }
+      profissionais = profissionais.filter(p => p.id !== id);
+      localStorage.setItem("profissionais", JSON.stringify(profissionais));
+      listarProfissionais();
+      atualizarDashboard();
+      showToast("Profissional excluído!");
     }
   }
 
   // ================== PRODUTOS (Estoque avançado) ======================
-  async function salvarProduto() {
+  function salvarProduto() {
     const nomeInput = document.getElementById("nomeProduto");
     const tipoInput = document.getElementById("tipoProduto");
     const quantidadeInput = document.getElementById("quantidadeProduto");
@@ -1063,22 +899,28 @@
 
     let dados = { nome: nomeInput.value.trim(), tipo: tipoInput.value.trim(), quantidade, minQtd, validade };
 
-    try {
-      if (produtoEditandoId !== null) {
-        const produtoRef = doc(db, "produtos", produtoEditandoId);
-        await updateDoc(produtoRef, dados);
+    if (produtoEditandoId !== null) {
+      const index = produtos.findIndex(p => p.id === produtoEditandoId);
+      if (index !== -1) {
+        dados.movimentacoes = produtos[index].movimentacoes || []; // Mantém movimentações existentes
+        produtos[index] = { ...produtos[index], ...dados };
         showToast("Produto atualizado com sucesso!");
-      } else {
-        dados.movimentacoes = []; // Inicia com array vazio de movimentações
-        await addDoc(collection(db, "produtos"), dados);
-        showToast("Produto salvo com sucesso!");
       }
-      limparCamposProduto();
       produtoEditandoId = null;
-    } catch (e) {
-      console.error("Erro ao salvar produto: ", e);
-      showToast("Erro ao salvar produto.");
+    } else {
+      dados.id = generateUUID(); // Atribui um ID único ao novo produto
+      dados.movimentacoes = []; // Inicia com array vazio de movimentações
+      produtos.push(dados);
+      showToast("Produto salvo com sucesso!");
     }
+
+    localStorage.setItem("produtos", JSON.stringify(produtos));
+    limparCamposProduto();
+    listarProdutos();
+    listarProdutosEmFalta();
+    preencherSelectProdutosUso();
+    listarMovimentacoes();
+    atualizarDashboard();
   }
   function limparCamposProduto() {
     document.getElementById("nomeProduto").value = "";
@@ -1135,18 +977,18 @@
       document.getElementById("minQuantidadeProduto").value = p.minQtd;
       document.getElementById("validadeProduto").value = p.validade || "";
       produtoEditandoId = p.id;
-      showToast("Modo de edição de produto.");
     }
   }
-  async function excluirProduto(id) {
+  function excluirProduto(id) {
     if (confirm("Deseja realmente excluir este produto?")) {
-      try {
-        await deleteDoc(doc(db, "produtos", id));
-        showToast("Produto excluído!");
-      } catch (e) {
-        console.error("Erro ao excluir produto: ", e);
-        showToast("Erro ao excluir produto.");
-      }
+      produtos = produtos.filter(p => p.id !== id);
+      localStorage.setItem("produtos", JSON.stringify(produtos));
+      listarProdutos();
+      listarProdutosEmFalta();
+      preencherSelectProdutosUso();
+      listarMovimentacoes();
+      atualizarDashboard();
+      showToast("Produto excluído!");
     }
   }
   function preencherSelectProdutosUso() {
@@ -1156,7 +998,7 @@
       select.innerHTML += `<option value="${p.id}">${p.nome} (Qtd: ${p.quantidade})</option>`;
     });
   }
-  async function usarProduto() {
+  function usarProduto() {
     const select = document.getElementById("selectProdutoUso");
     const produtoId = select.value;
     const qtdUsoInput = document.getElementById("quantidadeUso");
@@ -1176,55 +1018,35 @@
       return showToast("Quantidade insuficiente em estoque.");
     }
 
-    try {
-      const hoje = new Date().toISOString().slice(0,10);
-      const updatedMovimentacoes = [...(produto.movimentacoes || []), {
-        tipo: "Saída",
-        quantidade: qtdUso,
-        data: hoje,
-        descricao: "Uso no salão"
-      }];
+    produto.quantidade -= qtdUso;
+    const hoje = new Date().toISOString().slice(0,10);
+    produto.movimentacoes.push({
+      id: generateUUID(),
+      tipo: "Saída",
+      quantidade: qtdUso,
+      data: hoje,
+      descricao: "Uso no salão"
+    });
 
-      const produtoRef = doc(db, "produtos", produtoId);
-      await updateDoc(produtoRef, {
-        quantidade: produto.quantidade - qtdUso,
-        movimentacoes: updatedMovimentacoes
-      });
-
-      qtdUsoInput.value = "";
-      select.value = "";
-      showToast(`Usado ${qtdUso} de ${produto.nome}.`);
-    } catch (e) {
-      console.error("Erro ao usar produto: ", e);
-      showToast("Erro ao usar produto.");
-    }
+    localStorage.setItem("produtos", JSON.stringify(produtos));
+    listarProdutos();
+    listarProdutosEmFalta();
+    preencherSelectProdutosUso();
+    listarMovimentacoes();
+    qtdUsoInput.value = "";
+    select.value = ""; // Limpa o select
+    atualizarDashboard();
+    showToast(`Usado ${qtdUso} de ${produto.nome}.`);
   }
   function listarMovimentacoes() {
     const div = document.getElementById("historicoMovimentacoes");
     div.innerHTML = "";
-    // Garantir que os produtos têm movimentações e ordenar por data decrescente
-    const produtosComMovimentacao = produtos.filter(p => p.movimentacoes && p.movimentacoes.length > 0);
-    
-    // Flatten all movements and sort them by date (latest first)
-    let allMovimentacoes = [];
-    produtosComMovimentacao.forEach(p => {
-        p.movimentacoes.forEach(m => {
-            allMovimentacoes.push({
-                produtoNome: p.nome,
-                ...m
-            });
-        });
-    });
-
-    allMovimentacoes.sort((a, b) => new Date(b.data) - new Date(a.data));
-
-    if (allMovimentacoes.length === 0) {
-        div.textContent = "Nenhuma movimentação de produto registrada.";
-        return;
-    }
-
-    allMovimentacoes.forEach(m => {
-        div.innerHTML += `<div class="item"><strong>${m.produtoNome}</strong> - ${m.data} - ${m.tipo}: ${m.quantidade} - ${m.descricao || ''}</div>`;
+    produtos.forEach((p) => {
+      if (!p.movimentacoes || p.movimentacoes.length === 0) return;
+      div.innerHTML += `<h5>${p.nome}</h5>`;
+      p.movimentacoes.forEach(m => {
+        div.innerHTML += `<div class="item">${m.data} - ${m.tipo}: ${m.quantidade} - ${m.descricao || ''}</div>`;
+      });
     });
   }
 
@@ -1252,13 +1074,14 @@
     if (!profissional) return;
     
     profissional.servicos.forEach((s, i) => {
+      // O valor do option será o índice do serviço no array, pois é um array simples
       selectServico.innerHTML += `<option value="${i}">${s.nome} - ${currencyFormatter.format(s.valor)}</option>`;
     });
   }
-  async function salvarAgendamento() {
+  function salvarAgendamento() {
     const clienteId = document.getElementById("selectClienteAgendamento").value;
     const profId = document.getElementById("selectProfissionalAgendamento").value;
-    const servIndex = document.getElementById("selectServicoAgendamento").value;
+    const servIndex = document.getElementById("selectServicoAgendamento").value; // Este é o INDEX do serviço
     const data = document.getElementById("dataAgendamento").value;
     const hora = document.getElementById("horaAgendamento").value;
 
@@ -1271,30 +1094,35 @@
 
     if (!isValid) return;
 
-    let agendamentoData = {
+    let agendamento = {
+      id: generateUUID(), // ID único para o agendamento
       clienteId,
       profId,
-      servIndex: parseInt(servIndex),
+      servIndex: parseInt(servIndex), // Garante que seja um número
       data,
       hora,
-      status: "Pendente" // Sempre inicia como Pendente
+      status: "Pendente"
     };
 
-    try {
-        if (agendamentoEditandoId !== null) {
-            const agendamentoRef = doc(db, "agendamentos", agendamentoEditandoId);
-            await updateDoc(agendamentoRef, agendamentoData);
+    // Verificar se é uma edição
+    if (document.getElementById("agendamentoEditandoId") && document.getElementById("agendamentoEditandoId").value !== "") {
+        const agendamentoIdToEdit = document.getElementById("agendamentoEditandoId").value;
+        const index = agendamentos.findIndex(a => a.id === agendamentoIdToEdit);
+        if (index !== -1) {
+            agendamentos[index] = { ...agendamentos[index], ...agendamento };
             showToast("Agendamento atualizado com sucesso!");
-        } else {
-            await addDoc(collection(db, "agendamentos"), agendamentoData);
-            showToast("Agendamento salvo com sucesso!");
         }
-        limparCamposAgendamento();
-        agendamentoEditandoId = null; // Reseta o ID de edição
-    } catch (e) {
-        console.error("Erro ao salvar agendamento: ", e);
-        showToast("Erro ao salvar agendamento.");
+        document.getElementById("agendamentoEditandoId").value = ""; // Limpa o ID de edição
+    } else {
+        agendamentos.push(agendamento);
+        showToast("Agendamento salvo com sucesso!");
     }
+    
+    localStorage.setItem("agendamentos", JSON.stringify(agendamentos));
+    listarAgendamentos();
+    atualizarDashboard();
+    carregarFinanceiro();
+    limparCamposAgendamento();
   }
 
   function limparCamposAgendamento() {
@@ -1304,6 +1132,7 @@
       document.getElementById("dataAgendamento").value = "";
       document.getElementById("horaAgendamento").value = "";
 
+      // Remove classes de erro e mensagens
       document.getElementById("selectClienteAgendamento").classList.remove('error');
       document.getElementById("errorSelectClienteAgendamento").textContent = '';
       document.getElementById("selectProfissionalAgendamento").classList.remove('error');
@@ -1314,7 +1143,6 @@
       document.getElementById("errorDataAgendamento").textContent = '';
       document.getElementById("horaAgendamento").classList.remove('error');
       document.getElementById("errorHoraAgendamento").textContent = '';
-      agendamentoEditandoId = null;
   }
 
   function listarAgendamentos() {
@@ -1337,7 +1165,7 @@
     agendamentosExibidos.forEach(a => {
       const clienteNome = clientes.find(c => c.id === a.clienteId)?.nome || "N/A";
       const profissional = profissionais.find(p => p.id === a.profId);
-      const servico = profissional?.servicos[a.servIndex];
+      const servico = profissional?.servicos[a.servIndex]; // Usa servIndex para encontrar o serviço
 
       lista.innerHTML += `
       <div class="item">
@@ -1359,38 +1187,48 @@
     if (a) {
       document.getElementById("selectClienteAgendamento").value = a.clienteId;
       document.getElementById("selectProfissionalAgendamento").value = a.profId;
-      atualizarServicosProfissional();
+      atualizarServicosProfissional(); // Preenche os serviços com base no profissional selecionado
       document.getElementById("selectServicoAgendamento").value = a.servIndex;
       document.getElementById("dataAgendamento").value = a.data;
       document.getElementById("horaAgendamento").value = a.hora;
-      agendamentoEditandoId = a.id;
-      showToast("Modo de edição de agendamento. Salve para confirmar.");
+
+      // Adiciona um campo oculto para armazenar o ID do agendamento em edição
+      let hiddenInput = document.getElementById("agendamentoEditandoId");
+      if (!hiddenInput) {
+          hiddenInput = document.createElement("input");
+          hiddenInput.type = "hidden";
+          hiddenInput.id = "agendamentoEditandoId";
+          document.getElementById("agendamentosSection").appendChild(hiddenInput);
+      }
+      hiddenInput.value = a.id;
+      showToast("Editando agendamento. Salve para confirmar.");
     }
   }
 
-  async function excluirAgendamento(id) {
+  function excluirAgendamento(id) {
     if (confirm("Deseja realmente excluir este agendamento?")) {
-      try {
-        await deleteDoc(doc(db, "agendamentos", id));
-        showToast("Agendamento excluído!");
-      } catch (e) {
-        console.error("Erro ao excluir agendamento: ", e);
-        showToast("Erro ao excluir agendamento.");
-      }
+      agendamentos = agendamentos.filter(a => a.id !== id);
+      localStorage.setItem("agendamentos", JSON.stringify(agendamentos));
+      listarAgendamentos();
+      atualizarDashboard();
+      carregarFinanceiro();
+      showToast("Agendamento excluído!");
     }
   }
-  async function alterarStatusAgendamento(id) {
-    const agendamentoRef = doc(db, "agendamentos", id);
+  function alterarStatusAgendamento(id) {
     const agendamento = agendamentos.find(a => a.id === id);
     if (agendamento) {
-        const newStatus = agendamento.status === "Pendente" ? "Concluído" : "Pendente";
-        try {
-            await updateDoc(agendamentoRef, { status: newStatus });
-            showToast(`Agendamento ${newStatus.toLowerCase()}!`);
-        } catch (e) {
-            console.error("Erro ao alterar status:", e);
-            showToast("Erro ao alterar status do agendamento.");
+        if (agendamento.status === "Pendente") {
+            agendamento.status = "Concluído";
+            showToast("Agendamento concluído!");
+        } else {
+            agendamento.status = "Pendente";
+            showToast("Agendamento reaberto!");
         }
+        localStorage.setItem("agendamentos", JSON.stringify(agendamentos));
+        listarAgendamentos();
+        carregarFinanceiro();
+        atualizarDashboard();
     }
   }
   function limparFiltrosAgendamento() {
@@ -1401,23 +1239,20 @@
   }
 
   // ================== FINANCEIRO ======================
-  async function salvarCaixaInicial() {
+  function salvarCaixaInicial() {
     const valor = parseFloat(document.getElementById("caixaInicial").value);
     if (isNaN(valor) || valor < 0) return showToast("Valor inválido para o caixa inicial.");
-    
-    try {
-        const configRef = doc(db, "configuracoes", "caixaInicial");
-        await setDoc(configRef, { valor: valor }); // Usar setDoc para garantir que o documento existe ou seja atualizado
-        showToast("Caixa inicial salvo.");
-    } catch (e) {
-        console.error("Erro ao salvar caixa inicial: ", e);
-        showToast("Erro ao salvar caixa inicial.");
-    }
+    caixaInicial = valor;
+    localStorage.setItem("caixaInicial", caixaInicial);
+    showToast("Caixa inicial salvo.");
+    atualizarDashboard();
+    carregarFinanceiro();
   }
 
   function carregarFinanceiro() {
     document.getElementById("caixaInicial").value = caixaInicial.toFixed(2);
 
+    // Ganhos = soma dos agendamentos concluídos
     let ganhos = 0;
     let ganhosHTML = "";
     agendamentos.forEach(a => {
@@ -1427,12 +1262,13 @@
         if (serv) {
           ganhos += serv.valor;
           const clienteNome = clientes.find(c => c.id === a.clienteId)?.nome || "N/A";
-          ganhosHTML += `<div>${a.data} - ${clienteNome} - Serviço: ${serv.nome} - ${currencyFormatter.format(serv.valor)}</div>`;
+          ganhosHTML += `<div>${clienteNome} - Serviço: ${serv.nome} - ${currencyFormatter.format(serv.valor)}</div>`;
         }
       }
     });
     document.getElementById("listaGanhos").innerHTML = ganhosHTML;
 
+    // Gastos
     let gastosTotal = 0;
     let gastosHTML = "";
     gastos.forEach(g => {
@@ -1441,13 +1277,14 @@
     });
     document.getElementById("listaGastos").innerHTML = gastosHTML;
 
+    // Atualizar resumo financeiro
     const lucro = caixaInicial + ganhos - gastosTotal;
     document.getElementById("caixaAtual").textContent = currencyFormatter.format(lucro);
     document.getElementById("ganhosTotais").textContent = currencyFormatter.format(ganhos);
     document.getElementById("gastosTotais").textContent = currencyFormatter.format(gastosTotal);
     document.getElementById("lucroTotal").textContent = currencyFormatter.format(lucro);
   }
-  async function salvarGasto() {
+  function salvarGasto() {
     const descricaoInput = document.getElementById("descricaoGasto");
     const valorGastoInput = document.getElementById("valorGasto");
     const dataGastoInput = document.getElementById("dataGasto");
@@ -1468,17 +1305,14 @@
 
     if (!isValid) return;
 
-    let gastoData = { descricao: descricaoInput.value.trim(), valor, data: dataGastoInput.value };
-    try {
-        await addDoc(collection(db, "gastos"), gastoData);
-        showToast("Gasto salvo com sucesso!");
-        descricaoInput.value = "";
-        valorGastoInput.value = "";
-        dataGastoInput.value = "";
-    } catch (e) {
-        console.error("Erro ao salvar gasto: ", e);
-        showToast("Erro ao salvar gasto.");
-    }
+    gastos.push({ id: generateUUID(), descricao: descricaoInput.value.trim(), valor, data: dataGastoInput.value });
+    localStorage.setItem("gastos", JSON.stringify(gastos));
+    carregarFinanceiro();
+
+    descricaoInput.value = "";
+    valorGastoInput.value = "";
+    dataGastoInput.value = "";
+    showToast("Gasto salvo com sucesso!");
   }
 
   // =========== DASHBOARD ==============
@@ -1507,6 +1341,7 @@
   function desenharGraficoFinanceiro() {
     const ctx = document.getElementById('graficoFinanceiro').getContext('2d');
 
+    // Agrupar ganhos e gastos por mês
     const ganhosMes = {};
     const gastosMes = {};
 
@@ -1516,7 +1351,7 @@
       const serv = prof?.servicos[a.servIndex];
       if (!serv) return;
 
-      const mes = a.data.slice(0,7);
+      const mes = a.data.slice(0,7); // yyyy-mm
       ganhosMes[mes] = (ganhosMes[mes] || 0) + serv.valor;
     });
 
@@ -1525,6 +1360,7 @@
       gastosMes[mes] = (gastosMes[mes] || 0) + g.valor;
     });
 
+    // Criar lista de meses únicos (ordenados)
     const meses = Array.from(new Set([...Object.keys(ganhosMes), ...Object.keys(gastosMes)])).sort();
 
     const ganhosData = meses.map(m => ganhosMes[m] || 0);
@@ -1623,146 +1459,79 @@
     });
   }
 
-  // ======= BACKUP E RESTAURAÇÃO (Firebase) =======
-  async function exportarDadosFirestore() {
+  // ======= BACKUP E RESTAURAÇÃO =======
+  function exportarDados() {
+    const dados = {
+      clientes,
+      profissionais,
+      produtos,
+      agendamentos,
+      gastos,
+      caixaInicial
+    };
+    try {
+        const json = JSON.stringify(dados, null, 2);
+        const blob = new Blob([json], {type: "application/json"});
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "backup_espaco_tai_botelho.json";
+        document.body.appendChild(a); // Necessário para Firefox
+        a.click();
+        document.body.removeChild(a); // Limpa o elemento
+        URL.revokeObjectURL(url);
+        showToast("Dados exportados com sucesso!");
+    } catch (error) {
+        showToast("Erro ao exportar dados: " + error.message);
+        console.error("Erro ao exportar dados:", error);
+    }
+  }
+  function importarDados(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
       try {
-          showToast("Preparando exportação...");
-          const allData = {
-              clientes: (await getDocs(collection(db, "clientes"))).docs.map(doc => ({ id: doc.id, ...doc.data() })),
-              profissionais: (await getDocs(collection(db, "profissionais"))).docs.map(doc => ({ id: doc.id, ...doc.data() })),
-              produtos: (await getDocs(collection(db, "produtos"))).docs.map(doc => ({ id: doc.id, ...doc.data() })),
-              agendamentos: (await getDocs(collection(db, "agendamentos"))).docs.map(doc => ({ id: doc.id, ...doc.data() })),
-              gastos: (await getDocs(collection(db, "gastos"))).docs.map(doc => ({ id: doc.id, ...doc.data() })),
-              caixaInicial: (await getDoc(doc(db, "configuracoes", "caixaInicial"))).data()?.valor || 0
-          };
+        const dados = JSON.parse(e.target.result);
+        if (!confirm("Importar irá substituir TODOS os dados atuais. Deseja continuar?")) {
+            event.target.value = ""; // Limpa o campo do arquivo para permitir nova seleção
+            return;
+        }
 
-          const json = JSON.stringify(allData, null, 2);
-          const blob = new Blob([json], {type: "application/json"});
-          const url = URL.createObjectURL(blob);
+        clientes = dados.clientes || [];
+        profissionais = dados.profissionais || [];
+        produtos = dados.produtos || [];
+        agendamentos = dados.agendamentos || [];
+        gastos = dados.gastos || [];
+        caixaInicial = dados.caixaInicial || 0;
 
-          const a = document.createElement("a");
-          a.href = url;
-          a.download = "backup_firestore_espaco_tai_botelho.json";
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          URL.revokeObjectURL(url);
-          showToast("Dados exportados com sucesso!");
+        localStorage.setItem("clientes", JSON.stringify(clientes));
+        localStorage.setItem("profissionais", JSON.stringify(profissionais));
+        localStorage.setItem("produtos", JSON.stringify(produtos));
+        localStorage.setItem("agendamentos", JSON.stringify(agendamentos));
+        localStorage.setItem("gastos", JSON.stringify(gastos));
+        localStorage.setItem("caixaInicial", caixaInicial);
+
+        showToast("Dados importados com sucesso!");
+        abrirSecao("dashboardSection"); // Volta para o dashboard e recarrega tudo
       } catch (error) {
-          showToast("Erro ao exportar dados: " + error.message);
-          console.error("Erro ao exportar dados:", error);
+        showToast("Arquivo de backup inválido! Verifique o formato.");
+        console.error("Erro ao importar dados:", error);
+      } finally {
+          event.target.value = ""; // Limpa o campo do arquivo
       }
+    };
+    reader.readAsText(file);
   }
 
-  async function importarDadosFirestore(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-          try {
-              const dados = JSON.parse(e.target.result);
-              if (!confirm("Importar irá substituir TODOS os dados ATUAIS no Firestore. Deseja continuar?")) {
-                  event.target.value = "";
-                  return;
-              }
-
-              showToast("Iniciando importação...");
-
-              // Funções auxiliares para apagar e adicionar
-              const clearAndAddCollection = async (collectionName, items) => {
-                  const collectionRef = collection(db, collectionName);
-                  const docs = await getDocs(collectionRef);
-                  const deletePromises = docs.map(d => deleteDoc(doc(db, collectionName, d.id)));
-                  await Promise.all(deletePromises);
-                  
-                  const addPromises = items.map(item => {
-                      const { id, ...data } = item; // Separa o ID do Firestore dos demais dados
-                      return setDoc(doc(db, collectionName, id || generateUUID()), data); // Usa ID existente ou gera um novo
-                  });
-                  await Promise.all(addPromises);
-              };
-
-              // Importar clientes
-              await clearAndAddCollection("clientes", dados.clientes || []);
-              // Importar profissionais
-              await clearAndAddCollection("profissionais", dados.profissionais || []);
-              // Importar produtos
-              await clearAndAddCollection("produtos", dados.produtos || []);
-              // Importar agendamentos
-              await clearAndAddCollection("agendamentos", dados.agendamentos || []);
-              // Importar gastos
-              await clearAndAddCollection("gastos", dados.gastos || []);
-
-              // Importar caixa inicial (documento único)
-              if (typeof dados.caixaInicial !== 'undefined') {
-                  await setDoc(doc(db, "configuracoes", "caixaInicial"), { valor: parseFloat(dados.caixaInicial) });
-              }
-
-              showToast("Dados importados com sucesso!");
-              // Não precisa chamar abrirSecao aqui, o onSnapshot dos dados já vai recarregar tudo
-              // e o onAuthStateChanged já cuida da exibição da tela principal.
-          } catch (error) {
-              showToast("Arquivo de backup inválido ou erro na importação! " + error.message);
-              console.error("Erro ao importar dados:", error);
-          } finally {
-              event.target.value = "";
-          }
-      };
-      reader.readAsText(file);
-  }
-
-  // Função para gerar IDs únicos (UUID simples) - Usado no import, se um item não tiver ID do Firestore
-    function generateUUID() {
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-            const r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-            return v.toString(16);
-        });
-    }
-
-
-  // =============================================================================================================
-  // INICIALIZAÇÃO E CONTROLE DE SEÇÕES
-  // =============================================================================================================
-
-  function abrirSecao(id) {
-    document.querySelectorAll("section").forEach(sec => {
-      sec.style.display = "none";
-    });
-    document.getElementById(id).style.display = "block";
-
-    // Recarregar listas e selects ao abrir a seção (onSnapshot já cuida de muitas atualizações)
-    if (id === "clientesSection") {
-      listarClientes();
-      limparCamposCliente();
-    }
-    if (id === "profissionaisSection") {
-      listarProfissionais();
-      limparCamposProfissional();
-    }
-    if (id === "produtosSection") {
-      listarProdutos();
-      listarProdutosEmFalta();
-      preencherSelectProdutosUso();
-      listarMovimentacoes();
-      limparCamposProduto();
-    }
-    if (id === "agendamentosSection") {
-      preencherSelectClienteAgendamento();
-      preencherSelectProfissionalAgendamento();
-      listarAgendamentos();
-      limparCamposAgendamento();
-    }
-    if (id === "financeiroSection") carregarFinanceiro();
-    if (id === "dashboardSection") {
-      atualizarDashboard();
-      desenharGraficoFinanceiro();
-    }
-    if (id === "backupSection") { }
-  }
-
-  // No carregamento inicial da página, o onAuthStateChanged vai determinar qual tela exibir.
-  // Não precisamos de um window.onload que força a exibição de loginScreen aqui.
-  // A splash é controlada apenas pelo btnEntrar.
+  // Inicializar dashboard ao carregar
+  window.onload = () => {
+    // Esconder a tela principal até o login ou entrada
+    document.getElementById("main").style.display = "none";
+    document.getElementById("splash").style.display = "flex"; // Garante que a splash screen está visível
+    atualizarDashboard(); // Atualiza os números no dashboard mesmo que não esteja visível
+  };
 </script>
 
 </body>
