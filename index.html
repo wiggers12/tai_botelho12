@@ -40,7 +40,7 @@
     text-shadow: 1px 1px 4px #6d3c77;
   }
   #loginScreen {
-      display: none; /* Inicia oculto, será mostrado após splash */
+      /* display: none; */ /* Remove esta linha, onAuthStateChanged vai controlar */
   }
   #loginForm {
       background: rgba(255, 255, 255, 0.9);
@@ -106,7 +106,7 @@
 
   /* Main container */
   #main {
-    display: none;
+    display: none; /* Inicia oculto */
     flex: 1;
     padding: 20px;
     max-width: 1200px;
@@ -590,7 +590,7 @@
   // Importar as funções necessárias do Firebase SDK
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
   import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-  import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, orderBy, onSnapshot, getDoc } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+  import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, orderBy, onSnapshot, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-analytics.js"; // Se você estiver usando Analytics
 
   // Suas configurações do Firebase (as que você me enviou)
@@ -663,9 +663,10 @@
 
   document.getElementById("btnEntrar").onclick = () => {
     document.getElementById("splash").style.opacity = 0;
+    // Removendo o setTimeout para mostrar o loginScreen aqui.
+    // onAuthStateChanged vai lidar com a exibição de login/main.
     setTimeout(() => {
-      document.getElementById("splash").style.display = "none";
-      document.getElementById("loginScreen").style.display = "flex";
+        document.getElementById("splash").style.display = "none";
     }, 600);
   };
 
@@ -738,21 +739,22 @@
 
   // Observar o estado de autenticação para redirecionar o usuário
   onAuthStateChanged(auth, (user) => {
+    const splashScreen = document.getElementById("splash");
+    const loginScreen = document.getElementById("loginScreen");
+    const mainScreen = document.getElementById("main");
+
     if (user) {
       // Usuário logado
-      document.getElementById("loginScreen").style.opacity = 0;
-      setTimeout(() => {
-        document.getElementById("loginScreen").style.display = "none";
-        document.getElementById("main").style.display = "block";
-        abrirSecao("dashboardSection"); // Abre o dashboard após o login
-        carregarTodosOsDadosDoFirestore(); // Carrega todos os dados do Firestore
-      }, 600);
+      splashScreen.style.display = "none";
+      loginScreen.style.display = "none";
+      mainScreen.style.display = "block";
+      abrirSecao("dashboardSection"); // Abre o dashboard após o login
+      carregarTodosOsDadosDoFirestore(); // Carrega todos os dados do Firestore
     } else {
       // Usuário deslogado ou não logado
-      if (document.getElementById("splash").style.display === "none") {
-        document.getElementById("loginScreen").style.display = "flex";
-        document.getElementById("main").style.display = "none";
-      }
+      splashScreen.style.display = "none"; // Garante que a splash não apareça
+      loginScreen.style.display = "flex"; // Mostra a tela de login
+      mainScreen.style.display = "none";
     }
   });
 
@@ -760,9 +762,7 @@
     try {
       await signOut(auth);
       showToast("Você foi desconectado.");
-      document.getElementById("loginScreen").style.opacity = 1;
-      document.getElementById("splash").style.display = "none";
-      document.getElementById("main").style.display = "none";
+      // onAuthStateChanged vai ser acionado e fará a tela de login aparecer
     } catch (error) {
       console.error("Erro ao fazer logout:", error);
       showToast("Erro ao desconectar.");
@@ -840,7 +840,7 @@
               caixaInicial = parseFloat(docSnap.data().valor) || 0;
           } else {
               // Se não existir, crie com valor padrão
-              await updateDoc(configRef, { valor: 0 }, { merge: true });
+              await setDoc(configRef, { valor: 0 }); // Use setDoc para criar/substituir o documento
               caixaInicial = 0;
           }
           document.getElementById("caixaInicial").value = caixaInicial.toFixed(2);
@@ -1202,12 +1202,29 @@
   function listarMovimentacoes() {
     const div = document.getElementById("historicoMovimentacoes");
     div.innerHTML = "";
-    produtos.forEach((p) => {
-      if (!p.movimentacoes || p.movimentacoes.length === 0) return;
-      div.innerHTML += `<h5>${p.nome}</h5>`;
-      p.movimentacoes.forEach(m => {
-        div.innerHTML += `<div class="item">${m.data} - ${m.tipo}: ${m.quantidade} - ${m.descricao || ''}</div>`;
-      });
+    // Garantir que os produtos têm movimentações e ordenar por data decrescente
+    const produtosComMovimentacao = produtos.filter(p => p.movimentacoes && p.movimentacoes.length > 0);
+    
+    // Flatten all movements and sort them by date (latest first)
+    let allMovimentacoes = [];
+    produtosComMovimentacao.forEach(p => {
+        p.movimentacoes.forEach(m => {
+            allMovimentacoes.push({
+                produtoNome: p.nome,
+                ...m
+            });
+        });
+    });
+
+    allMovimentacoes.sort((a, b) => new Date(b.data) - new Date(a.data));
+
+    if (allMovimentacoes.length === 0) {
+        div.textContent = "Nenhuma movimentação de produto registrada.";
+        return;
+    }
+
+    allMovimentacoes.forEach(m => {
+        div.innerHTML += `<div class="item"><strong>${m.produtoNome}</strong> - ${m.data} - ${m.tipo}: ${m.quantidade} - ${m.descricao || ''}</div>`;
     });
   }
 
@@ -1390,7 +1407,7 @@
     
     try {
         const configRef = doc(db, "configuracoes", "caixaInicial");
-        await updateDoc(configRef, { valor: valor });
+        await setDoc(configRef, { valor: valor }); // Usar setDoc para garantir que o documento existe ou seja atualizado
         showToast("Caixa inicial salvo.");
     } catch (e) {
         console.error("Erro ao salvar caixa inicial: ", e);
@@ -1410,7 +1427,7 @@
         if (serv) {
           ganhos += serv.valor;
           const clienteNome = clientes.find(c => c.id === a.clienteId)?.nome || "N/A";
-          ganhosHTML += `<div>${clienteNome} - Serviço: ${serv.nome} - ${currencyFormatter.format(serv.valor)}</div>`;
+          ganhosHTML += `<div>${a.data} - ${clienteNome} - Serviço: ${serv.nome} - ${currencyFormatter.format(serv.valor)}</div>`;
         }
       }
     });
@@ -1682,7 +1699,8 @@
               }
 
               showToast("Dados importados com sucesso!");
-              abrirSecao("dashboardSection"); // Recarrega o dashboard
+              // Não precisa chamar abrirSecao aqui, o onSnapshot dos dados já vai recarregar tudo
+              // e o onAuthStateChanged já cuida da exibição da tela principal.
           } catch (error) {
               showToast("Arquivo de backup inválido ou erro na importação! " + error.message);
               console.error("Erro ao importar dados:", error);
@@ -1693,8 +1711,17 @@
       reader.readAsText(file);
   }
 
+  // Função para gerar IDs únicos (UUID simples) - Usado no import, se um item não tiver ID do Firestore
+    function generateUUID() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            const r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
+    }
+
+
   // =============================================================================================================
-  // INICIALIZAÇÃO
+  // INICIALIZAÇÃO E CONTROLE DE SEÇÕES
   // =============================================================================================================
 
   function abrirSecao(id) {
@@ -1733,13 +1760,9 @@
     if (id === "backupSection") { }
   }
 
-  // window.onload não é mais necessário para controle de login, pois onAuthStateChanged já faz isso
-  // Ele ainda pode ser usado para outras inicializações que não dependam do estado de autenticação
-  // Ex:
-  // window.onload = () => {
-  //    // Outras inicializações que não dependem do login
-  // };
-
+  // No carregamento inicial da página, o onAuthStateChanged vai determinar qual tela exibir.
+  // Não precisamos de um window.onload que força a exibição de loginScreen aqui.
+  // A splash é controlada apenas pelo btnEntrar.
 </script>
 
 </body>
