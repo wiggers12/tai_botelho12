@@ -37,7 +37,7 @@
       margin: 20px 0;
       font-weight: bold;
     }
-    input[type="number"] {
+    input[type="number"], input[type="text"] {
       width: 100%;
       padding: 10px;
       font-size: 18px;
@@ -61,6 +61,20 @@
       margin-top: 10px;
       font-weight: bold;
     }
+    .ranking {
+      margin-top: 20px;
+      text-align: left;
+    }
+    .ranking h3 {
+      margin-bottom: 5px;
+      color: #444;
+    }
+    .ranking ol {
+      padding-left: 20px;
+    }
+    .ranking li {
+      margin-bottom: 4px;
+    }
   </style>
 </head>
 <body>
@@ -72,7 +86,18 @@
   <input type="number" id="resposta" placeholder="Digite a resposta" autofocus>
   <button onclick="verificarResposta()">Responder</button>
   <p id="status"></p>
-  <button onclick="iniciarJogo()" style="margin-top:20px;">🔁 Reiniciar</button>
+
+  <div id="nomeArea" style="display:none;">
+    <input type="text" id="nomeJogador" placeholder="Seu nome">
+    <button onclick="salvarPontuacao()">Salvar Pontuação</button>
+  </div>
+
+  <button onclick="iniciarJogo()" style="margin-top:20px;">🔁 Jogar Novamente</button>
+
+  <div class="ranking">
+    <h3>🏅 Ranking (Top 10)</h3>
+    <ol id="rankingLista"></ol>
+  </div>
 </div>
 
 <script>
@@ -86,7 +111,6 @@
     let n1 = Math.floor(Math.random() * 10) + 1;
     let n2 = Math.floor(Math.random() * 10) + 1;
 
-    // aumenta a dificuldade conforme os pontos
     if (pontos >= 5) {
       n1 = Math.floor(Math.random() * 20) + 10;
       n2 = Math.floor(Math.random() * 20) + 10;
@@ -111,7 +135,7 @@
       pontos++;
       document.getElementById('status').textContent = "✅ Correto!";
     } else {
-      tempo = Math.max(tempo - 2, 0); // tira 2s por erro
+      tempo = Math.max(tempo - 2, 0);
       document.getElementById('status').textContent = "❌ Errado!";
     }
 
@@ -129,6 +153,10 @@
     tempo = 60;
     pontos = 0;
     document.getElementById('status').textContent = "";
+    document.getElementById('nomeArea').style.display = "none";
+    document.getElementById('resposta').disabled = false;
+    document.getElementById('resposta').focus();
+
     gerarEquacao();
     atualizarTela();
 
@@ -139,11 +167,39 @@
       if (tempo <= 0) {
         clearInterval(timer);
         document.getElementById('status').textContent = `⏱️ Fim de jogo! Você fez ${pontos} ponto(s)!`;
+        document.getElementById('resposta').disabled = true;
+        document.getElementById('nomeArea').style.display = "block";
       }
     }, 1000);
   }
 
+  function salvarPontuacao() {
+    const nome = document.getElementById("nomeJogador").value.trim() || "Anônimo";
+    const ranking = JSON.parse(localStorage.getItem("rankingMath") || "[]");
+
+    ranking.push({ nome, pontos });
+    ranking.sort((a, b) => b.pontos - a.pontos);
+    if (ranking.length > 10) ranking.length = 10;
+
+    localStorage.setItem("rankingMath", JSON.stringify(ranking));
+    document.getElementById('nomeArea').style.display = "none";
+    atualizarRanking();
+  }
+
+  function atualizarRanking() {
+    const ranking = JSON.parse(localStorage.getItem("rankingMath") || "[]");
+    const lista = document.getElementById("rankingLista");
+    lista.innerHTML = "";
+
+    ranking.forEach((r, i) => {
+      const item = document.createElement("li");
+      item.textContent = `${r.nome} - ${r.pontos} ponto(s)`;
+      lista.appendChild(item);
+    });
+  }
+
   iniciarJogo();
+  atualizarRanking();
 </script>
 
 </body>
