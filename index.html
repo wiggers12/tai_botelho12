@@ -3,44 +3,78 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Juntos no Mapa – Teste Firebase</title>
+  <title>Juntos no Mapa – Firebase</title>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
   <style>
-    body { font-family: sans-serif; background: #f4f0fa; padding: 20px; max-width: 600px; margin: auto; }
-    h1 { text-align: center; color: #6a1b9a; }
-    input, button { width: 100%; padding: 10px; margin: 6px 0; border-radius: 8px; border: 1px solid #ccc; font-size: 16px; }
-    button { background: #8e24aa; color: white; border: none; cursor: pointer; }
-    button:hover { background: #6a1b9a; }
-    .card { background: white; border-radius: 10px; padding: 20px; margin-top: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
-    .user { background: #f7f1fc; padding: 10px; border-radius: 6px; margin-bottom: 10px; }
+    body {
+      font-family: sans-serif;
+      background: #f4f0fa;
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
+    }
+    h1 {
+      text-align: center;
+      color: #6a1b9a;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin: 6px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+    button {
+      background: #8e24aa;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #6a1b9a;
+    }
+    .card {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      margin-top: 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .user {
+      background: #f7f1fc;
+      padding: 10px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+    }
   </style>
 </head>
 <body>
 
-<h1>📍 Juntos no Mapa (Teste)</h1>
+<h1>📍 Juntos no Mapa</h1>
 
 <div class="card">
-  <input type="text" id="grupo" placeholder="Código do grupo (teste123)">
+  <input type="text" id="grupo" placeholder="Código do grupo (ex: casal123)">
   <input type="text" id="nome" placeholder="Seu nome">
   <button onclick="compartilhar()">📡 Compartilhar Localização</button>
 </div>
 
 <div class="card">
-  <h3>Membros do Grupo</h3>
+  <h3>👥 Membros do Grupo</h3>
   <div id="membros"></div>
 </div>
 
 <script>
-  // Projeto Firebase de demo já configurado (público e só para teste)
+  // Firebase temporário para teste – pode substituir pelo seu mais tarde
   const firebaseConfig = {
-    apiKey: "AIzaSyA-DemoKey1234567890",
-    authDomain: "juntos-teste.firebaseapp.com",
-    databaseURL: "https://juntos-teste-default-rtdb.firebaseio.com",
-    projectId: "juntos-teste",
-    storageBucket: "juntos-teste.appspot.com",
-    messagingSenderId: "1234567890",
-    appId: "1:1234567890:web:abcdefghijkl"
+    apiKey: "AIzaSyBJx-U4VTH3FPRHT04nDoYXc5P6nxISmMo",
+    authDomain: "juntos-no-mapa.firebaseapp.com",
+    databaseURL: "https://juntos-no-mapa-default-rtdb.firebaseio.com",
+    projectId: "juntos-no-mapa",
+    storageBucket: "juntos-no-mapa.appspot.com",
+    messagingSenderId: "355157978243",
+    appId: "1:355157978243:web:26a9f1ea9bb13f5c58a3c4"
   };
 
   firebase.initializeApp(firebaseConfig);
@@ -49,8 +83,15 @@
   function compartilhar() {
     const grupo = document.getElementById("grupo").value.trim();
     const nome = document.getElementById("nome").value.trim();
-    if (!grupo || !nome) { return alert("Preencha nome e grupo!"); }
-    if (!navigator.geolocation) { return alert("Geolocalização não suportada."); }
+    if (!grupo || !nome) {
+      alert("Preencha nome e grupo!");
+      return;
+    }
+
+    if (!navigator.geolocation) {
+      alert("Geolocalização não suportada neste navegador.");
+      return;
+    }
 
     navigator.geolocation.getCurrentPosition(pos => {
       const lat = pos.coords.latitude;
@@ -58,24 +99,35 @@
       const hora = new Date().toLocaleTimeString();
 
       db.ref(`grupos/${grupo}/${nome}`).set({ lat, lon, hora });
-      alert("📍 Localização enviada!");
-    }, err => alert("Erro: " + err.message));
+      alert("📍 Localização enviada com sucesso!");
+    }, err => {
+      alert("Erro ao obter localização: " + err.message);
+    });
   }
 
   function escutarGrupo() {
     const grupo = document.getElementById("grupo").value.trim();
     if (!grupo) return;
+
     db.ref(`grupos/${grupo}`).on("value", snap => {
       const membrosDiv = document.getElementById("membros");
       membrosDiv.innerHTML = "";
+
       const dados = snap.val();
-      if (!dados) { return membrosDiv.innerHTML = "<p>Nenhum membro ainda...</p>"; }
+      if (!dados) {
+        membrosDiv.innerHTML = "<p>Nenhum membro ainda neste grupo...</p>";
+        return;
+      }
+
       Object.keys(dados).forEach(nome => {
         const { lat, lon, hora } = dados[nome];
         const div = document.createElement("div");
         div.className = "user";
-        div.innerHTML = `<strong>${nome}</strong><br>Atualizado: ${hora}<br>
-          <a href="https://maps.google.com/maps?q=${lat},${lon}" target="_blank">Ver no mapa</a>`;
+        div.innerHTML = `
+          <strong>${nome}</strong><br>
+          Última atualização: ${hora}<br>
+          <a href="https://maps.google.com/maps?q=${lat},${lon}" target="_blank">Ver no mapa</a>
+        `;
         membrosDiv.appendChild(div);
       });
     });
