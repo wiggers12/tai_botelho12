@@ -23,6 +23,24 @@
       box-shadow: 0 0 15px rgba(0,0,0,0.1);
       max-width: 400px;
       width: 90%;
+      transition: 0.3s ease;
+    }
+    .shake {
+      animation: shake 0.4s;
+    }
+    .flash {
+      animation: flash 0.3s;
+    }
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-8px); }
+      50% { transform: translateX(8px); }
+      75% { transform: translateX(-8px); }
+      100% { transform: translateX(0); }
+    }
+    @keyframes flash {
+      0% { background-color: #a5d6a7; }
+      100% { background-color: white; }
     }
     h1 {
       margin-bottom: 10px;
@@ -79,7 +97,7 @@
 </head>
 <body>
 
-<div class="container">
+<div class="container" id="gameContainer">
   <h1>🧠 Desafio dos 60 Segundos</h1>
   <div class="info">⏱️ Tempo: <span id="tempo">60</span>s | 🏆 Pontos: <span id="pontos">0</span></div>
   <div class="equacao" id="equacao">5 + 3 = ?</div>
@@ -100,11 +118,22 @@
   </div>
 </div>
 
+<!-- Sons -->
+<audio id="somAcerto" src="https://cdn.pixabay.com/audio/2022/03/15/audio_a9cb8aeb29.mp3"></audio>
+<audio id="somErro" src="https://cdn.pixabay.com/audio/2022/03/15/audio_6e00c7724c.mp3"></audio>
+<audio id="somFim" src="https://cdn.pixabay.com/audio/2022/03/15/audio_467b1c181c.mp3"></audio>
+
 <script>
   let tempo = 60;
   let pontos = 0;
   let timer;
   let respostaCorreta = 0;
+
+  const input = document.getElementById('resposta');
+  const container = document.getElementById('gameContainer');
+  const somAcerto = document.getElementById('somAcerto');
+  const somErro = document.getElementById('somErro');
+  const somFim = document.getElementById('somFim');
 
   function gerarEquacao() {
     const op = ['+', '-', 'x'][Math.floor(Math.random() * 3)];
@@ -126,7 +155,6 @@
   }
 
   function verificarResposta() {
-    const input = document.getElementById('resposta');
     const valor = parseInt(input.value);
 
     if (isNaN(valor)) return;
@@ -134,15 +162,25 @@
     if (valor === respostaCorreta) {
       pontos++;
       document.getElementById('status').textContent = "✅ Correto!";
+      somAcerto.play();
+      animar("flash");
     } else {
       tempo = Math.max(tempo - 2, 0);
       document.getElementById('status').textContent = "❌ Errado!";
+      somErro.play();
+      animar("shake");
     }
 
     input.value = "";
-    input.focus(); // mantém o teclado aberto
+    input.focus();
     atualizarTela();
     gerarEquacao();
+  }
+
+  function animar(tipo) {
+    container.classList.remove("shake", "flash");
+    void container.offsetWidth; // Forçar reflow
+    container.classList.add(tipo);
   }
 
   function atualizarTela() {
@@ -168,6 +206,7 @@
       if (tempo <= 0) {
         clearInterval(timer);
         document.getElementById('status').textContent = `⏱️ Fim de jogo! Você fez ${pontos} ponto(s)!`;
+        somFim.play();
         document.getElementById('resposta').disabled = true;
         document.getElementById('nomeArea').style.display = "block";
         document.getElementById('nomeJogador').focus();
@@ -200,8 +239,8 @@
     });
   }
 
-  // ⌨️ Permitir enviar resposta com ENTER
-  document.getElementById("resposta").addEventListener("keydown", function(e) {
+  // ENTER ativa resposta
+  input.addEventListener("keydown", function(e) {
     if (e.key === "Enter") verificarResposta();
   });
 
