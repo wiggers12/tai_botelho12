@@ -140,6 +140,7 @@
     }
 
     input.value = "";
+    input.focus(); // mantém o teclado aberto
     atualizarTela();
     gerarEquacao();
   }
@@ -169,6 +170,7 @@
         document.getElementById('status').textContent = `⏱️ Fim de jogo! Você fez ${pontos} ponto(s)!`;
         document.getElementById('resposta').disabled = true;
         document.getElementById('nomeArea').style.display = "block";
+        document.getElementById('nomeJogador').focus();
       }
     }, 1000);
   }
@@ -191,12 +193,17 @@
     const lista = document.getElementById("rankingLista");
     lista.innerHTML = "";
 
-    ranking.forEach((r, i) => {
+    ranking.forEach((r) => {
       const item = document.createElement("li");
       item.textContent = `${r.nome} - ${r.pontos} ponto(s)`;
       lista.appendChild(item);
     });
   }
+
+  // ⌨️ Permitir enviar resposta com ENTER
+  document.getElementById("resposta").addEventListener("keydown", function(e) {
+    if (e.key === "Enter") verificarResposta();
+  });
 
   iniciarJogo();
   atualizarRanking();
