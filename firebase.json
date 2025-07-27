@@ -30,7 +30,7 @@
         "firebase-debug.*.log",
         "*.local"
       ],
-      "region": "us-central1" // Região para implantação das funções
+      "region": "us-central1"
     }
   ]
 }

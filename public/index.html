@@ -1,16 +1,14 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Click Rápido - O Melhor Leva Tudo!</title>
-    <!-- Tailwind CSS CDN para estilização rápida e responsiva -->
+    <title>Pixcom - Sorteio Pix Instagram!</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Fonte Inter para uma tipografia moderna e legível -->
+    <!-- Inter Font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Estilos globais para o corpo da página */
         body {
             font-family: 'Inter', sans-serif;
             background-color: #1a202c; /* Fundo escuro */
@@ -18,70 +16,57 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh; /* Ocupa a altura total da viewport */
+            min-height: 100vh;
             padding: 1rem;
             box-sizing: border-box;
         }
-        /* Contêiner principal do jogo */
-        .game-container {
+        .container {
             background-color: #2d3748; /* Fundo escuro ligeiramente mais claro */
-            border-radius: 1rem; /* Cantos arredondados */
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* Sombra suave */
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
             padding: 2rem;
             width: 100%;
-            max-width: 600px; /* Largura máxima para desktop */
+            max-width: 600px;
             text-align: center;
         }
-        /* Área onde os quadrados do jogo aparecem */
-        .game-area {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); /* Grid responsivo com quadrados de 60px */
-            gap: 0.5rem; /* Espaçamento entre os quadrados */
-            margin-top: 1.5rem;
-            min-height: 300px; /* Altura mínima para a área de jogo */
-            border: 2px solid #4a5568; /* Borda sutil */
-            border-radius: 0.75rem;
+        .input-field {
+            width: 100%;
             padding: 0.75rem;
-            background-color: #1a202c;
-        }
-        /* Estilo base para cada quadrado */
-        .square {
-            width: 60px;
-            height: 60px;
             border-radius: 0.5rem;
-            cursor: pointer; /* Indica que é clicável */
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            background-color: #4a5568;
+            color: #e2e8f0;
+            border: 1px solid #4a5568;
+            margin-bottom: 1rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: #63b3ed;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
+        }
+        .btn-primary {
+            background-color: #4299e1;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
             font-weight: bold;
-            color: #fff;
-            transition: transform 0.1s ease-out, background-color 0.1s ease-out; /* Animação suave ao clicar */
+            transition: background-color 0.2s, transform 0.2s;
+            cursor: pointer;
         }
-        /* Efeito de escala ao clicar em um quadrado */
-        .square:active {
-            transform: scale(0.95);
+        .btn-primary:hover {
+            background-color: #3182ce;
+            transform: translateY(-2px);
         }
-        /* Cores dos quadrados */
-        .square.green { background-color: #48bb78; }
-        .square.red { background-color: #e53e3e; }
-        .square.blue { background-color: #4299e1; }
-        .square.yellow { background-color: #ecc94b; }
-
-        /* Feedback visual para cliques corretos e incorretos */
-        .square.hit { background-color: #2f855a !important; } /* Acerto (verde mais escuro) */
-        .square.miss { background-color: #c53030 !important; } /* Erro (vermelho mais escuro) */
-
-        /* Estilo para a caixa de mensagem personalizada */
         .message-box {
-            position: fixed; /* Fixa na tela */
+            position: fixed;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%); /* Centraliza na tela */
+            transform: translate(-50%, -50%);
             background-color: #2d3748;
             padding: 2rem;
             border-radius: 1rem;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            z-index: 1000; /* Acima de outros elementos */
+            z-index: 1000;
             text-align: center;
             max-width: 90%;
             display: none; /* Escondido por padrão */
@@ -101,68 +86,66 @@
     </style>
 </head>
 <body>
-    <div class="game-container">
-        <h1 class="text-4xl font-bold mb-4 text-green-400">Click Rápido!</h1>
-        <p class="text-lg mb-6">Clique nos quadrados <span class="text-green-400 font-bold">VERDES</span> o mais rápido possível!</p>
+    <div class="container">
+        <h1 class="text-4xl font-bold mb-4 text-pink-400">Pixcom - Sorteio Pix Instagram!</h1>
+        <p class="text-lg mb-6">Inscreva-se para participar e ganhar um Pix!</p>
 
-        <!-- Seção do Prêmio Acumulado -->
-        <div class="mb-8 p-4 bg-gray-700 rounded-lg shadow-inner">
-            <p class="text-xl font-semibold text-gray-300">Valor Atual do Prêmio:</p>
-            <p class="text-5xl font-bold text-green-400 mt-2">R$ <span id="prizePoolDisplay">0.00</span></p>
-            <p class="text-sm text-gray-400 mt-3" id="currentPeriodDisplay">Carregando período...</p>
+        <div id="registrationStatus" class="mb-4 text-xl font-semibold text-center">
+            Status: <span id="statusText" class="text-yellow-300">Carregando...</span>
         </div>
 
-        <button id="buyEntryButton" class="w-full py-4 px-6 rounded-lg text-2xl font-bold transition duration-300 ease-in-out transform bg-gradient-to-r from-blue-600 to-purple-600 hover:scale-105 hover:from-blue-700 hover:to-purple-700 shadow-lg mb-6">
-            Comprar Entrada (R$ 5,00)
-        </button>
+        <div id="registrationForm">
+            <div class="mb-4 text-left">
+                <label for="instagramHandle" class="block text-gray-300 text-sm font-bold mb-2">Seu @ do Instagram:</label>
+                <input type="text" id="instagramHandle" placeholder="@seuinstagram" class="input-field" required>
+                <p class="text-xs text-gray-400 mt-1">Ex: @meu_perfil_legal</p>
+            </div>
 
-        <div class="flex justify-between items-center mb-4">
-            <div class="text-xl font-semibold">Pontuação: <span id="score">0</span></div>
-            <div class="text-xl font-semibold">Tempo: <span id="timer">30</span>s</div>
+            <div class="mb-6 text-left">
+                <label for="pixKey" class="block text-gray-300 text-sm font-bold mb-2">Sua Chave Pix:</label>
+                <input type="text" id="pixKey" placeholder="CPF, E-mail, Telefone ou Chave Aleatória" class="input-field" required>
+                <p class="text-xs text-gray-400 mt-1">Será usada para o envio do Pix em caso de vitória.</p>
+            </div>
+
+            <button id="registerButton" class="btn-primary w-full">
+                Quero Participar!
+            </button>
         </div>
 
-        <div id="playerInputSection" class="mb-4">
-            <label for="playerNameInput" class="block text-lg font-semibold mb-2">Seu Apelido:</label>
-            <input type="text" id="playerNameInput" placeholder="Digite seu apelido" class="w-full max-w-xs p-2 rounded-md bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" maxlength="15">
+        <div id="winnerSection" class="mt-8 hidden">
+            <h2 class="text-3xl font-bold mb-4 text-purple-400">Vencedor!</h2>
+            <p class="text-2xl font-bold text-white"><span id="winnerHandle"></span></p>
+            <p class="text-md text-gray-400 mt-2">Parabéns!</p>
         </div>
-
-        <button id="startButton" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
-            Iniciar Jogo
-        </button>
-
-        <div id="gameArea" class="game-area hidden"></div>
 
         <div class="mt-8">
-            <h2 class="text-3xl font-bold mb-4 text-yellow-400">Ranking Global</h2>
-            <div id="loadingRanking" class="text-center py-4">Carregando ranking...</div>
-            <ul id="rankingList" class="list-disc list-inside text-left hidden">
-                <!-- Itens do ranking serão carregados aqui -->
+            <h2 class="text-3xl font-bold mb-4 text-green-400">Participantes</h2>
+            <div id="loadingParticipants" class="text-center py-4">Carregando participantes...</div>
+            <ul id="participantsList" class="list-disc list-inside text-left hidden">
+                <!-- Participantes serão carregados aqui -->
             </ul>
             <p class="text-sm mt-4 text-gray-400">Seu ID de Usuário: <span id="userIdDisplay" class="font-mono text-gray-300 break-all"></span></p>
-            <p class="text-xs text-gray-500 mt-2">
-                Ao comprar uma entrada, você concorda com os termos e condições do jogo.
-                O jogador com a maior pontuação ao final do período leva o prêmio.
-            </p>
+        </div>
+        
+        <div class="mt-8 text-center">
+            <a href="/admin.html" class="text-blue-400 hover:underline text-sm">Acesso Admin</a>
         </div>
     </div>
 
-    <!-- Caixa de Mensagem Personalizada -->
+    <!-- Message Box -->
     <div id="messageBox" class="message-box">
         <h3 id="messageTitle" class="text-2xl font-bold mb-4"></h3>
         <p id="messageContent" class="text-lg mb-6"></p>
         <button id="messageButton">Ok</button>
     </div>
 
-    <!-- Firebase SDKs (importados como módulos para funcionalidades modernas) -->
+    <!-- Firebase SDKs -->
     <script type="module">
-        // Importa as funções necessárias dos SDKs do Firebase
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, onSnapshot, collection, query, getDocs } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
-        import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-functions.js"; // Importa para chamar Cloud Functions
+        import { getFirestore, doc, setDoc, onSnapshot, collection, query, getDocs } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
-
-        // Sua NOVA configuração do Firebase para "smart-money-da982"
+        // Sua configuração do Firebase para o projeto 'smart-money-da982'
         const firebaseConfig = {
             apiKey: "AIzaSyDgal4Xbc-OCqYXilXsYUP5tqM-Yu85t_0",
             authDomain: "smart-money-da982.firebaseapp.com",
@@ -173,341 +156,217 @@
             measurementId: "G-QDJKW4W74W"
         };
 
-        // Inicializa o Firebase com a configuração fornecida
+        // Inicializa o Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
-        const functions = getFunctions(app, 'us-central1'); // Inicializa o SDK de Functions, especificando a região
 
+        window.firebaseAuth = auth; // <-- ADICIONADO: Expõe o objeto 'auth' globalmente para acesso via console
 
-        // Variáveis de estado do jogo
-        let userId = null; // ID único do usuário autenticado no Firebase
-        let gameInterval;  // ID do intervalo para geração de quadrados
-        let timerInterval; // ID do intervalo para o contador de tempo
-        let score = 0;     // Pontuação atual do jogador
-        let timeLeft = 30; // Tempo restante de jogo em segundos
-        let gameRunning = false; // Flag para indicar se o jogo está ativo
-        const colors = ['green', 'red', 'blue', 'yellow']; // Cores possíveis dos quadrados
-        const targetColor = 'green'; // A cor que o jogador deve clicar
-
-        // Referências aos elementos DOM (Document Object Model) para manipulação
-        const gameArea = document.getElementById('gameArea');
-        const scoreDisplay = document.getElementById('score');
-        const timerDisplay = document.getElementById('timer');
-        const startButton = document.getElementById('startButton');
-        const rankingList = document.getElementById('rankingList');
-        const loadingRanking = document.getElementById('loadingRanking');
+        let userId = null; // ID do usuário atual
+        const instagramHandleInput = document.getElementById('instagramHandle');
+        const pixKeyInput = document.getElementById('pixKey');
+        const registerButton = document.getElementById('registerButton');
+        const participantsList = document.getElementById('participantsList');
+        const loadingParticipants = document.getElementById('loadingParticipants');
         const userIdDisplay = document.getElementById('userIdDisplay');
-        const playerNameInput = document.getElementById('playerNameInput');
-        const playerInputSection = document.getElementById('playerInputSection');
-        const prizePoolDisplay = document.getElementById('prizePoolDisplay');
-        const currentPeriodDisplay = document.getElementById('currentPeriodDisplay');
-        const buyEntryButton = document.getElementById('buyEntryButton');
+        const registrationForm = document.getElementById('registrationForm');
+        const statusText = document.getElementById('statusText');
+        const winnerSection = document.getElementById('winnerSection');
+        const winnerHandle = document.getElementById('winnerHandle');
+
+
+        // Elementos da caixa de mensagem personalizada
+        const messageBox = document.getElementById('messageBox');
+        const messageTitle = document.getElementById('messageTitle');
+        const messageContent = document.getElementById('messageContent');
+        const messageButton = document.getElementById('messageButton');
 
         /**
-         * Exibe uma caixa de mensagem personalizada na tela.
+         * Exibe uma caixa de mensagem personalizada.
          * @param {string} title - O título da mensagem.
-         * @param {string} content - O conteúdo detalhado da mensagem.
-         * @param {function} [callback] - Função opcional a ser executada ao fechar a caixa.
+         * @param {string} content - O conteúdo da mensagem.
+         * @param {function} [callback] - Função a ser executada ao fechar a caixa.
          */
         function showMessageBox(title, content, callback = null) {
             messageTitle.textContent = title;
             messageContent.textContent = content;
-            messageBox.style.display = 'block'; // Torna a caixa visível
+            messageBox.style.display = 'block';
             messageButton.onclick = () => {
-                messageBox.style.display = 'none'; // Esconde a caixa ao clicar no botão
+                messageBox.style.display = 'none';
                 if (callback) {
-                    callback(); // Executa o callback, se fornecido
+                    callback();
                 }
             };
         }
 
         /**
-         * Autentica o usuário no Firebase. Autentica anonimamente. Define o userId.
+         * Autentica o usuário no Firebase anonimamente.
          */
         async function authenticateUser() {
             try {
-                // Autentica anonimamente para obter um UID para o usuário
                 await signInAnonymously(auth);
-                // Define o userId como o UID do usuário autenticado ou um UUID aleatório como fallback
                 userId = auth.currentUser?.uid || crypto.randomUUID();
-                userIdDisplay.textContent = userId; // Exibe o ID do usuário na interface
+                userIdDisplay.textContent = userId;
                 console.log('Usuário autenticado:', userId);
             } catch (error) {
                 console.error("Erro na autenticação Firebase:", error);
                 showMessageBox("Erro de Autenticação", "Não foi possível autenticar. Tente novamente mais tarde.");
-                userId = crypto.randomUUID(); // Fallback para um ID aleatório se a autenticação falhar
+                userId = crypto.randomUUID();
                 userIdDisplay.textContent = userId;
             }
         }
 
         /**
-         * Inicia uma nova partida do jogo.
-         * Verifica se o apelido do jogador foi inserido antes de começar.
+         * Registra o participante no Firestore.
          */
-        function startGame() {
-            if (gameRunning) return; // Impede que o jogo seja iniciado múltiplas vezes
-
-            const playerName = playerNameInput.value.trim();
-            if (!playerName) {
-                showMessageBox("Apelido Necessário", "Por favor, digite seu apelido antes de iniciar o jogo.");
-                return;
-            }
-
-            score = 0;
-            timeLeft = 30;
-            scoreDisplay.textContent = score;
-            timerDisplay.textContent = timeLeft;
-            gameArea.innerHTML = ''; // Limpa a área de jogo de quadrados anteriores
-            gameArea.classList.remove('hidden'); // Mostra a área de jogo
-            startButton.classList.add('hidden'); // Esconde o botão de iniciar
-            playerInputSection.classList.add('hidden'); // Esconde o input de apelido durante o jogo
-            buyEntryButton.disabled = true; // Desabilita o botão de compra durante o jogo
-            gameRunning = true; // Define o estado do jogo como ativo
-
-            // Inicia o contador de tempo regressivo
-            timerInterval = setInterval(() => {
-                timeLeft--;
-                timerDisplay.textContent = timeLeft;
-                if (timeLeft <= 0) {
-                    endGame(); // Termina o jogo quando o tempo acaba
-                }
-            }, 1000); // Atualiza a cada segundo
-
-            // Gera novos quadrados em intervalos regulares
-            gameInterval = setInterval(generateSquare, 500); // Gera um quadrado a cada 0.5 segundos
-        }
-
-        /**
-         * Finaliza a partida atual do jogo.
-         * Salva a pontuação e recarrega o ranking.
-         */
-        async function endGame() {
-            clearInterval(gameInterval);  // Para a geração de quadrados
-            clearInterval(timerInterval); // Para o contador de tempo
-            gameRunning = false;          // Define o estado do jogo como inativo
-            gameArea.classList.add('hidden');     // Esconde a área de jogo
-            startButton.classList.remove('hidden'); // Mostra o botão de iniciar
-            playerInputSection.classList.remove('hidden'); // Mostra o input de apelido novamente
-            buyEntryButton.disabled = false; // Habilita o botão de compra
-
-            showMessageBox(
-                "Fim de Jogo!",
-                `Sua pontuação final: ${score}.`,
-                async () => {
-                    // Garante que o usuário está autenticado antes de tentar salvar a pontuação
-                    if (auth.currentUser && userId) {
-                        const playerName = playerNameInput.value.trim();
-                        await saveScore(score, playerName); // Salva a pontuação no Firestore
-                        await loadRanking(); // Recarrega o ranking para exibir a nova pontuação
-                    } else {
-                        showMessageBox("Erro", "Não foi possível salvar sua pontuação. Autenticação pendente ou ID de usuário não definido.");
-                    }
-                }
-            );
-        }
-
-        /**
-         * Gera um novo quadrado (verde, vermelho, azul ou amarelo) na área de jogo.
-         */
-        function generateSquare() {
-            const square = document.createElement('div');
-            // Escolhe uma cor aleatória para o quadrado
-            const randomColor = colors[Math.floor(Math.random() * colors.length)];
-            square.classList.add('square', randomColor); // Adiciona classes CSS
-            square.dataset.color = randomColor; // Armazena a cor no dataset para fácil acesso
-
-            // Adiciona um listener de clique ao quadrado
-            square.addEventListener('click', () => {
-                if (!gameRunning) return; // Ignora cliques se o jogo não estiver rodando
-
-                if (square.dataset.color === targetColor) {
-                    score++; // Incrementa a pontuação se a cor for a correta (verde)
-                    scoreDisplay.textContent = score;
-                    square.classList.add('hit'); // Adiciona feedback visual de acerto
-                } else {
-                    score--; // Decrementa a pontuação se a cor for errada
-                    scoreDisplay.textContent = score;
-                    square.classList.add('miss'); // Adiciona feedback visual de erro
-                }
-                // Remove o quadrado após um pequeno atraso para permitir que o feedback visual seja visto
-                setTimeout(() => {
-                    if (gameArea.contains(square)) { // Verifica se o quadrado ainda está na área de jogo
-                        square.remove();
-                    }
-                }, 100); // Remove rapidamente após 100ms
-            });
-
-            gameArea.appendChild(square); // Adiciona o quadrado à área de jogo
-
-            // Remove o quadrado automaticamente após um tempo se não for clicado
-            setTimeout(() => {
-                if (gameArea.contains(square)) {
-                    square.remove();
-                }
-            }, 1500); // Quadrado desaparece após 1.5 segundos
-        }
-
-        /**
-         * Salva a pontuação do jogador no Firestore, atualizando se for a maior pontuação já registrada para aquele usuário.
-         * As pontuações são armazenadas na coleção 'ranking' sob o ID do usuário.
-         * @param {number} finalScore - A pontuação final do jogador.
-         * @param {string} playerName - O apelido do jogador.
-         */
-        async function saveScore(finalScore, playerName) {
-            if (!userId) {
-                console.error("Erro: userId não definido para salvar pontuação.");
-                return;
-            }
-
-            try {
-                // Referência ao documento do usuário na coleção 'ranking'
-                // Caminho: /artifacts/{projectId}/public/data/ranking/{userId}
-                const userDocRef = doc(db, `artifacts/${firebaseConfig.projectId}/public/data/ranking`, userId);
-                const userDocSnap = await getDoc(userDocRef); // Tenta obter o documento existente
-
-                if (userDocSnap.exists()) {
-                    const currentHighScore = userDocSnap.data().score;
-                    // Se a nova pontuação for maior que a pontuação máxima atual, atualiza
-                    if (finalScore > currentHighScore) {
-                        await setDoc(userDocRef, {
-                            userId: userId,
-                            playerName: playerName,
-                            score: finalScore,
-                            timestamp: new Date(), // Atualiza o timestamp
-                        });
-                        console.log("Nova pontuação máxima salva!");
-                    } else {
-                        console.log("Pontuação atual não é maior que a máxima existente.");
-                    }
-                } else {
-                    // Se não houver documento para o usuário, cria um novo
-                    await setDoc(userDocRef, {
-                        userId: userId,
-                        playerName: playerName,
-                        score: finalScore,
-                        timestamp: new Date(),
-                    });
-                    console.log("Primeira pontuação do usuário salva!");
-                }
-            } catch (e) {
-                console.error("Erro ao adicionar/atualizar documento de ranking: ", e);
-                showMessageBox("Erro ao Salvar", "Não foi possível salvar sua pontuação. Verifique sua conexão.");
-            }
-        }
-
-        /**
-         * Carrega e exibe o ranking global do Firestore.
-         * Pega todas as pontuações e as ordena localmente para exibir os 10 melhores.
-         */
-        async function loadRanking() {
-            loadingRanking.classList.remove('hidden'); // Mostra mensagem de carregamento
-            rankingList.classList.add('hidden');       // Esconde a lista enquanto carrega
-            rankingList.innerHTML = ''; // Limpa a lista existente
-
-            try {
-                // Referência à coleção 'ranking'
-                const rankingCollectionRef = collection(db, `artifacts/${firebaseConfig.projectId}/public/data/ranking`);
-                const q = query(rankingCollectionRef); // Cria uma query para buscar todos os documentos
-
-                const querySnapshot = await getDocs(q); // Executa a query
-                let players = [];
-                querySnapshot.forEach((doc) => {
-                    players.push(doc.data()); // Adiciona os dados de cada documento à lista de jogadores
-                });
-
-                // Ordena os jogadores pela pontuação (do maior para o menor)
-                players.sort((a, b) => b.score - a.score);
-
-                // Limita aos 10 melhores para exibição no ranking
-                const topPlayers = players.slice(0, 10);
-
-                if (topPlayers.length === 0) {
-                    rankingList.innerHTML = '<li class="text-center text-gray-400">Nenhuma pontuação ainda. Seja o primeiro!</li>';
-                } else {
-                    topPlayers.forEach((player, index) => {
-                        const listItem = document.createElement('li');
-                        listItem.classList.add('py-2', 'border-b', 'border-gray-700', 'flex', 'justify-between', 'items-center');
-                        if (index === 0) {
-                            listItem.classList.add('text-yellow-300', 'font-bold', 'text-xl'); // Destaque para o primeiro lugar
-                        }
-                        // Exibe o apelido do jogador, ou o ID truncado se o apelido não estiver disponível
-                        const displayName = player.playerName || player.userId.substring(0, 8) + '...';
-                        listItem.innerHTML = `
-                            <span>${index + 1}. ${displayName}</span>
-                            <span class="font-bold">${player.score} pontos</span>
-                        `;
-                        rankingList.appendChild(listItem);
-                    });
-                }
-                rankingList.classList.remove('hidden'); // Mostra a lista do ranking
-            } catch (e) {
-                console.error("Erro ao carregar ranking: ", e);
-                rankingList.innerHTML = '<li class="text-center text-red-400">Erro ao carregar ranking.</li>';
-                rankingList.classList.remove('hidden');
-            } finally {
-                loadingRanking.classList.add('hidden'); // Esconde a mensagem de carregamento
-            }
-        }
-
-        /**
-         * Função para chamar a Cloud Function de processamento de compra de entrada.
-         * Esta função interage com o backend para iniciar o fluxo de pagamento real.
-         */
-        async function handleBuyEntry() {
+        async function registerParticipant() {
             if (!userId) {
                 showMessageBox("Erro", "Usuário não autenticado. Tente novamente.");
                 return;
             }
-            const playerName = playerNameInput.value.trim();
-            if (!playerName) {
-                showMessageBox("Apelido Necessário", "Por favor, digite seu apelido antes de comprar a entrada.");
+
+            const instagramHandle = instagramHandleInput.value.trim();
+            const pixKey = pixKeyInput.value.trim();
+
+            if (!instagramHandle || !pixKey) {
+                showMessageBox("Campos Vazios", "Por favor, preencha seu @ do Instagram e sua Chave Pix.");
                 return;
             }
 
-            buyEntryButton.disabled = true; // Desabilita o botão para evitar cliques múltiplos
-            buyEntryButton.textContent = 'Processando...';
-            showMessageBox("Processando...", "Aguarde enquanto sua entrada é processada.");
+            if (!instagramHandle.startsWith('@')) {
+                showMessageBox("Formato Inválido", "O @ do Instagram deve começar com '@'.");
+                return;
+            }
+
+            registerButton.disabled = true;
+            registerButton.textContent = 'Registrando...';
 
             try {
-                // Chama a Cloud Function 'processarCompraEntrada'
-                const processarCompra = httpsCallable(functions, 'processarCompraEntrada');
-                const result = await processarCompra({ playerName: playerName });
-
-                if (result.data.success && result.data.checkoutUrl) {
-                    showMessageBox("Redirecionando...", "Você será redirecionado para o PagSeguro para concluir o pagamento.", () => {
-                        window.location.href = result.data.checkoutUrl; // Redireciona para o PagSeguro
-                    });
-                } else {
-                    showMessageBox("Erro no Pagamento", result.data.message || "Não foi possível iniciar o pagamento. Tente novamente.");
-                }
-            } catch (error) {
-                console.error("Erro ao chamar Cloud Function:", error);
-                showMessageBox("Erro", "Ocorreu um erro ao processar seu pagamento. Verifique sua conexão ou tente novamente mais tarde.");
+                // Caminho para dados públicos: /artifacts/{projectId}/public/data/giveaway_participants
+                const participantDocRef = doc(db, `artifacts/${firebaseConfig.projectId}/public/data/giveaway_participants`, userId);
+                await setDoc(participantDocRef, {
+                    userId: userId,
+                    instagramHandle: instagramHandle,
+                    pixKey: pixKey,
+                    timestamp: new Date(),
+                });
+                showMessageBox("Sucesso!", "Você foi registrado no sorteio! Boa sorte!");
+                instagramHandleInput.value = ''; // Limpa o campo
+                pixKeyInput.value = ''; // Limpa o campo
+            } catch (e) {
+                console.error("Erro ao registrar participante: ", e);
+                showMessageBox("Erro", "Não foi possível registrar sua participação. Tente novamente.");
             } finally {
-                buyEntryButton.disabled = false;
-                buyEntryButton.textContent = 'Comprar Entrada (R$ 5,00)';
+                registerButton.disabled = false;
+                registerButton.textContent = 'Quero Participar!';
             }
         }
 
-        // Adiciona os Event Listeners aos botões
-        startButton.addEventListener('click', startGame);
-        buyEntryButton.addEventListener('click', handleBuyEntry);
+        /**
+         * Carrega e exibe a lista de participantes do Firestore em tempo real.
+         */
+        async function loadParticipants() {
+            loadingParticipants.classList.remove('hidden');
+            participantsList.classList.add('hidden');
+            participantsList.innerHTML = ''; // Limpa a lista existente
 
-        // Lógica de inicialização: Autentica o usuário e carrega os dados iniciais
-        // O `onAuthStateChanged` garante que a lógica só rode após o Firebase ter verificado o estado de autenticação.
+            try {
+                // Listener para o status do sorteio (aberto/fechado/vencedor)
+                const giveawayStatusRef = doc(db, `artifacts/${firebaseConfig.projectId}/public/data/giveaway_status`, 'current');
+                onSnapshot(giveawayStatusRef, (docSnap) => {
+                    if (docSnap.exists()) {
+                        const statusData = docSnap.data();
+                        if (statusData.isOpen) {
+                            statusText.textContent = 'Inscrições Abertas!';
+                            statusText.classList.remove('text-red-400', 'text-purple-400');
+                            statusText.classList.add('text-green-400');
+                            registrationForm.classList.remove('hidden');
+                        } else {
+                            statusText.textContent = 'Inscrições Encerradas!';
+                            statusText.classList.remove('text-green-400', 'text-purple-400');
+                            statusText.classList.add('text-red-400');
+                            registrationForm.classList.add('hidden'); // Esconde o formulário
+                        }
+                        if (statusData.winnerHandle) {
+                            winnerHandle.textContent = statusData.winnerHandle;
+                            winnerSection.classList.remove('hidden');
+                            statusText.textContent = 'Sorteio Realizado!';
+                            statusText.classList.remove('text-green-400', 'text-red-400');
+                            statusText.classList.add('text-purple-400');
+                        } else {
+                            winnerSection.classList.add('hidden');
+                        }
+                    } else {
+                        // Se o documento de status não existir, assume aberto por padrão
+                        statusText.textContent = 'Inscrições Abertas!';
+                        statusText.classList.remove('text-red-400', 'text-purple-400');
+                        statusText.classList.add('text-green-400');
+                        registrationForm.classList.remove('hidden');
+                        winnerSection.classList.add('hidden');
+                    }
+                }, (error) => {
+                    console.error("Erro ao carregar status do sorteio: ", error);
+                    statusText.textContent = 'Erro ao carregar status.';
+                    statusText.classList.remove('text-green-400', 'text-purple-400');
+                    statusText.classList.add('text-red-400');
+                });
+
+
+                // Listener para a lista de participantes
+                const participantsCollectionRef = collection(db, `artifacts/${firebaseConfig.projectId}/public/data/giveaway_participants`);
+                const q = query(participantsCollectionRef);
+
+                onSnapshot(q, (querySnapshot) => {
+                    let participants = [];
+                    querySnapshot.forEach((doc) => {
+                        participants.push(doc.data());
+                    });
+
+                    if (participants.length === 0) {
+                        participantsList.innerHTML = '<li class="text-center text-gray-400">Nenhum participante ainda. Seja o primeiro!</li>';
+                    } else {
+                        participantsList.innerHTML = ''; // Limpa antes de adicionar
+                        participants.forEach((p) => {
+                            const listItem = document.createElement('li');
+                            listItem.classList.add('py-2', 'border-b', 'border-gray-700', 'flex', 'justify-between', 'items-center');
+                            // Exibe o handle do Instagram e uma parte da chave Pix (para privacidade)
+                            const displayPixKey = p.pixKey.substring(0, 4) + '...'; // Exibe apenas os 4 primeiros caracteres
+                            listItem.innerHTML = `
+                                <span class="text-blue-300 font-semibold">${p.instagramHandle}</span>
+                                <span class="text-gray-400 text-sm">Pix: ${displayPixKey}</span>
+                            `;
+                            participantsList.appendChild(listItem);
+                        });
+                    }
+                    participantsList.classList.remove('hidden');
+                    loadingParticipants.classList.add('hidden');
+                }, (error) => {
+                    console.error("Erro ao carregar participantes: ", error);
+                    participantsList.innerHTML = '<li class="text-center text-red-400">Erro ao carregar participantes.</li>';
+                    participantsList.classList.remove('hidden');
+                    loadingParticipants.classList.add('hidden');
+                });
+
+            } catch (e) {
+                console.error("Erro ao configurar listener de participantes: ", e);
+                participantsList.innerHTML = '<li class="text-center text-red-400">Erro ao carregar participantes.</li>';
+                participantsList.classList.remove('hidden');
+                loadingParticipants.classList.add('hidden');
+            }
+        }
+
+        // Event Listeners
+        registerButton.addEventListener('click', registerParticipant);
+
+        // Inicializa a autenticação e carrega a lista de participantes ao carregar a página
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                // Se um usuário já estiver logado (ou se logou agora)
                 userId = user.uid;
                 userIdDisplay.textContent = userId;
-                await loadRanking(); // Carrega o ranking
-                setupPrizePoolListener(); // Inicia o listener do prêmio
+                await loadParticipants();
             } else {
-                // Se nenhum usuário estiver logado, tenta autenticar anonimamente
                 await authenticateUser();
-                // A carga do ranking e o listener do prêmio serão chamados após a autenticação bem-sucedida
-                // dentro da função `authenticateUser`.
             }
         });
     </script>
